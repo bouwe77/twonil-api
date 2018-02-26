@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>TwoNil.Shared</AssemblyName>
+    <RootNamespace>TwoNil.Shared</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="DomainObjects\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="sqlite-net-pcl" Version="1.4.118" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Randomization\Randomization.csproj" />
+  </ItemGroup>
+
+</Project>

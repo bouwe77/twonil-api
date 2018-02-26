@@ -1,0 +1,139 @@
+﻿{
+  "dolores": {
+    "errorDetailsInResponses": "All",
+    "routes": [
+      {
+        "identifier": "Home",
+        "uriTemplate": "",
+        "get": {
+          "type": "TwoNil.API.Controllers.HomeController, TwoNil.API",
+          "method": "Home"
+        }
+      },
+      {
+        "identifier": "Game",
+        "uriTemplate": "/games/{gameId}",
+        "get": {
+          "type": "TwoNil.API.Controllers.GameController, TwoNil.API",
+          "method": "GetItem"
+        },
+        "delete": {
+          "type": "TwoNil.API.Controllers.GameController, TwoNil.API",
+          "method": "DeleteItem"
+        }
+      },
+      {
+        "identifier": "Games",
+        "uriTemplate": "/games",
+        "get": {
+          "type": "TwoNil.API.Controllers.GameController, TwoNil.API",
+          "method": "GetCollection"
+        }
+      },
+      {
+        "identifier": "LeagueTablesBySeason",
+        "uriTemplate": "/games/{gameId}/seasons/{seasonId}/leaguetables",
+        "get": {
+          "type": "TwoNil.API.Controllers.LeagueTableController, TwoNil.API",
+          "method": "GetBySeason"
+        }
+      },
+      {
+        "identifier": "LeagueTableBySeasonAndCompetition",
+        "uriTemplate": "/games/{gameId}/seasons/{seasonId}/competitions/{competitionId}/leaguetable",
+        "get": {
+          "type": "TwoNil.API.Controllers.LeagueTableController, TwoNil.API",
+          "method": "GetBySeasonAndCompetition"
+        }
+      },
+      {
+        "identifier": "Match",
+        "uriTemplate": "/games/{gameId}/matches/{matchId}",
+        "get": {
+          "type": "TwoNil.API.Controllers.MatchController, TwoNil.API",
+          "method": "GetItem"
+        }
+      },
+      {
+        "identifier": "TeamMatches",
+        "uriTemplate": "/games/{gameId}/seasons/{seasonId}/teams/{teamId}/matches",
+        "get": {
+          "type": "TwoNil.API.Controllers.MatchController, TwoNil.API",
+          "method": "GetTeamMatches"
+        }
+      },
+      {
+        "identifier": "DayMatches",
+        "uriTemplate": "/games/{gameId}/days/{dayId}/matches",
+        "get": {
+          "type": "TwoNil.API.Controllers.MatchController, TwoNil.API",
+          "method": "GetDayMatches"
+        },
+        "post": {
+          "type": "TwoNil.API.Controllers.MatchController, TwoNil.API",
+          "method": "PostPlayDayMatches"
+        }
+      },
+      {
+        "identifier": "TeamPlayers",
+        "uriTemplate": "/games/{gameId}/teams/{teamId}/players",
+        "get": {
+          "type": "TwoNil.API.Controllers.PlayerController, TwoNil.API",
+          "method": "GetTeamPlayers"
+        }
+      },
+      {
+        "identifier": "RelationItem",
+        "uriTemplate": "/rels/{relationName}",
+        "get": {
+          "type": "TwoNil.API.Controllers.RelationController, TwoNil.API",
+          "method": "GetRelationItem"
+        }
+      },
+      {
+        "identifier": "SeasonItem",
+        "uriTemplate": "/games/{gameId}/seasons/{seasonId}",
+        "get": {
+          "type": "TwoNil.API.Controllers.SeasonController, TwoNil.API",
+          "method": "GetSeasonItem"
+        },
+        "post": {
+          "type": "TwoNil.API.Controllers.SeasonController, TwoNil.API",
+          "method": "PostEndSeasonItem"
+        }
+      },
+      {
+        "identifier": "SeasonTeamStatistics",
+        "uriTemplate": "/games/{gameId}/seasons/{seasonId}/teams/{teamId}",
+        "get": {
+          "type": "TwoNil.API.Controllers.SeasonController, TwoNil.API",
+          "method": "GetSeasonTeamStats"
+        }
+      },
+      {
+        "identifier": "TeamItem",
+        "uriTemplate": "/games/{gameId}/teams/{teamId}",
+        "get": {
+          "type": "TwoNil.API.Controllers.TeamController, TwoNil.API",
+          "method": "GetTeamItem"
+        }
+      },
+      {
+        "identifier": "UserCollection",
+        "uriTemplate": "/users",
+        "post": {
+          "type": "TwoNil.API.Controllers.UserController, TwoNil.API",
+          "method": "PostAddUser"
+        }
+      },
+      {
+        "identifier": "UserItem",
+        "uriTemplate": "/users/{userId}",
+        "get": {
+          "type": "TwoNil.API.Controllers.UserController, TwoNil.API",
+          "method": "GetUserItem"
+        }
+      }
+    ]
+  }
+}

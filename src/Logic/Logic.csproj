@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>TwoNil.Logic</AssemblyName>
+    <RootNamespace>TwoNil.Logic</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Data\Data.csproj" />
+    <ProjectReference Include="..\Randomization\Randomization.csproj" />
+    <ProjectReference Include="..\Shared\Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Bouwe.Cryptography">
+      <HintPath>..\..\..\-- Mijn ReUsables\-- release\Bouwe.Cryptography\Bouwe.Cryptography.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
