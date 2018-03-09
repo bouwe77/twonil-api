@@ -50,7 +50,7 @@ namespace TwoNil.API.Controllers
          }
 
          var response = new Response(HttpStatusCode.Created);
-         response.Headers.Add("Location", UriFactory.GetUserUri(user.Id));
+         response.Headers.Add("Location", UriHelper.GetUserUri(user.Id));
 
          return response;
       }
@@ -74,9 +74,9 @@ namespace TwoNil.API.Controllers
             throw ResponseHelper.Get404NotFound("");
          }
 
-         var userResource = new UserMapper().Map(user, UserMapper.Firstname, UserMapper.Lastname, UserMapper.Username, UserMapper.Email);
+         var userResource = new UserMapper(UriHelper).Map(user, UserMapper.Firstname, UserMapper.Lastname, UserMapper.Username, UserMapper.Email);
 
-         var halDocument = CreateHalDocument(UriFactory.GetUserUri(userId));
+         var halDocument = CreateHalDocument(UriHelper.GetUserUri(userId));
          halDocument.AddResource("rel:user", userResource);
 
          var response = GetResponse(halDocument);

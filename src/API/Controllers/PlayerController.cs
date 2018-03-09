@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Dolores.Responses;
-using Sally.Hal;
+using Shally.Hal;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
 using TwoNil.Shared.DomainObjects;
@@ -31,7 +31,7 @@ namespace TwoNil.API.Controllers
          // Map the players to player resources.
          var playerResources = players.Select(GetPlayerResource).ToList();
 
-         var halDocument = CreateHalDocument(UriFactory.GetTeamPlayersUri(gameId, teamId), game);
+         var halDocument = CreateHalDocument(UriHelper.GetTeamPlayersUri(gameId, teamId), game);
          halDocument.AddResource("rel:players", playerResources);
 
          var response = GetResponse(halDocument);
@@ -40,7 +40,7 @@ namespace TwoNil.API.Controllers
 
       private Resource GetPlayerResource(Player player)
       {
-         var playerResource = new PlayerMapper().Map(
+         var playerResource = new PlayerMapper(UriHelper).Map(
             player,
             PlayerMapper.Name,
             PlayerMapper.Age,
@@ -52,7 +52,7 @@ namespace TwoNil.API.Controllers
          // Team.
          if (player.Team != null)
          {
-            var teamResource = new TeamMapper().Map(player.Team, TeamMapper.TeamName);
+            var teamResource = new TeamMapper(UriHelper).Map(player.Team, TeamMapper.TeamName);
             playerResource.AddResource("rel:team", teamResource);
          }
 

@@ -6,7 +6,7 @@ using Dolores;
 using Dolores.Exceptions;
 using Dolores.Responses;
 using Microsoft.AspNetCore.Http;
-using Sally.Hal;
+using Shally.Hal;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
 using TwoNil.Logic.Exceptions;
@@ -24,11 +24,12 @@ namespace TwoNil.API.Controllers
       protected HalDocumentFactory HalDocumentFactory;
       //protected new virtual MyPrincipal User => HttpContext.Current == null ? null : HttpContext.Current.User as MyPrincipal;
 
-
+      protected UriHelper UriHelper;
 
       protected ControllerBase()
       {
          ServiceFactory = new ServiceFactory();
+         UriHelper = new UriHelper(RouteHelper);
       }
 
       internal GameInfo GetGameInfo(string gameId)
@@ -81,7 +82,7 @@ namespace TwoNil.API.Controllers
          //bool loggedIn = User != null;
          bool loggedIn = true;
 
-         var halDocumentFactory = new HalDocumentFactory(loggedIn);
+         var halDocumentFactory = new HalDocumentFactory(loggedIn, UriHelper);
          return halDocumentFactory.Create(selfHref, gameInfo);
       }
    }

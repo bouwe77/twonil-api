@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Sally.Hal;
+using Shally.Hal;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Resources
@@ -10,10 +10,16 @@ namespace TwoNil.API.Resources
       public static string Lastname = "lastname";
       public static string Username = "username";
       public static string Email = "email";
+      private UriHelper _uriHelper;
+
+      public UserMapper(UriHelper uriHelper)
+      {
+         _uriHelper = uriHelper;
+      }
 
       public Resource Map(User user, params string[] properties)
       {
-         var resource = new Resource(new Link(UriFactory.GetUserUri(user.Id)));
+         var resource = new Resource(new Link(_uriHelper.GetUserUri(user.Id)));
 
          if (properties.Contains(Firstname))
          {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sally.Hal;
+using Shally.Hal;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Resources
@@ -12,10 +12,17 @@ namespace TwoNil.API.Resources
    /// </summary>
    public class MatchesGroupedByCompetitionResourceFactory
    {
+      private readonly UriHelper _uriHelper;
+
+      public MatchesGroupedByCompetitionResourceFactory(UriHelper uriHelper)
+      {
+         _uriHelper = uriHelper;
+      }
+
       public IEnumerable<Resource> Create(IEnumerable<Match> matches, string gameId, string teamIdOnTop)
       {
-         var matchMapper = new MatchMapper();
-         var teamMapper = new TeamMapper();
+         var matchMapper = new MatchMapper(_uriHelper);
+         var teamMapper = new TeamMapper(_uriHelper);
 
          var matchesGroupedByCompetitionId = matches.ToLookup(m => m.CompetitionId);
 
@@ -24,7 +31,7 @@ namespace TwoNil.API.Resources
          {
             bool teamIdFound = false;
 
-            var matchesForOneCompetitionResource = new Resource(new Link(UriFactory.GetHomeUri()));
+            var matchesForOneCompetitionResource = new Resource(new Link(_uriHelper.GetHomeUri()));
 
             var matchResources = new List<Resource>();
 

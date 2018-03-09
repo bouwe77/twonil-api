@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Linq;
 using Dolores.Http;
 using Dolores.Responses;
-using Sally.Hal;
+using Shally.Hal;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
 using TwoNil.Logic.Exceptions;
@@ -31,7 +31,7 @@ namespace TwoNil.API.Controllers
             throw Handle(businessLogicException);
          }
 
-         var matchDayUri = UriFactory.GetMatchDayUri(gameId, dayId);
+         var matchDayUri = UriHelper.GetMatchDayUri(gameId, dayId);
 
          var response = new Response(HttpStatusCode.Created);
          response.Headers.Add("Location", matchDayUri);
@@ -54,9 +54,9 @@ namespace TwoNil.API.Controllers
             throw ResponseHelper.Get404NotFound($"No matches found for match day '{dayId}'");
          }
 
-         var halDocument = CreateHalDocument(UriFactory.GetMatchDayUri(gameId, dayId), game);
+         var halDocument = CreateHalDocument(UriHelper.GetMatchDayUri(gameId, dayId), game);
 
-         var resourceFactory = new MatchesGroupedByCompetitionResourceFactory();
+         var resourceFactory = new MatchesGroupedByCompetitionResourceFactory(UriHelper);
          var matchResources = resourceFactory.Create(matches, gameId, game.CurrentTeamId);
 
          halDocument.AddResource("rel:matches-per-competition", matchResources);
@@ -92,11 +92,11 @@ namespace TwoNil.API.Controllers
             throw ResponseHelper.Get404NotFound($"No matches found for seasonId '{seasonId}' and teamId '{teamId}'");
          }
 
-         var halDocument = CreateHalDocument(UriFactory.GetSeasonTeamMatchesUri(gameId, seasonId, teamId), game);
+         var halDocument = CreateHalDocument(UriHelper.GetSeasonTeamMatchesUri(gameId, seasonId, teamId), game);
 
-         halDocument.AddLink("rel:matches-of-team", new Link(UriFactory.GetTeamUri(gameId, teamId)));
+         halDocument.AddLink("rel:matches-of-team", new Link(UriHelper.GetTeamUri(gameId, teamId)));
 
-         var resourceFactory = new TeamMatchResourceFactory();
+         var resourceFactory = new TeamMatchResourceFactory(UriHelper);
          var resources = resourceFactory.Create(matches, gameId, seasonId, teamId);
          halDocument.AddResource("rel:matches", resources);
 

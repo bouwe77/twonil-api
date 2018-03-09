@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Dolores.Http;
 using Dolores.Responses;
-using Sally.Hal;
-using Sally.Forms;
+using Microsoft.Extensions.Logging;
+using Shally.Hal;
+using Shally.Forms;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
 
@@ -16,17 +17,19 @@ namespace TwoNil.API.Controllers
 
       public GameController()
       {
-         _gameInfoMapper = new GameInfoMapper();
+         _gameInfoMapper = new GameInfoMapper(UriHelper);
       }
 
       public Response GetCollection()
       {
+         Logger.LogInformation("moio de poio, moddervokker");
+
          var gameService = ServiceFactory.CreateGameService();
 
          //TODO Let MODDERVOKKIN op
          var games = gameService.GetGames("17eqhq").ToList();
 
-         var halDocument = CreateHalDocument(UriFactory.GetGamesUri());
+         var halDocument = CreateHalDocument(UriHelper.GetGamesUri());
 
          var gameResources = new List<Resource>();
          foreach (var game in games)
@@ -34,7 +37,7 @@ namespace TwoNil.API.Controllers
             var gameResource = _gameInfoMapper.Map(game, GameInfoMapper.GameName, GameInfoMapper.TeamName);
 
             var form = new Form("delete-game");
-            form.Action = UriFactory.GetGameUri(game.Id);
+            form.Action = UriHelper.GetGameUri(game.Id);
             form.Method = "delete";
             form.Title = "Delete";
             gameResource.AddForm(form);
@@ -59,20 +62,20 @@ namespace TwoNil.API.Controllers
             throw ResponseHelper.Get501NotImplemented("You must pick a team now, but this is not implemented yet...");
          }
 
-         var halDocument = CreateHalDocument(UriFactory.GetGameUri(gameId), gameInfo);
+         var halDocument = CreateHalDocument(UriHelper.GetGameUri(gameId), gameInfo);
 
-         var teamResource = new TeamMapper().Map(gameInfo.CurrentTeam, TeamMapper.TeamName, TeamMapper.Rating, TeamMapper.RatingPercentage);
+         var teamResource = new TeamMapper(UriHelper).Map(gameInfo.CurrentTeam, TeamMapper.TeamName, TeamMapper.Rating, TeamMapper.RatingPercentage);
          halDocument.AddResource("rel:my-team", teamResource);
 
          var seasonService = ServiceFactory.CreateSeasonService(gameInfo);
          var currentSeason = seasonService.GetCurrentSeason();
-         var seasonResource = new SeasonMapper().Map(currentSeason, SeasonMapper.SeasonName);
+         var seasonResource = new SeasonMapper(UriHelper).Map(currentSeason, SeasonMapper.SeasonName);
 
          bool endOfSeason = seasonService.DetermineSeasonEnded(currentSeason.Id);
          if (endOfSeason)
          {
             var form = new Form("end-season");
-            form.Action = UriFactory.GetSeasonUri(gameId, currentSeason.Id);
+            form.Action = UriHelper.GetSeasonUri(gameId, currentSeason.Id);
             form.Method = "post";
             form.Title = "END SEASON!";
             seasonResource.AddForm(form);
@@ -82,7 +85,7 @@ namespace TwoNil.API.Controllers
 
          var statisticsService = ServiceFactory.CreateStatisticsService(gameInfo);
          var seasonTeamStatistics = statisticsService.GetSeasonTeamStatistics(currentSeason.Id, gameInfo.CurrentTeamId);
-         var seasonTeamStatisticsResource = new SeasonTeamStatisticsMapper().Map(
+         var seasonTeamStatisticsResource = new SeasonTeamStatisticsMapper(UriHelper).Map(
             seasonTeamStatistics,
             SeasonTeamStatisticsMapper.SeasonName,
             SeasonTeamStatisticsMapper.LeagueName,
@@ -97,13 +100,13 @@ namespace TwoNil.API.Controllers
          if (nextMatchDay.HasValue)
          {
             string matchDayId = nextMatchDay.Value.ToString("yyyyMMddHH");
-            var matchDayResource = MatchDayResourceFactory.Create(gameId, matchDayId);
+            var matchDayResource = new MatchDayResourceFactory(UriHelper).Create(gameId, matchDayId);
 
             // Add a resource for the match of the current team.
             var matchForCurrentTeam = matchService.GetByMatchDayAndTeam(nextMatchDay.Value, gameInfo.CurrentTeamId);
             if (matchForCurrentTeam != null)
             {
-               var matchResource = new MatchMapper().Map(
+               var matchResource = new MatchMapper(UriHelper).Map(
                   matchForCurrentTeam,
                   MatchMapper.CompetitionName,
                   MatchMapper.CompetitionType,
@@ -112,7 +115,7 @@ namespace TwoNil.API.Controllers
 
                if (matchForCurrentTeam.HomeTeam != null && matchForCurrentTeam.AwayTeam != null)
                {
-                  var teamMapper = new TeamMapper();
+                  var teamMapper = new TeamMapper(UriHelper);
                   var homeTeamResource = teamMapper.Map(matchForCurrentTeam.HomeTeam, TeamMapper.TeamName);
                   matchResource.AddResource("home-team", homeTeamResource);
                   var awayTeamResource = teamMapper.Map(matchForCurrentTeam.AwayTeam, TeamMapper.TeamName);
@@ -123,7 +126,7 @@ namespace TwoNil.API.Controllers
             }
 
             var form = new Form("play-match-day");
-            form.Action = UriFactory.GetMatchDayUri(gameId, matchDayId);
+            form.Action = UriHelper.GetMatchDayUri(gameId, matchDayId);
             form.Method = "post";
             form.Title = "Play matches";
             matchDayResource.AddForm(form);
@@ -161,8 +164,9 @@ namespace TwoNil.API.Controllers
                throw ResponseHelper.GetHttpResponseException(HttpStatusCode.ServiceUnavailable, "At the moment new games can not be created. Sorry... :(");
             }
 
-            var response = new Response(HttpStatusCode.Created);
-            response.SetLocationHeader(UriFactory.GetGameUri(game.Id));
+            string locationUri = UriHelper.GetGameUri(game.Id);
+            var response = new CreatedResponse(locationUri);
+
             return response;
          }
          catch (Exception)

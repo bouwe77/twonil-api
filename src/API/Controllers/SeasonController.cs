@@ -31,7 +31,7 @@ namespace TwoNil.API.Controllers
 
          seasonService.EndSeasonAndCreateNext(seasonId);
 
-         var seasonUri = UriFactory.GetSeasonUri(gameId, seasonId);
+         var seasonUri = UriHelper.GetSeasonUri(gameId, seasonId);
 
          var response = new Response(HttpStatusCode.Ok);
          response.Headers.Add("Location", seasonUri);
@@ -54,9 +54,9 @@ namespace TwoNil.API.Controllers
             throw ResponseHelper.Get404NotFound($"Season with ID '{seasonId}' not found");
          }
 
-         var halDocument = CreateHalDocument(UriFactory.GetSeasonUri(gameId, seasonId), gameInfo);
+         var halDocument = CreateHalDocument(UriHelper.GetSeasonUri(gameId, seasonId), gameInfo);
 
-         var resource = new SeasonStatisticsMapper().Map(
+         var resource = new SeasonStatisticsMapper(UriHelper).Map(
             seasonStatistics,
             SeasonStatisticsMapper.SeasonName,
             SeasonStatisticsMapper.NationalChampion,

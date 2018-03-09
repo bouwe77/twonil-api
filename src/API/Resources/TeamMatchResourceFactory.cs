@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Sally.Hal;
+using Shally.Hal;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Resources
@@ -10,14 +10,21 @@ namespace TwoNil.API.Resources
    /// </summary>
    public class TeamMatchResourceFactory
    {
+      private readonly UriHelper _uriHelper;
+
+      public TeamMatchResourceFactory(UriHelper uriHelper)
+      {
+         _uriHelper = uriHelper;
+      }
+
       public IEnumerable<Resource> Create(IEnumerable<TeamRoundMatch> matches, string gameId, string seasonId, string teamId)
       {
-         var teamMapper = new TeamMapper();
+         var teamMapper = new TeamMapper(_uriHelper);
 
          var matchResources = new List<Resource>();
          foreach (var match in matches)
          {
-            var matchResource = new Resource(new Link(UriFactory.GetHomeUri()));
+            var matchResource = new Resource(new Link(_uriHelper.GetHomeUri()));
 
             matchResource.AddProperty("date", match.MatchDate.ToString("dd-MMM"));
             matchResource.AddProperty("competition-name", match.CompetitionName);

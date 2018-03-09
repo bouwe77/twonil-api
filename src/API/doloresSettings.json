@@ -3,7 +3,7 @@
     "errorDetailsInResponses": "All",
     "routes": [
       {
-        "identifier": "Home",
+        "identifier": "home-route",
         "uriTemplate": "",
         "get": {
           "type": "TwoNil.API.Controllers.HomeController, TwoNil.API",
@@ -11,7 +11,7 @@
         }
       },
       {
-        "identifier": "Game",
+        "identifier": "game-route",
         "uriTemplate": "/games/{gameId}",
         "get": {
           "type": "TwoNil.API.Controllers.GameController, TwoNil.API",
@@ -23,7 +23,7 @@
         }
       },
       {
-        "identifier": "Games",
+        "identifier": "games-route",
         "uriTemplate": "/games",
         "get": {
           "type": "TwoNil.API.Controllers.GameController, TwoNil.API",
@@ -31,7 +31,7 @@
         }
       },
       {
-        "identifier": "LeagueTablesBySeason",
+        "identifier": "leaguetables-by-season-route",
         "uriTemplate": "/games/{gameId}/seasons/{seasonId}/leaguetables",
         "get": {
           "type": "TwoNil.API.Controllers.LeagueTableController, TwoNil.API",
@@ -39,7 +39,7 @@
         }
       },
       {
-        "identifier": "LeagueTableBySeasonAndCompetition",
+        "identifier": "leaguetable-by-season-and-competition-route",
         "uriTemplate": "/games/{gameId}/seasons/{seasonId}/competitions/{competitionId}/leaguetable",
         "get": {
           "type": "TwoNil.API.Controllers.LeagueTableController, TwoNil.API",
@@ -47,7 +47,7 @@
         }
       },
       {
-        "identifier": "Match",
+        "identifier": "match-route",
         "uriTemplate": "/games/{gameId}/matches/{matchId}",
         "get": {
           "type": "TwoNil.API.Controllers.MatchController, TwoNil.API",
@@ -55,7 +55,7 @@
         }
       },
       {
-        "identifier": "TeamMatches",
+        "identifier": "team-matches-route",
         "uriTemplate": "/games/{gameId}/seasons/{seasonId}/teams/{teamId}/matches",
         "get": {
           "type": "TwoNil.API.Controllers.MatchController, TwoNil.API",
@@ -63,7 +63,7 @@
         }
       },
       {
-        "identifier": "DayMatches",
+        "identifier": "day-matches-route",
         "uriTemplate": "/games/{gameId}/days/{dayId}/matches",
         "get": {
           "type": "TwoNil.API.Controllers.MatchController, TwoNil.API",
@@ -75,7 +75,7 @@
         }
       },
       {
-        "identifier": "TeamPlayers",
+        "identifier": "team-players-route",
         "uriTemplate": "/games/{gameId}/teams/{teamId}/players",
         "get": {
           "type": "TwoNil.API.Controllers.PlayerController, TwoNil.API",
@@ -83,7 +83,7 @@
         }
       },
       {
-        "identifier": "RelationItem",
+        "identifier": "relation-route",
         "uriTemplate": "/rels/{relationName}",
         "get": {
           "type": "TwoNil.API.Controllers.RelationController, TwoNil.API",
@@ -91,7 +91,7 @@
         }
       },
       {
-        "identifier": "SeasonItem",
+        "identifier": "season-route",
         "uriTemplate": "/games/{gameId}/seasons/{seasonId}",
         "get": {
           "type": "TwoNil.API.Controllers.SeasonController, TwoNil.API",
@@ -103,7 +103,7 @@
         }
       },
       {
-        "identifier": "SeasonTeamStatistics",
+        "identifier": "season-team-statistics-route",
         "uriTemplate": "/games/{gameId}/seasons/{seasonId}/teams/{teamId}",
         "get": {
           "type": "TwoNil.API.Controllers.SeasonController, TwoNil.API",
@@ -111,7 +111,7 @@
         }
       },
       {
-        "identifier": "TeamItem",
+        "identifier": "team-route",
         "uriTemplate": "/games/{gameId}/teams/{teamId}",
         "get": {
           "type": "TwoNil.API.Controllers.TeamController, TwoNil.API",
@@ -119,7 +119,7 @@
         }
       },
       {
-        "identifier": "UserCollection",
+        "identifier": "users-route",
         "uriTemplate": "/users",
         "post": {
           "type": "TwoNil.API.Controllers.UserController, TwoNil.API",
@@ -127,7 +127,7 @@
         }
       },
       {
-        "identifier": "UserItem",
+        "identifier": "user-route",
         "uriTemplate": "/users/{userId}",
         "get": {
           "type": "TwoNil.API.Controllers.UserController, TwoNil.API",

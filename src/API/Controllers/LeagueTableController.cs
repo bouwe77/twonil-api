@@ -1,4 +1,4 @@
-﻿using Sally.Hal;
+﻿using Shally.Hal;
 using System.Collections.Generic;
 using Dolores.Responses;
 using TwoNil.API.Helpers;
@@ -41,7 +41,7 @@ namespace TwoNil.API.Controllers
             throw Handle(businessLogicException);
          }
 
-         var leagueTableResource = new LeagueTableMapper().Map(leagueTable);
+         var leagueTableResource = new LeagueTableMapper(UriHelper).Map(leagueTable);
 
          var response = GetResponse(leagueTableResource);
          return response;
@@ -68,7 +68,7 @@ namespace TwoNil.API.Controllers
             throw Handle(businessLogicException);
          }
 
-         var mapper = new LeagueTableMapper();
+         var mapper = new LeagueTableMapper(UriHelper);
          var leagueTableResources = new List<Resource>();
          foreach (var leagueTable in leagueTables)
          {
@@ -76,7 +76,7 @@ namespace TwoNil.API.Controllers
             leagueTableResources.Add(resource);
          }
 
-         var halDocument = CreateHalDocument(UriFactory.GetSeasonLeagueTablesUri(gameId, seasonId), game);
+         var halDocument = CreateHalDocument(UriHelper.GetSeasonLeagueTablesUri(gameId, seasonId), game);
 
          var competitionService = ServiceFactory.CreateCompetitionService();
          var currentCompetitionName = competitionService.Get(game.CurrentTeam.CurrentLeagueCompetitionId).Name;

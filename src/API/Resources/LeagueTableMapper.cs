@@ -1,16 +1,23 @@
 ﻿using System.Collections.Generic;
-using Sally.Hal;
+using Shally.Hal;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Resources
 {
    public class LeagueTableMapper : IResourceMapper<LeagueTable>
    {
+      private readonly UriHelper _uriHelper;
+
+      public LeagueTableMapper(UriHelper uriHelper)
+      {
+         _uriHelper = uriHelper;
+      }
+
       public Resource Map(LeagueTable leagueTable, params string[] properties)
       {
-         var teamMapper = new TeamMapper();
+         var teamMapper = new TeamMapper(_uriHelper);
 
-         var leagueTableLink = new Link(UriFactory.GetCompetitionLeagueTableUri(leagueTable.GameId, leagueTable.SeasonCompetition.SeasonId, leagueTable.SeasonCompetition.CompetitionId));
+         var leagueTableLink = new Link(_uriHelper.GetCompetitionLeagueTableUri(leagueTable.GameId, leagueTable.SeasonCompetition.SeasonId, leagueTable.SeasonCompetition.CompetitionId));
          var resource = new Resource(leagueTableLink);
 
          resource.AddProperty("competition-name", leagueTable.CompetitionName);

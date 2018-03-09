@@ -1,22 +1,28 @@
 ﻿using System.Linq;
-using Sally.Hal;
+using Shally.Hal;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Resources
 {
    public class SeasonStatisticsMapper : IResourceMapper<SeasonStatistics>
    {
+      private readonly UriHelper _uriHelper;
       public static string SeasonName = "name";
       public static string NationalChampion = "national-champion";
       public static string NationalChampionRunnerUp = "national-champion-runnerup";
       public static string NationalCupWinner = "national-cup-winner";
       public static string NationalCupRunnerUp = "national-cup-runnerup";
 
+      public SeasonStatisticsMapper(UriHelper uriHelper)
+      {
+         _uriHelper = uriHelper;
+      }
+
       public Resource Map(SeasonStatistics seasonStatistics, params string[] properties)
       {
-         var teamMapper = new TeamMapper();
+         var teamMapper = new TeamMapper(_uriHelper);
 
-         var resource = new Resource(new Link(UriFactory.GetSeasonUri(seasonStatistics.GameId, seasonStatistics.Id)));
+         var resource = new Resource(new Link(_uriHelper.GetSeasonUri(seasonStatistics.GameId, seasonStatistics.Id)));
 
          if (properties.Contains(SeasonName))
          {

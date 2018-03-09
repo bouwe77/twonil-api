@@ -1,11 +1,12 @@
 ﻿using System.Linq;
-using Sally.Hal;
+using Shally.Hal;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Resources
 {
    public class PlayerMapper : IResourceMapper<Player>
    {
+      private readonly UriHelper _uriHelper;
       public static string Name = "name";
       public static string Age = "age";
       public static string PreferredPosition = "preferred-position";
@@ -13,9 +14,14 @@ namespace TwoNil.API.Resources
       public static string Rating = "rating";
       public static string Skills = "skills";
 
+      public PlayerMapper(UriHelper uriHelper)
+      {
+         _uriHelper = uriHelper;
+      }
+
       public Resource Map(Player player, params string[] properties)
       {
-         var resource = new Resource(new Link(UriFactory.GetPlayerUri(player.GameId, player.Id)));
+         var resource = new Resource(new Link(_uriHelper.GetPlayerUri(player.GameId, player.Id)));
 
          if (properties.Contains(Name))
          {

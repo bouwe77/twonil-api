@@ -1,4 +1,4 @@
-﻿using Sally.Hal;
+﻿using Shally.Hal;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Resources

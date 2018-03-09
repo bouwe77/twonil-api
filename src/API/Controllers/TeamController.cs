@@ -1,4 +1,4 @@
-﻿using Sally.Hal;
+﻿using Shally.Hal;
 using System.Collections.Generic;
 using Dolores.Responses;
 using TwoNil.API.Helpers;
@@ -21,9 +21,9 @@ namespace TwoNil.API.Controllers
             throw ResponseHelper.Get404NotFound($"Team ID '{teamId}' not found");
          }
 
-         var halDocument = CreateHalDocument(UriFactory.GetTeamUri(gameId, teamId), gameInfo);
+         var halDocument = CreateHalDocument(UriHelper.GetTeamUri(gameId, teamId), gameInfo);
 
-         var teamMapper = new TeamMapper();
+         var teamMapper = new TeamMapper(UriHelper);
 
          var teams = teamService.GetGroupedByLeague();
          var teamResources = new List<Resource>();
@@ -42,7 +42,7 @@ namespace TwoNil.API.Controllers
 
          var statisticsService = ServiceFactory.CreateStatisticsService(gameInfo);
          var seasonTeamStatistics = statisticsService.GetSeasonTeamStatistics(currentSeason.Id, teamId);
-         var seasonTeamStatisticsResource = new SeasonTeamStatisticsMapper().Map(
+         var seasonTeamStatisticsResource = new SeasonTeamStatisticsMapper(UriHelper).Map(
             seasonTeamStatistics,
             SeasonTeamStatisticsMapper.SeasonName,
             SeasonTeamStatisticsMapper.LeagueName,
@@ -121,7 +121,7 @@ namespace TwoNil.API.Controllers
 
       //      // Return a response containing a location with a link to the game.
       //      // LET OP Deze locatie verwijst niet naar hetgeen daadwerkelijk gecreeerd is, wellicht dat dit een redirect moet worden of zo? maar ik vind het nu wel even best
-      //      var gameLink = UriFactory.GetGameUri(gameId);
+      //      var gameLink = UriHelper.GetGameUri(gameId);
       //      var location = new Uri(gameLink);
 
       //      return new HttpResponseMessage(HttpStatusCode.Created)

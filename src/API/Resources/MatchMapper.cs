@@ -1,11 +1,12 @@
 ﻿using System.Linq;
-using Sally.Hal;
+using Shally.Hal;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Resources
 {
    public class MatchMapper : IResourceMapper<Match>
    {
+      private readonly UriHelper _uriHelper;
       public static string HomeScore = "home-score";
       public static string AwayScore = "away-score";
       public static string HomePenaltyScore = "home-penalty-score";
@@ -17,9 +18,14 @@ namespace TwoNil.API.Resources
       public static string Played = "played";
       public static string PenaltiesTaken = "penalties-taken";
 
+      public MatchMapper(UriHelper uriHelper)
+      {
+         _uriHelper = uriHelper;
+      }
+
       public Resource Map(Match match, params string[] properties)
       {
-         var resource = new Resource(new Link(UriFactory.GetMatchUri(match.GameId, match.Id)));
+         var resource = new Resource(new Link(_uriHelper.GetMatchUri(match.GameId, match.Id)));
 
          if (properties.Contains(HomeScore))
          {

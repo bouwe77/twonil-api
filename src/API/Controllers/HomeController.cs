@@ -9,7 +9,7 @@ namespace TwoNil.API.Controllers
       public Response Home()
       {
          Logger.LogInformation("==========> hoi :)");
-         var halDocument = CreateHalDocument(UriFactory.GetHomeUri());
+         var halDocument = CreateHalDocument(UriHelper.GetHomeUri());
          var response = GetResponse(halDocument);
          return response;
       }

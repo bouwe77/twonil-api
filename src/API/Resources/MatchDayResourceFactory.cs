@@ -1,4 +1,4 @@
-﻿using Sally.Hal;
+﻿using Shally.Hal;
 
 namespace TwoNil.API.Resources
 {
@@ -7,9 +7,16 @@ namespace TwoNil.API.Resources
    /// </summary>
    public class MatchDayResourceFactory
    {
-      public static Resource Create(string gameId, string matchDayId)
+      private readonly UriHelper _uriHelper;
+
+      public MatchDayResourceFactory(UriHelper uriHelper)
       {
-         var resource = new Resource(new Link(UriFactory.GetMatchDayUri(gameId, matchDayId)));
+         _uriHelper = uriHelper;
+      }
+
+      public Resource Create(string gameId, string matchDayId)
+      {
+         var resource = new Resource(new Link(_uriHelper.GetMatchDayUri(gameId, matchDayId)));
 
          return resource;
       }
