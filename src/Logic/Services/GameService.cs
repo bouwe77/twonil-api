@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Randomization;
 using TwoNil.Data;
 using TwoNil.Shared.DomainObjects;
 
@@ -9,14 +8,6 @@ namespace TwoNil.Logic.Services
 {
    public class GameService : ServiceBase
    {
-      private readonly IListRandomizer _listRandomizer;
-
-      internal GameService()
-         : base()
-      {
-         _listRandomizer = new ListRandomizer();
-      }
-
       public IEnumerable<GameInfo> GetGames(string userId)
       {
          var gameInfos = new List<GameInfo>();
@@ -36,27 +27,6 @@ namespace TwoNil.Logic.Services
          }
 
          return gameInfos;
-      }
-
-      public Game CreateGameForUser(string userId)
-      {
-         Game game;
-         using (var gameRepository = new MasterRepositoryFactory().CreateGameRepository())
-         {
-            game = gameRepository.Find(x => x.UserId == null).FirstOrDefault();
-         }
-
-         if (game != null)
-         {
-            game.UserId = userId;
-            using (var repository = new MasterRepositoryFactory().CreateTransactionManager())
-            {
-               repository.RegisterUpdate(game);
-               repository.Save();
-            }
-         }
-
-         return game;
       }
 
       public GameInfo GetGame(string gameId, string userId)

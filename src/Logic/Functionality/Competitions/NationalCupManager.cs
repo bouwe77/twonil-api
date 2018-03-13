@@ -9,10 +9,10 @@ namespace TwoNil.Logic.Functionality.Competitions
 {
    internal class NationalCupManager
    {
-      private DatabaseRepositoryFactory _repositoryFactory;
+      private IDatabaseRepositoryFactory _repositoryFactory;
       private Competition _competition;
 
-      public NationalCupManager(DatabaseRepositoryFactory repositoryFactory)
+      public NationalCupManager(IDatabaseRepositoryFactory repositoryFactory)
       {
          _repositoryFactory = repositoryFactory;
 

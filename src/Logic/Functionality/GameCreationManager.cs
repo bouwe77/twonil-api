@@ -32,7 +32,7 @@ namespace TwoNil.Logic.Functionality
             // Insert the Game record in the Master database.
             InsertGame(game);
          }
-         catch (Exception)
+         catch (Exception exception)
          {
             gameDatabaseManager.Delete();
             throw;

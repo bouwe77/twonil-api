@@ -1,6 +1,4 @@
 ﻿using Dolores.Responses;
-using Microsoft.Extensions.Logging;
-using TwoNil.API.Resources;
 
 namespace TwoNil.API.Controllers
 {
@@ -8,7 +6,6 @@ namespace TwoNil.API.Controllers
    {
       public Response Home()
       {
-         Logger.LogInformation("==========> hoi :)");
          var halDocument = CreateHalDocument(UriHelper.GetHomeUri());
          var response = GetResponse(halDocument);
          return response;

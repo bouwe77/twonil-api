@@ -1,4 +1,5 @@
-﻿using TwoNil.Logic.Exceptions;
+﻿using System.Linq;
+using TwoNil.Logic.Exceptions;
 using TwoNil.Logic.Functionality.Competitions;
 using TwoNil.Shared.DomainObjects;
 
@@ -38,7 +39,7 @@ namespace TwoNil.Logic.Services
          bool seasonEnded;
          using (var matchRepository = RepositoryFactory.CreateMatchRepository())
          {
-            seasonEnded = matchRepository.AllMatchesEnded(seasonId);
+            seasonEnded = matchRepository.GetBySeason(seasonId).All(m => m.MatchStatus == MatchStatus.Ended);
          }
 
          return seasonEnded;

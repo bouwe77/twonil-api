@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Dolores.Http;
@@ -7,6 +8,8 @@ using Shally.Hal;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
 using TwoNil.Logic.Exceptions;
+using TwoNil.Logic.Services;
+using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Controllers
 {
@@ -99,6 +102,9 @@ namespace TwoNil.API.Controllers
          var resourceFactory = new TeamMatchResourceFactory(UriHelper);
          var resources = resourceFactory.Create(matches, gameId, seasonId, teamId);
          halDocument.AddResource("rel:matches", resources);
+
+         var teamListResourceFactory = new TeamListResourceFactory(game, UriHelper, UriHelper.GetSeasonTeamMatchesUri(gameId, seasonId, "###teamid###"));
+         halDocument.AddResource("teams", teamListResourceFactory.Create());
 
          return GetResponse(halDocument);
       }

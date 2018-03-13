@@ -5,7 +5,7 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Data.Database
 {
-   public class MatchRepository : ReadRepository<Match>
+   public class MatchRepository : ReadRepository<Match>, IMatchRepository
    {
       internal MatchRepository(string databaseFilePath, string gameId)
          : base(databaseFilePath, gameId)
@@ -118,10 +118,21 @@ namespace TwoNil.Data.Database
          return matches;
       }
 
-      public bool AllMatchesEnded(string seasonId)
+      public IEnumerable<Match> GetMatchesBetweenTeams(SeasonCompetition seasonCompetition, string team1Id, string team2Id)
       {
-         var matchesNotEnded = Find(match => match.SeasonId == seasonId && match.MatchStatus != MatchStatus.Ended);
-         return !matchesNotEnded.Any();
+         var matches = Find(m =>
+            m.SeasonId == seasonCompetition.SeasonId
+            && m.CompetitionId == seasonCompetition.CompetitionId
+            && (m.HomeTeamId == team1Id && m.AwayTeamId == team2Id
+                || m.HomeTeamId == team2Id && m.AwayTeamId == team1Id));
+
+         var matchesBetweenTeams = matches.ToList();
+         foreach (var match in matchesBetweenTeams)
+         {
+            GetReferencedData(match);
+         }
+
+         return matchesBetweenTeams;
       }
 
       public IEnumerable<TeamRoundMatch> GetTeamRoundMatches(string gameId, string teamId, string seasonId)

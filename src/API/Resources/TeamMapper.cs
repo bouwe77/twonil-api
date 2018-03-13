@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Shally.Hal;
 using TwoNil.Shared.DomainObjects;
 
@@ -43,6 +44,17 @@ namespace TwoNil.API.Resources
          }
 
          return resource;
+      }
+
+      public IEnumerable<Resource> Map(IEnumerable<Team> teams, params string[] properties)
+      {
+         var teamResources = new List<Resource>();
+         foreach (var t in teams)
+         {
+            teamResources.Add(Map(t, properties));
+         }
+
+         return teamResources;
       }
    }
 }

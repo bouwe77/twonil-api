@@ -70,7 +70,7 @@ namespace TwoNil.API.Resources
          gameLinks.Add(gameLink);
 
          // The manager's squad.
-         var teamPlayersLink = new Link(_uriHelper.GetTeamPlayersUri(gameInfo.Id, gameInfo.CurrentTeamId)) { Title = "Squad" };
+         var teamPlayersLink = new Link(_uriHelper.GetTeamPlayersUri(gameInfo.Id, gameInfo.CurrentTeamId)) { Title = "Players" };
          gameLinks.Add(teamPlayersLink);
 
          // League tables for the current season.

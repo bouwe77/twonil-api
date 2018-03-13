@@ -8,7 +8,7 @@ namespace TwoNil.API.Controllers
 {
    public class SeasonController : ControllerBase
    {
-      public Response PostEndSeason(string gameId, string seasonId)
+      public Response PostEndSeasonItem(string gameId, string seasonId)
       {
          var game = GetGameInfo(gameId);
 

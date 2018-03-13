@@ -10,22 +10,16 @@ using TwoNil.Shared.DomainObjects;
 namespace TwoNil.API.Controllers
 {
    //[BasicAuthenticationFilter(false)]
-   public class AuthenticationController : ControllerBase
+   public class LoginController : ControllerBase
    {
       public Response Post()
       {
          const string invalidRequestBodyError = "Invalid request body";
 
-         //TODO Klopt deze check en/of is deze verstandig op deze manier?
-         if (Request?.MessageBody == null || Request.MessageBody.Length == 0)
-         {
-            throw ResponseHelper.Get400BadRequest(invalidRequestBodyError);
-         }
-
-         AuthenticateResource authenticateResource;
+         LoginResource loginResource;
          try
          {
-            authenticateResource = Request.MessageBody.DeserializeJson<AuthenticateResource>();
+            loginResource = Request.MessageBody.DeserializeJson<LoginResource>();
          }
          catch (Exception)
          {
@@ -37,7 +31,7 @@ namespace TwoNil.API.Controllers
          User user;
          try
          {
-            user = userService.GetUser(authenticateResource.Username, authenticateResource.Password);
+            user = userService.GetUser(loginResource.Username, loginResource.Password);
          }
          catch (ValidationException validationException)
          {

@@ -12,10 +12,10 @@ namespace TwoNil.Logic.Functionality.Competitions
    {
       private readonly Randomizer _randomizer;
       private readonly NumberRandomizer _numberRandomizer;
-      private DatabaseRepositoryFactory _repositoryFactory;
+      private IDatabaseRepositoryFactory _repositoryFactory;
       private Competition _competition;
 
-      public FriendlyManager(DatabaseRepositoryFactory repositoryFactory)
+      public FriendlyManager(IDatabaseRepositoryFactory repositoryFactory)
       {
          _repositoryFactory = repositoryFactory;
          _randomizer = new Randomizer();

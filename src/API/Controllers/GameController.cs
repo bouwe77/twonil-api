@@ -8,6 +8,7 @@ using Shally.Hal;
 using Shally.Forms;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
+using TwoNil.Logic.Functionality;
 
 namespace TwoNil.API.Controllers
 {
@@ -22,8 +23,6 @@ namespace TwoNil.API.Controllers
 
       public Response GetCollection()
       {
-         Logger.LogInformation("moio de poio, moddervokker");
-
          var gameService = ServiceFactory.CreateGameService();
 
          //TODO Let MODDERVOKKIN op
@@ -153,24 +152,17 @@ namespace TwoNil.API.Controllers
       {
          try
          {
-            var gameService = ServiceFactory.CreateGameService();
-
-            //TODO Let MODDERVOKKIN op
-            var game = gameService.CreateGameForUser("17eqhq");
-
-            // No game is returned if there are no games available. Games need to be created with the GameCreator app.
-            if (game == null)
-            {
-               throw ResponseHelper.GetHttpResponseException(HttpStatusCode.ServiceUnavailable, "At the moment new games can not be created. Sorry... :(");
-            }
+            var gameCreationManager = new GameCreationManager();
+            var game = gameCreationManager.CreateGame();
 
             string locationUri = UriHelper.GetGameUri(game.Id);
             var response = new CreatedResponse(locationUri);
 
             return response;
          }
-         catch (Exception)
+         catch (Exception exception)
          {
+            Logger.LogWarning($"Creating the game failed: '{exception.Message}' {exception}");
             throw ResponseHelper.Get500InternalServerError("Creating the game failed");
          }
       }

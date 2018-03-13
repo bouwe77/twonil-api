@@ -11,6 +11,8 @@ namespace TwoNil.API.Resources
          _routeHelper = routeHelper;
       }
 
+      //TODO Dolores RouteHelper hier gebruiken!!!
+
       private string GetUri(string uri, params object[] parameters)
       {
          string formattedUri = string.Format(uri, parameters);

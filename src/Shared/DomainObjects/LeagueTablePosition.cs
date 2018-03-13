@@ -11,10 +11,7 @@ namespace TwoNil.Shared.DomainObjects
       [Ignore]
       public Team Team
       {
-         get
-         {
-            return _team;
-         }
+         get => _team;
          set
          {
             _team = value;
@@ -28,10 +25,7 @@ namespace TwoNil.Shared.DomainObjects
       [Ignore]
       public LeagueTable LeagueTable
       {
-         get
-         {
-            return _leagueTable;
-         }
+         get => _leagueTable;
          set
          {
             _leagueTable = value;

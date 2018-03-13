@@ -3,7 +3,7 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Data
 {
-   public class DatabaseRepositoryFactory : RepositoryFactoryBase
+   public class DatabaseRepositoryFactory : RepositoryFactoryBase, IDatabaseRepositoryFactory
    {
       private string _gameId;
 
@@ -38,7 +38,7 @@ namespace TwoNil.Data
          return new TeamRepository(DatabaseFilePath, _gameId);
       }
 
-      public MatchRepository CreateMatchRepository()
+      public IMatchRepository CreateMatchRepository()
       {
          return new MatchRepository(DatabaseFilePath, _gameId);
       }

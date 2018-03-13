@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Bouwe.Cryptography;
 using TwoNil.Data;
 using TwoNil.Logic.Exceptions;
 using TwoNil.Shared.DomainObjects;
@@ -12,27 +11,20 @@ namespace TwoNil.Logic.Services
    {
       private const string _emailValidationPattern = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|([-a-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)@[a-z0-9][\w\.-]*[a-z0-9]\.[a-z][a-z\.]*[a-z]$";
       private Regex _emailAddressRegex = new Regex(_emailValidationPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-      private const string _passwordHashPrefix = "$TwoNilHash$V1$";
 
       public User GetUser(string username, string password)
       {
          // Validation: both username and password are required.
          if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
          {
-            throw new ValidationException("Invalid authentication properties provided");
+            throw new ValidationException("Invalid login request");
          }
 
          var user = GetByUsername(username);
 
          if (user != null)
          {
-            // Verify the password hashes.
-            var passwordHasher = new PasswordHasher(_passwordHashPrefix);
-            bool verified = passwordHasher.Verify(password, user.PasswordHash);
-            if (!verified)
-            {
-               user = null;
-            }
+            //TODO Verify the password hash.
          }
 
          return user;
@@ -67,15 +59,14 @@ namespace TwoNil.Logic.Services
             throw new ConflictException($"Username '{username}' already exists");
          }
 
-         string passwordHash = new PasswordHasher(_passwordHashPrefix).Hash(password);
-
          var user = new User()
          {
             Firstname = firstname,
             Lastname = lastname,
             Username = username,
             Email = email,
-            PasswordHash = passwordHash
+            //TODO create Password hash
+            PasswordHash = "moio"
          };
 
          using (var repository = new MasterRepositoryFactory().CreateTransactionManager())

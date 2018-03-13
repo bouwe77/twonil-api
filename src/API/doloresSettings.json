@@ -28,6 +28,10 @@
         "get": {
           "type": "TwoNil.API.Controllers.GameController, TwoNil.API",
           "method": "GetCollection"
+        },
+        "post": {
+          "type": "TwoNil.API.Controllers.GameController, TwoNil.API",
+          "method": "Post"
         }
       },
       {
@@ -132,6 +136,14 @@
         "get": {
           "type": "TwoNil.API.Controllers.UserController, TwoNil.API",
           "method": "GetUserItem"
+        }
+      },
+      {
+        "identifier": "logins-route",
+        "uriTemplate": "/logins",
+        "post": {
+          "type": "TwoNil.API.Controllers.LoginController, TwoNil.API",
+          "method": "Post"
         }
       }
     ]

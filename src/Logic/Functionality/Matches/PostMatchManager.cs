@@ -13,31 +13,28 @@ namespace TwoNil.Logic.Functionality.Matches
    /// </summary>
    internal class PostMatchManager
    {
-      private readonly TransactionManager _repository;
-      private readonly SeasonManager _seasonManager;
-      private DatabaseRepositoryFactory _repositoryFactory;
+      private readonly TransactionManager _transactionManager;
+      private readonly IDatabaseRepositoryFactory _repositoryFactory;
 
-      public PostMatchManager(TransactionManager repository, DatabaseRepositoryFactory repositoryFactory, SeasonManager seasonManager)
+      public PostMatchManager(TransactionManager transactionManager, IDatabaseRepositoryFactory repositoryFactory)
       {
-         _repository = repository;
-         _seasonManager = seasonManager;
+         _transactionManager = transactionManager;
          _repositoryFactory = repositoryFactory;
       }
 
-      public void Handle(string seasonId, IEnumerable<Match> matches)
+      public void Handle(string seasonId, List<Match> matches)
       {
-         var leagueTableManager = new LeagueTableManager();
-
          var rounds = matches.Select(c => c.Round).Distinct().ToList();
-
-         var seasonStatisticsManager = new SeasonStatisticsManager(_repository, _repositoryFactory);
-         var seasonTeamStatisticsManager = new SeasonTeamStatisticsManager(_repository, _repositoryFactory, seasonId);
 
          Season season;
          using (var seasonRepository = _repositoryFactory.CreateSeasonRepository())
          {
             season = seasonRepository.GetOne(seasonId);
          }
+
+         var seasonStatisticsManager = new SeasonStatisticsManager(_transactionManager, _repositoryFactory);
+         var seasonTeamStatisticsManager = new SeasonTeamStatisticsManager(_transactionManager, _repositoryFactory, seasonId);
+         var leagueTableManager = new LeagueTableManager();
 
          foreach (var round in rounds)
          {
@@ -54,17 +51,17 @@ namespace TwoNil.Logic.Functionality.Matches
 
                // Update the league table and current league table position of the team.
                leagueTableManager.UpdateLeagueTable(leagueTable, matchesForThisRound);
-               _repository.RegisterUpdate(leagueTable);
-               _repository.RegisterUpdate(leagueTable.LeagueTablePositions);
+               leagueTableManager.CorrectPositionsIfNecessary(leagueTable, _repositoryFactory);
+               _transactionManager.RegisterUpdate(leagueTable);
+               _transactionManager.RegisterUpdate(leagueTable.LeagueTablePositions);
                var teams = leagueTable.LeagueTablePositions.Select(x => x.Team).ToList();
-               _repository.RegisterUpdate(teams);
+               _transactionManager.RegisterUpdate(teams);
 
                // Update the team statistics for this season.
                seasonTeamStatisticsManager.Update(seasonId, matchesForThisRound, leagueTable);
 
                // If all league matches have been played, update the season statistics.
                using (var competitionRepository = new MemoryRepositoryFactory().CreateCompetitionRepository())
-               using (var matchRepository = _repositoryFactory.CreateMatchRepository())
                {
                   if (round.CompetitionId == competitionRepository.GetLeague1().Id)
                   {
@@ -85,12 +82,12 @@ namespace TwoNil.Logic.Functionality.Matches
                var nationalCupManager = new NationalCupManager(_repositoryFactory);
                var cupMatches = matches.Where(m => m.RoundId == round.Id);
                var matchesNextRound = nationalCupManager.DrawNextRound(round, cupMatches, season);
-               _repository.RegisterInsert(matchesNextRound);
+               _transactionManager.RegisterInsert(matchesNextRound);
 
                // If the final has been played: update the winner to the season statistics.
                if (round.Name == Round.Final)
                {
-                  var match = matches.Where(m => m.RoundId == round.Id).Single();
+                  var match = matches.Single(m => m.RoundId == round.Id);
                   var winner = match.GetWinner();
                   var runnerUp = match.HomeTeam.Equals(winner) ? match.AwayTeam : match.HomeTeam;
                   seasonStatisticsManager.UpdateNationalCupWinner(seasonId, winner, runnerUp);
@@ -100,7 +97,7 @@ namespace TwoNil.Logic.Functionality.Matches
             // If the round is a National Super Cup: save the winner to the season statistics.
             else if (round.CompetitionType == CompetitionType.NationalSuperCup)
             {
-               var match = matches.Where(m => m.RoundId == round.Id).Single();
+               var match = matches.Single(m => m.RoundId == round.Id);
                var winner = match.GetWinner();
 
                seasonStatisticsManager.UpdateNationalSuperCupWinner(seasonId, winner);
@@ -113,8 +110,8 @@ namespace TwoNil.Logic.Functionality.Matches
 
       private void CreateDuringSeasonFriendlies(string seasonId)
       {
-         var rounds = new List<Round>();
-         IEnumerable<Team> teams = new List<Team>();
+         List<Round> rounds;
+         IEnumerable<Team> teams;
 
          // Get rounds and matches from the database.
          using (var roundRepository = _repositoryFactory.CreateRoundRepository())
@@ -122,7 +119,7 @@ namespace TwoNil.Logic.Functionality.Matches
          using (var teamRepository = _repositoryFactory.CreateTeamRepository())
          {
             rounds = roundRepository.GetBySeason(seasonId).ToList();
-            var matchesFromDatabase = matchRepository.GetBySeason(seasonId);
+            var matchesFromDatabase = matchRepository.GetBySeason(seasonId).ToList();
 
             foreach (var round in rounds)
             {
@@ -133,11 +130,11 @@ namespace TwoNil.Logic.Functionality.Matches
          }
 
          // Add the matches that will be saved (i.e. inserted) to the database.
-         var transactions = _repository.GetTransactions().Where(x => x.DomainObject is Match);
+         var transactions = _transactionManager.GetTransactions().Where(x => x.DomainObject is Match);
          foreach (var transaction in transactions)
          {
             Match match = transaction.DomainObject as Match;
-            var round = rounds.Single(r => r.Id == match.RoundId);
+            var round = rounds.Single(r => match != null && r.Id == match.RoundId);
 
             if (!round.Matches.Contains(match))
             {
@@ -146,11 +143,11 @@ namespace TwoNil.Logic.Functionality.Matches
          }
 
          var friendlyManager = new FriendlyManager(_repositoryFactory);
-         var matches = friendlyManager.CreateMatchesForFriendlyRound(rounds, teams);
+         var matches = friendlyManager.CreateMatchesForFriendlyRound(rounds, teams).ToList();
 
          if (matches.Any())
          {
-            _repository.RegisterInsert(matches);
+            _transactionManager.RegisterInsert(matches);
          }
       }
    }

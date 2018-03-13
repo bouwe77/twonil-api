@@ -9,11 +9,11 @@ namespace TwoNil.Logic.Functionality.Teams
 {
    internal class SeasonTeamStatisticsManager
    {
-      private readonly DatabaseRepositoryFactory _repositoryFactory;
+      private readonly IDatabaseRepositoryFactory _repositoryFactory;
       private readonly TransactionManager _repository;
       private readonly IDictionary<string, SeasonTeamStatistics> _seasonTeamStatistics;
 
-      public SeasonTeamStatisticsManager(TransactionManager repository, DatabaseRepositoryFactory repositoryFactory, string seasonId)
+      public SeasonTeamStatisticsManager(TransactionManager repository, IDatabaseRepositoryFactory repositoryFactory, string seasonId)
       {
          _repository = repository;
          _repositoryFactory = repositoryFactory;

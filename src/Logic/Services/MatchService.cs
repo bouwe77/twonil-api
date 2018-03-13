@@ -93,16 +93,15 @@ namespace TwoNil.Logic.Services
             Play(match);
          }
 
-         using (var repository = RepositoryFactory.CreateTransactionManager())
+         using (var transactionManager = RepositoryFactory.CreateTransactionManager())
          {
-            repository.RegisterUpdate(matchesToPlay);
+            transactionManager.RegisterUpdate(matchesToPlay);
 
             // After matches have been played a lot of stuff must be determined and updated.
-            var seasonManager = new SeasonManager(RepositoryFactory);
-            var postMatchManager = new PostMatchManager(repository, RepositoryFactory, seasonManager);
+            var postMatchManager = new PostMatchManager(transactionManager, RepositoryFactory);
             postMatchManager.Handle(currentSeason.Id, matchesToPlay);
 
-            repository.Save();
+            transactionManager.Save();
          }
       }
 

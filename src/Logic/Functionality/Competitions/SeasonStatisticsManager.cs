@@ -7,9 +7,9 @@ namespace TwoNil.Logic.Functionality.Competitions
    internal class SeasonStatisticsManager
    {
       private readonly TransactionManager _repository;
-      private DatabaseRepositoryFactory _repositoryFactory;
+      private IDatabaseRepositoryFactory _repositoryFactory;
 
-      public SeasonStatisticsManager(TransactionManager repository, DatabaseRepositoryFactory repositoryFactory)
+      public SeasonStatisticsManager(TransactionManager repository, IDatabaseRepositoryFactory repositoryFactory)
       {
          _repository = repository;
          _repositoryFactory = repositoryFactory;

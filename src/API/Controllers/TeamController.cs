@@ -25,14 +25,8 @@ namespace TwoNil.API.Controllers
 
          var teamMapper = new TeamMapper(UriHelper);
 
-         var teams = teamService.GetGroupedByLeague();
-         var teamResources = new List<Resource>();
-         foreach (var t in teams)
-         {
-            teamResources.Add(teamMapper.Map(t, TeamMapper.TeamName, TeamMapper.LeagueName));
-         }
-
-         halDocument.AddResource("teams", teamResources);
+         var teamListResourceFactory = new TeamListResourceFactory(gameInfo, UriHelper, UriHelper.GetTeamUri(gameId, "###teamid###"));
+         halDocument.AddResource("teams", teamListResourceFactory.Create());
 
          var teamResource = teamMapper.Map(team, TeamMapper.TeamName, TeamMapper.Rating, TeamMapper.RatingPercentage);
          halDocument.AddResource("rel:team", teamResource);

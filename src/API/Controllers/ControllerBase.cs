@@ -71,7 +71,7 @@ namespace TwoNil.API.Controllers
             MessageBody = new MemoryStream(Encoding.UTF8.GetBytes(halDocument.Json.ToString()))
          };
 
-         response.SetContentTypeHeader("application/hal+json");
+         response.SetContentTypeHeader("application/hal+json; charset=utf-8");
          
          return response;
       }
