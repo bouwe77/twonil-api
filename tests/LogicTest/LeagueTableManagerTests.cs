@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Moq.Language.Flow;
 using TwoNil.Data;
 using TwoNil.Data.Database;
 using TwoNil.Logic.Functionality.Competitions;
@@ -59,7 +58,8 @@ namespace TwoNil.Logic
 
          var leagueTable = new LeagueTable { LeagueTablePositions = positions };
 
-         var leagueTableManager = new LeagueTableManager();
+         _repositoryFactory.Setup(x => x.CreateMatchRepository()).Returns(_matchRepository.Object);
+         var leagueTableManager = new LeagueTableManager(_repositoryFactory.Object);
          leagueTableManager.UpdateLeagueTable(leagueTable, matches);
 
          // Expected positions:[1] Team1, [2] Team3, [3] Team4, [4] Team2.
@@ -121,9 +121,25 @@ namespace TwoNil.Logic
       [TestMethod]
       public void UpdateLeagueTable_SortsAlpabetically()
       {
-         LeagueTable leagueTable = GetNewShuffledLeagueTable();
+         // We need 4 teams.
+         var team1 = new Team { Id = "1", Name = "Team1" };
+         var team2 = new Team { Id = "2", Name = "Team2" };
+         var team3 = new Team { Id = "3", Name = "Team3" };
+         var team4 = new Team { Id = "4", Name = "Team4" };
 
-         var leagueTableManager = new LeagueTableManager();
+         // Every team has a league table position.
+         var positions = new List<LeagueTablePosition>
+         {
+            new LeagueTablePosition { Team = team4, Position = 4 },
+            new LeagueTablePosition { Team = team1, Position = 1 },
+            new LeagueTablePosition { Team = team2, Position = 2 },
+            new LeagueTablePosition { Team = team3, Position = 3 },
+         };
+
+         var leagueTable = new LeagueTable { LeagueTablePositions = positions };
+
+         _repositoryFactory.Setup(x => x.CreateMatchRepository()).Returns(_matchRepository.Object);
+         var leagueTableManager = new LeagueTableManager(_repositoryFactory.Object);
          leagueTableManager.UpdateLeagueTable(leagueTable, new List<Match>());
 
          // Because all positions have the exact same number of matches, points and goals, the positions should be sorted alphabetically.
@@ -138,56 +154,7 @@ namespace TwoNil.Logic
       }
 
       [TestMethod]
-      public void CorrectLeagueTableIfNecessary_DoesNotCorrect_IfNoMatchesHaveBeenPlayed()
-      {
-         LeagueTable leagueTable = GetNewShuffledLeagueTable();
-
-         var leagueTableManager = new LeagueTableManager();
-         leagueTableManager.CorrectPositionsIfNecessary(leagueTable, _repositoryFactory.Object);
-
-         // Nothing is corrected, not even the position numbers, as this is only necessary when match results are compared.
-         Assert.AreEqual("4", leagueTable.LeagueTablePositions[0].TeamId);
-         Assert.AreEqual(4, leagueTable.LeagueTablePositions[0].Position);
-         Assert.AreEqual("1", leagueTable.LeagueTablePositions[1].TeamId);
-         Assert.AreEqual(1, leagueTable.LeagueTablePositions[1].Position);
-         Assert.AreEqual("2", leagueTable.LeagueTablePositions[2].TeamId);
-         Assert.AreEqual(2, leagueTable.LeagueTablePositions[2].Position);
-         Assert.AreEqual("3", leagueTable.LeagueTablePositions[3].TeamId);
-         Assert.AreEqual(3, leagueTable.LeagueTablePositions[3].Position);
-      }
-
-      [TestMethod]
-      public void CorrectLeagueTableIfNecessary_DoesNotCorrect_IfOneMatchHasBeenPlayed()
-      {
-         LeagueTable leagueTable = GetNewShuffledLeagueTable();
-
-         // Make the league table totally crap. This ofcourse is not possible, but we will use this to prove
-         // the CorrectPositionsIfNecessary will not update it because only one match has been played...
-         leagueTable.LeagueTablePositions[0].Points = 1;
-         leagueTable.LeagueTablePositions[1].Points = 8;
-         leagueTable.LeagueTablePositions[2].Points = 300;
-         leagueTable.LeagueTablePositions[3].Points = 2;
-
-         var leagueTableManager = new LeagueTableManager();
-         leagueTableManager.CorrectPositionsIfNecessary(leagueTable, _repositoryFactory.Object);
-
-         // Nothing is corrected, not even the position numbers, as this is only necessary when match results are compared.
-         Assert.AreEqual("4", leagueTable.LeagueTablePositions[0].TeamId);
-         Assert.AreEqual(4, leagueTable.LeagueTablePositions[0].Position);
-         Assert.AreEqual(1, leagueTable.LeagueTablePositions[0].Points);
-         Assert.AreEqual("1", leagueTable.LeagueTablePositions[1].TeamId);
-         Assert.AreEqual(1, leagueTable.LeagueTablePositions[1].Position);
-         Assert.AreEqual(8, leagueTable.LeagueTablePositions[1].Points);
-         Assert.AreEqual("2", leagueTable.LeagueTablePositions[2].TeamId);
-         Assert.AreEqual(2, leagueTable.LeagueTablePositions[2].Position);
-         Assert.AreEqual(300, leagueTable.LeagueTablePositions[2].Points);
-         Assert.AreEqual("3", leagueTable.LeagueTablePositions[3].TeamId);
-         Assert.AreEqual(3, leagueTable.LeagueTablePositions[3].Position);
-         Assert.AreEqual(2, leagueTable.LeagueTablePositions[3].Points);
-      }
-
-      [TestMethod]
-      public void CorrectLeagueTableIfNecessary_Corrects_IfTwoMatchesHaveBeenPlayed()
+      public void UpdateLeagueTable_ChecksMatchResults_IfTwoMatchesHaveBeenPlayed()
       {
          // We need 4 teams.
          var team1 = new Team { Id = "1", Name = "Team1" };
@@ -206,7 +173,7 @@ namespace TwoNil.Logic
 
          var leagueTable = new LeagueTable { LeagueTablePositions = positions };
 
-         // Although very unlikely, but just to prove the CorrectPositionsIfNecessary method works, 
+         // Although not very realistic, but just to prove the method works, 
          // Team2 and Team4 have better match results against Team1 and Team3 respectively, so their position must be swapped.
          var matchesBetweenTeam1And2 = new List<Match>
          {
@@ -225,8 +192,8 @@ namespace TwoNil.Logic
             .Returns(matchesBetweenTeam1And2)
             .Returns(matchesBetweenTeam3And4);
 
-         var leagueTableManager = new LeagueTableManager();
-         leagueTableManager.CorrectPositionsIfNecessary(leagueTable, _repositoryFactory.Object);
+         var leagueTableManager = new LeagueTableManager(_repositoryFactory.Object);
+         leagueTableManager.UpdateLeagueTable(leagueTable, new List<Match>());
 
          Assert.AreEqual("2", leagueTable.LeagueTablePositions[0].TeamId);
          Assert.AreEqual(1, leagueTable.LeagueTablePositions[0].Position);
@@ -238,9 +205,66 @@ namespace TwoNil.Logic
          Assert.AreEqual(4, leagueTable.LeagueTablePositions[3].Position);
       }
 
+      [TestMethod]
+      public void UpdateLeagueTable_ChecksMatchResults_IfTwoMatchesHaveBeenPlayedAndAllTeamsHaveTheSamePosition()
+      {
+         // We need 4 teams.
+         var team1 = new Team { Id = "1", Name = "Team1" };
+         var team2 = new Team { Id = "2", Name = "Team2" };
+         var team3 = new Team { Id = "3", Name = "Team3" };
+         var team4 = new Team { Id = "4", Name = "Team4" };
+
+         // All teams have 6 points.
+         var positions = new List<LeagueTablePosition>
+         {
+            new LeagueTablePosition { Team = team2, Matches = 2, Points = 6, Position = 1 },
+            new LeagueTablePosition { Team = team4, Matches = 2, Points = 6, Position = 2 },
+            new LeagueTablePosition { Team = team1, Matches = 2, Points = 6, Position = 3 },
+            new LeagueTablePosition { Team = team3, Matches = 2, Points = 6, Position = 4 },
+         };
+
+         var leagueTable = new LeagueTable { LeagueTablePositions = positions };
+
+         // Although not very realistic, but just to prove the method works, 
+         // Team3 on position 4 has the best match results, followed by Team1 on position 3 etc., so their positions must be swapped.
+         var matchesBetweenTeam4And2 = new List<Match>
+         {
+            new Match { HomeTeam = team4, AwayTeam = team2, HomeScore = 1, AwayScore = 0 }, //Team4-Team2 1-0
+            new Match { HomeTeam = team2, AwayTeam = team4, HomeScore = 0, AwayScore = 1 }  //Team2-Team4 0-1, so Team4 wins 2-0 on aggregate
+         };
+
+         var matchesBetweenTeam1And4 = new List<Match>
+         {
+            new Match { HomeTeam = team1, AwayTeam = team4, HomeScore = 0, AwayScore = 1 }, // Team1-Team4 0-1
+            new Match { HomeTeam = team4, AwayTeam = team1, HomeScore = 0, AwayScore = 0 }, // Team4-Team1 0-0, so Team4 wins 1-0 on aggregate
+         };
+
+         var matchesBetweenTeam3And1 = new List<Match>
+         {
+            new Match { HomeTeam = team3, AwayTeam = team1, HomeScore = 0, AwayScore = 1 }, // Team3-Team1 0-1
+            new Match { HomeTeam = team1, AwayTeam = team3, HomeScore = 0, AwayScore = 0 }, // Team1-Team3 0-0, so Team1 wins 1-0 on aggregate
+         };
+
+         _repositoryFactory.Setup(x => x.CreateMatchRepository()).Returns(_matchRepository.Object);
+         _matchRepository.SetupSequence(x => x.GetMatchesBetweenTeams(It.IsAny<SeasonCompetition>(), It.IsAny<string>(), It.IsAny<string>()))
+            .Returns(matchesBetweenTeam4And2)
+            .Returns(matchesBetweenTeam1And4)
+            .Returns(matchesBetweenTeam3And1);
+         var leagueTableManager = new LeagueTableManager(_repositoryFactory.Object);
+         leagueTableManager.UpdateLeagueTable(leagueTable, new List<Match>());
+
+         Assert.AreEqual("4", leagueTable.LeagueTablePositions[0].TeamId);
+         Assert.AreEqual(1, leagueTable.LeagueTablePositions[0].Position);
+         Assert.AreEqual("2", leagueTable.LeagueTablePositions[1].TeamId);
+         Assert.AreEqual(2, leagueTable.LeagueTablePositions[1].Position);
+         Assert.AreEqual("1", leagueTable.LeagueTablePositions[2].TeamId);
+         Assert.AreEqual(3, leagueTable.LeagueTablePositions[2].Position);
+         Assert.AreEqual("3", leagueTable.LeagueTablePositions[3].TeamId);
+         Assert.AreEqual(4, leagueTable.LeagueTablePositions[3].Position);
+      }
 
       [TestMethod]
-      public void CorrectLeagueTableIfNecessary_DoesNotCorrect_WhenPositionsAreCorrect()
+      public void UpdateLeagueTable_ChecksMatchResults_ChangesNothing_WhenPositionsAreCorrect()
       {
          // We need 4 teams.
          var team1 = new Team { Id = "1", Name = "Team1" };
@@ -278,8 +302,8 @@ namespace TwoNil.Logic
             .Returns(matchesBetweenTeam1And2)
             .Returns(matchesBetweenTeam3And4);
 
-         var leagueTableManager = new LeagueTableManager();
-         leagueTableManager.CorrectPositionsIfNecessary(leagueTable, _repositoryFactory.Object);
+         var leagueTableManager = new LeagueTableManager(_repositoryFactory.Object);
+         leagueTableManager.UpdateLeagueTable(leagueTable, new List<Match>());
 
          Assert.AreEqual("1", leagueTable.LeagueTablePositions[0].TeamId);
          Assert.AreEqual(1, leagueTable.LeagueTablePositions[0].Position);
@@ -289,28 +313,6 @@ namespace TwoNil.Logic
          Assert.AreEqual(3, leagueTable.LeagueTablePositions[2].Position);
          Assert.AreEqual("4", leagueTable.LeagueTablePositions[3].TeamId);
          Assert.AreEqual(4, leagueTable.LeagueTablePositions[3].Position);
-      }
-
-      private static LeagueTable GetNewShuffledLeagueTable()
-      {
-         // We need 4 teams.
-         var team1 = new Team { Id = "1", Name = "Team1" };
-         var team2 = new Team { Id = "2", Name = "Team2" };
-         var team3 = new Team { Id = "3", Name = "Team3" };
-         var team4 = new Team { Id = "4", Name = "Team4" };
-
-         // Every team has a league table position.
-         var positions = new List<LeagueTablePosition>
-         {
-            new LeagueTablePosition { Team = team4, Position = 4 },
-            new LeagueTablePosition { Team = team1, Position = 1 },
-            new LeagueTablePosition { Team = team2, Position = 2 },
-            new LeagueTablePosition { Team = team3, Position = 3 },
-         };
-
-         var leagueTable = new LeagueTable { LeagueTablePositions = positions };
-
-         return leagueTable;
       }
    }
 }

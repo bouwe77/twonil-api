@@ -24,7 +24,7 @@ namespace TwoNil.API.Resources
          var matchResources = new List<Resource>();
          foreach (var match in matches)
          {
-            var matchResource = new Resource(new Link(_uriHelper.GetHomeUri()));
+            var matchResource = new Resource(new Link(_uriHelper.GetMatchUri(match.GameId, match.MatchId)));
 
             matchResource.AddProperty("date", match.MatchDate.ToString("dd-MMM"));
             matchResource.AddProperty("competition-name", match.CompetitionName);
@@ -38,13 +38,13 @@ namespace TwoNil.API.Resources
 
             if (match.HomeTeam != null)
             {
-               var homeTeamResource = teamMapper.Map(match.HomeTeam, TeamMapper.TeamName);
+               var homeTeamResource = teamMapper.Map(match.HomeTeam, TeamMapper.TeamName, TeamMapper.LeagueName, TeamMapper.CurrentLeaguePosition);
                matchResource.AddResource("home-team", homeTeamResource);
             }
 
             if (match.AwayTeam != null)
             {
-               var awayTeamResource = teamMapper.Map(match.AwayTeam, TeamMapper.TeamName);
+               var awayTeamResource = teamMapper.Map(match.AwayTeam, TeamMapper.TeamName, TeamMapper.LeagueName, TeamMapper.CurrentLeaguePosition);
                matchResource.AddResource("away-team", awayTeamResource);
             }
 

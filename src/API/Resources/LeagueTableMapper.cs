@@ -27,7 +27,7 @@ namespace TwoNil.API.Resources
          {
             var position = new Resource(leagueTableLink);
 
-            position.AddResource("team", teamMapper.Map(leagueTablePosition.Team, TeamMapper.TeamName));
+            position.AddResource("team", teamMapper.Map(leagueTablePosition.Team, TeamMapper.TeamName, TeamMapper.LeagueName, TeamMapper.CurrentLeaguePosition));
             position.AddProperty("position", leagueTablePosition.Position);
             position.AddProperty("played", leagueTablePosition.Matches);
             position.AddProperty("points", leagueTablePosition.Points);

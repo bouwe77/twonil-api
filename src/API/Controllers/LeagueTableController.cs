@@ -1,8 +1,10 @@
 ﻿using Shally.Hal;
 using System.Collections.Generic;
+using System.Linq;
 using Dolores.Responses;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
+using TwoNil.API.Resources.TwoNil.API.Resources;
 using TwoNil.Logic.Exceptions;
 using TwoNil.Shared.DomainObjects;
 
@@ -83,6 +85,9 @@ namespace TwoNil.API.Controllers
          halDocument.AddProperty("current-competition-name", currentCompetitionName);
 
          halDocument.AddResource("rel:leaguetables", leagueTableResources);
+
+         var seasonListResourceFactory = new SeasonListResourceFactory(game, UriHelper, UriHelper.GetSeasonLeagueTablesUri(gameId, "###seasonid###"));
+         halDocument.AddResource("rel:seasons", seasonListResourceFactory.Create());
 
          var response = GetResponse(halDocument);
          return response;

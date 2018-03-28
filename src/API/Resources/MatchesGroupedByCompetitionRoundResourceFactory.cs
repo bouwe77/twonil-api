@@ -19,13 +19,14 @@ namespace TwoNil.API.Resources
          _uriHelper = uriHelper;
       }
 
-      public IEnumerable<Resource> Create(IEnumerable<Match> matches, string gameId, string teamIdOnTop)
+      public IEnumerable<Resource> Create(IEnumerable<Match> matches, string gameId, string teamIdOnTop, out int numberOfMatches)
       {
+         numberOfMatches = 0;
+
          var matchMapper = new MatchMapper(_uriHelper);
          var teamMapper = new TeamMapper(_uriHelper);
 
          var matchesGroupedByCompetitionId = matches.ToLookup(m => m.CompetitionId);
-
          var competitionResources = new List<Resource>();
          foreach (var group in matchesGroupedByCompetitionId)
          {
@@ -54,6 +55,8 @@ namespace TwoNil.API.Resources
                matchResource.AddResource("home-team", teamMapper.Map(match.HomeTeam, TeamMapper.TeamName));
                matchResource.AddResource("away-team", teamMapper.Map(match.AwayTeam, TeamMapper.TeamName));
                matchResources.Add(matchResource);
+
+               numberOfMatches++;
 
                first = false;
             }

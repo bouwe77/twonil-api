@@ -35,7 +35,7 @@ namespace TwoNil.API.Controllers
          halDocument.AddResource("rel:players", playerResources);
 
          var teamListResourceFactory = new TeamListResourceFactory(game, UriHelper, UriHelper.GetTeamPlayersUri(gameId, "###teamid###"));
-         halDocument.AddResource("teams", teamListResourceFactory.Create());
+         halDocument.AddResource("rel:teams", teamListResourceFactory.Create());
 
          var response = GetResponse(halDocument);
          return response;

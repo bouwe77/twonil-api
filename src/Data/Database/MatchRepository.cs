@@ -12,6 +12,17 @@ namespace TwoNil.Data.Database
       {
       }
 
+      public Match GetMatch(string matchId)
+      {
+         var match = GetOne(matchId);
+         if (match != null)
+         {
+            GetReferencedData(match);
+         }
+
+         return match;
+      }
+
       public IEnumerable<Match> GetBySeason(string seasonId)
       {
          var matches = Find(match => match.SeasonId.Equals(seasonId));
@@ -90,17 +101,17 @@ namespace TwoNil.Data.Database
       {
          var repositoryFactory = new DatabaseRepositoryFactory(match.GameId);
 
-         using (var teamRepository = repositoryFactory.CreateRepository<Team>())
+         using (var teamRepository = repositoryFactory.CreateTeamRepository())
          {
             if (!string.IsNullOrWhiteSpace(match.HomeTeamId))
             {
-               var homeTeam = teamRepository.GetOne(match.HomeTeamId);
+               var homeTeam = teamRepository.GetTeam(match.HomeTeamId);
                match.HomeTeam = homeTeam;
             }
 
             if (!string.IsNullOrWhiteSpace(match.AwayTeamId))
             {
-               var awayTeam = teamRepository.GetOne(match.AwayTeamId);
+               var awayTeam = teamRepository.GetTeam(match.AwayTeamId);
                match.AwayTeam = awayTeam;
             }
          }
@@ -138,7 +149,7 @@ namespace TwoNil.Data.Database
       public IEnumerable<TeamRoundMatch> GetTeamRoundMatches(string gameId, string teamId, string seasonId)
       {
          const string sql = @"
-            SELECT r.MatchDate, r.CompetitionId, r.CompetitionName, r.Name AS RoundName, m.HomeTeamId, m.AwayTeamId, 
+            SELECT r.MatchDate, r.CompetitionId, r.CompetitionName, r.Name AS RoundName, m.Id AS MatchId, m.HomeTeamId, m.AwayTeamId, 
             m.HomeScore, m.AwayScore, m.PenaltiesTaken, m.HomePenaltyScore, m.AwayPenaltyScore, m.MatchStatus
             FROM rounds r 
             LEFT OUTER JOIN matches m 
@@ -161,17 +172,17 @@ namespace TwoNil.Data.Database
       {
          var repositoryFactory = new DatabaseRepositoryFactory(teamRoundMatch.GameId);
 
-         using (var teamRepository = repositoryFactory.CreateRepository<Team>())
+         using (var teamRepository = repositoryFactory.CreateTeamRepository())
          {
             if (!string.IsNullOrWhiteSpace(teamRoundMatch.HomeTeamId))
             {
-               var homeTeam = teamRepository.GetOne(teamRoundMatch.HomeTeamId);
+               var homeTeam = teamRepository.GetTeam(teamRoundMatch.HomeTeamId);
                teamRoundMatch.HomeTeam = homeTeam;
             }
 
             if (!string.IsNullOrWhiteSpace(teamRoundMatch.AwayTeamId))
             {
-               var awayTeam = teamRepository.GetOne(teamRoundMatch.AwayTeamId);
+               var awayTeam = teamRepository.GetTeam(teamRoundMatch.AwayTeamId);
                teamRoundMatch.AwayTeam = awayTeam;
             }
          }

@@ -87,6 +87,10 @@ namespace TwoNil.API.Resources
          var otherTeamsLink = new Link(_uriHelper.GetTeamUri(gameInfo.Id, gameInfo.CurrentTeamId)) { Title = "Other Teams" };
          gameLinks.Add(otherTeamsLink);
 
+         // Seasons, starting with the current season.
+         var seasonLink = new Link(_uriHelper.GetSeasonUri(gameInfo.Id, currentSeason.Id)) { Title = "Seasons" };
+         gameLinks.Add(seasonLink);
+
          halDocument.AddLink("game", gameLinks);
       }
    }

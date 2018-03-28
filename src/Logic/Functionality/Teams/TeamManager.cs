@@ -8,14 +8,12 @@ namespace TwoNil.Logic.Functionality.Teams
 {
    internal class TeamManager
    {
-      private ListRandomizer _listRandomizer;
-      private DatabaseRepositoryFactory _repositoryFactory;
-      private TeamGenerator _teamGenerator;
+      private readonly ListRandomizer _listRandomizer;
+      private readonly DatabaseRepositoryFactory _repositoryFactory;
 
       public TeamManager(DatabaseRepositoryFactory repositoryFactory)
       {
          _repositoryFactory = repositoryFactory;
-         _teamGenerator = new TeamGenerator();
          _listRandomizer = new ListRandomizer();
       }
 
@@ -25,21 +23,12 @@ namespace TwoNil.Logic.Functionality.Teams
 
          using (var formationRepository = new MemoryRepositoryFactory().CreateFormationRepository())
          {
-            var formations = formationRepository.GetAll();
-            bool teamGenerationReady = false;
-            while (!teamGenerationReady)
+            var formations = formationRepository.GetAll().ToList();
+
+            for (int i = 0; i < howMany; i++)
             {
-               var team = _teamGenerator.Generate();
-
-               // Team names must be unique.
-               bool teamExists = teams.Any(t => t.Name == team.Name);
-               if (!teamExists)
-               {
-                  team.Formation = _listRandomizer.GetItem(formations);
-                  teams.Add(team);
-               }
-
-               teamGenerationReady = (teams.Count == howMany);
+               var team = new Team { Formation = _listRandomizer.GetItem(formations) };
+               teams.Add(team);
             }
          }
 

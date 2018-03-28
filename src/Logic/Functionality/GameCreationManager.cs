@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using TwoNil.Data;
+using TwoNil.Data.Memory;
 using TwoNil.Logic.Functionality.Competitions;
 using TwoNil.Logic.Functionality.Players;
 using TwoNil.Logic.Functionality.Teams;
@@ -97,6 +98,13 @@ namespace TwoNil.Logic.Functionality
          // Generate all teams for this game.
          const int howManyTeams = Constants.HowManyTeamsPerLeague * Constants.HowManyLeagues;
          var teams = teamManager.Create(howManyTeams).ToList();
+
+         // Assign team names.
+         var teamNames = new TeamNameRepository().GetAll();
+         for (int i = 0; i < teams.Count; i++)
+         {
+            teams[i].Name = teamNames[i];
+         }
 
          teamsAndPlayers.Teams = teams;
 

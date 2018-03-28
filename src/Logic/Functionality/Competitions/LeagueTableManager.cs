@@ -9,6 +9,13 @@ namespace TwoNil.Logic.Functionality.Competitions
 {
    internal class LeagueTableManager
    {
+      private readonly IDatabaseRepositoryFactory _repositoryFactory;
+
+      public LeagueTableManager(IDatabaseRepositoryFactory repositoryFactory)
+      {
+         _repositoryFactory = repositoryFactory;
+      }
+
       /// <summary>
       /// Updates the existing league table with the given match results.
       /// </summary>
@@ -67,6 +74,9 @@ namespace TwoNil.Logic.Functionality.Competitions
             awayTeam.Points += awayPoints;
          }
 
+         bool checkMatchResults = leagueTable.LeagueTablePositions.All(ltp => ltp.Matches > 1);
+         var matchRepository = _repositoryFactory.CreateMatchRepository();
+
          // Sort the league table.
          leagueTable.LeagueTablePositions.Sort((pos1, pos2) =>
          {
@@ -75,50 +85,20 @@ namespace TwoNil.Logic.Functionality.Competitions
             // If both teams still have the same results they will be sorted alphabetically to determine which team goes first.
             if (result == 0)
             {
-               result = string.Compare(pos1.Team.Name, pos2.Team.Name, StringComparison.Ordinal);
+               if (checkMatchResults)
+               {
+                  result = CheckMatchResults(leagueTable, pos1, pos2, matchRepository);
+               }
+               else
+               {
+                  result = string.Compare(pos1.Team.Name, pos2.Team.Name, StringComparison.Ordinal);
+               }
             }
 
             return result;
          });
 
          UpdatePositionNumbers(leagueTable);
-      }
-
-      /// <summary>
-      /// Corrects the league table positions if necessary.
-      /// This is necessary when two teams have exact the same amount of points, goal difference and goals scored.
-      /// The <see cref="UpdateLeagueTable"/> method will sort these teams alphabetically.
-      /// What this method does is look at the match results between the two teams and corrects the position if necessary.
-      /// Note this method has two limitations, which normally should not cause any problems:
-      /// - It does not correct the positions if no or just one match has been played.
-      /// - It does not correct the positions if more than 2 teams have exact the same points and goals.
-      /// </summary>
-      /// <param name="leagueTable"></param>
-      /// <param name="repositoryFactory"></param>
-      public void CorrectPositionsIfNecessary(LeagueTable leagueTable, IDatabaseRepositoryFactory repositoryFactory)
-      {
-         // Only correct if 2 or more matches have been played.
-         if (leagueTable.LeagueTablePositions.All(ltp => ltp.Matches > 1))
-         {
-            var matchRepository = repositoryFactory.CreateMatchRepository();
-
-            // Sort the league table.
-            leagueTable.LeagueTablePositions.Sort((pos1, pos2) =>
-            {
-               int result = SortOnPointsAndGoals(pos1, pos2);
-
-               // If both teams still have the same results look at the match results between the teams. 
-               // If this yields no winner the sort result stays the same and the teams are not re-sorted.
-               if (result == 0)
-               {
-                  result = CheckMatchResults(leagueTable, pos1, pos2, matchRepository);
-               }
-
-               return result;
-            });
-
-            UpdatePositionNumbers(leagueTable);
-         }
       }
 
       private static int CheckMatchResults(LeagueTable leagueTable, LeagueTablePosition pos1, LeagueTablePosition pos2, IMatchRepository matchRepository)

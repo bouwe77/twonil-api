@@ -2,6 +2,7 @@
 using Dolores.Responses;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
+using TwoNil.API.Resources.TwoNil.API.Resources;
 using TwoNil.Logic.Exceptions;
 
 namespace TwoNil.API.Controllers
@@ -16,17 +17,22 @@ namespace TwoNil.API.Controllers
 
          var seasonService = ServiceFactory.CreateSeasonService(game);
 
-         try
+         var season = seasonService.Get(seasonId);
+         if (season == null)
          {
-            bool seasonEnded = seasonService.DetermineSeasonEnded(seasonId);
-            if (!seasonEnded)
-            {
-               throw ResponseHelper.Get400BadRequest("The season is not finished yet");
-            }
+            throw ResponseHelper.Get404NotFound($"Season '{seasonId}' does not exist");
          }
-         catch (BusinessLogicException businessLogicException)
+
+         var currentSeason = seasonService.GetCurrentSeason();
+         if (!currentSeason.Equals(season))
          {
-            throw Handle(businessLogicException);
+            throw ResponseHelper.Get409Conflict("This is not the current season");
+         }
+
+         bool seasonEnded = seasonService.DetermineSeasonEnded(season.Id);
+         if (!seasonEnded)
+         {
+            throw ResponseHelper.Get400BadRequest("The season is not finished yet");
          }
 
          seasonService.EndSeasonAndCreateNext(seasonId);
@@ -64,6 +70,9 @@ namespace TwoNil.API.Controllers
             SeasonStatisticsMapper.NationalCupWinner,
             SeasonStatisticsMapper.NationalCupRunnerUp);
          halDocument.AddResource("rel:season", resource);
+
+         var seasonListResourceFactory = new SeasonListResourceFactory(gameInfo, UriHelper, UriHelper.GetSeasonUri(gameId, "###seasonid###"));
+         halDocument.AddResource("rel:seasons", seasonListResourceFactory.Create());
 
          var response = GetResponse(halDocument);
          return response;

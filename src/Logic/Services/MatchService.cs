@@ -19,13 +19,13 @@ namespace TwoNil.Logic.Services
          _seasonService = new ServiceFactory().CreateSeasonService(gameInfo);
       }
 
-      public Match Get(Match match)
+      public Match GetMatch(string matchId)
       {
          using (var matchRepository = RepositoryFactory.CreateMatchRepository())
          {
             // Get the match from the database.
-            var foundMatch = matchRepository.GetOne(match.Id);
-            return foundMatch;
+            var match = matchRepository.GetMatch(matchId);
+            return match;
          }
       }
 

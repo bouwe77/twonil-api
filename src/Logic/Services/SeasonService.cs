@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using TwoNil.Logic.Exceptions;
 using TwoNil.Logic.Functionality.Competitions;
 using TwoNil.Shared.DomainObjects;
@@ -28,14 +29,16 @@ namespace TwoNil.Logic.Services
          }
       }
 
+      public IEnumerable<Season> GetAll()
+      {
+         using (var seasonRepository = RepositoryFactory.CreateSeasonRepository())
+         {
+            return seasonRepository.GetAll();
+         }
+      }
+
       public bool DetermineSeasonEnded(string seasonId)
       {
-         var season = Get(seasonId);
-         if (season == null)
-         {
-            throw new NotFoundException($"Season '{seasonId}' does not exist");
-         }
-
          bool seasonEnded;
          using (var matchRepository = RepositoryFactory.CreateMatchRepository())
          {

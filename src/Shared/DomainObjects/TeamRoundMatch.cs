@@ -9,6 +9,7 @@ namespace TwoNil.Shared.DomainObjects
    public class TeamRoundMatch
    {
       public string GameId { get; set; }
+      public string MatchId { get; set; }
       public DateTime MatchDate { get; set; }
       public string CompetitionId { get; set; }
       public string CompetitionName { get; set; }
@@ -22,13 +23,7 @@ namespace TwoNil.Shared.DomainObjects
       public int AwayPenaltyScore { get; set; }
       public MatchStatus MatchStatus { get; set; }
 
-      public bool Played
-      {
-         get
-         {
-            return MatchStatus == MatchStatus.Ended;
-         }
-      }
+      public bool Played => MatchStatus == MatchStatus.Ended;
 
       private Team _homeTeam;
       private Team _awayTeam;

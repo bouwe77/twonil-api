@@ -1,22 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Randomization;
-using TwoNil.Logic.Functionality.Teams;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Services
 {
    public class TeamService : ServiceWithGameBase
    {
-      private readonly TeamGenerator _teamGenerator;
-      private readonly IListRandomizer _listRandomizer;
-
       internal TeamService(GameInfo gameInfo)
          : base(gameInfo)
       {
-         _teamGenerator = new TeamGenerator();
-         _listRandomizer = new ListRandomizer();
       }
 
       /// <summary>
@@ -53,11 +45,6 @@ namespace TwoNil.Logic.Services
             var team = teamRepository.GetTeam(teamId);
             return team;
          }
-      }
-
-      public Team GetMyTeam()
-      {
-         throw new NotImplementedException();
       }
    }
 }

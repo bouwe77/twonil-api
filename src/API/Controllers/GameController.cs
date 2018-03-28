@@ -112,14 +112,11 @@ namespace TwoNil.API.Controllers
                   MatchMapper.Date,
                   MatchMapper.Round);
 
-               if (matchForCurrentTeam.HomeTeam != null && matchForCurrentTeam.AwayTeam != null)
-               {
-                  var teamMapper = new TeamMapper(UriHelper);
-                  var homeTeamResource = teamMapper.Map(matchForCurrentTeam.HomeTeam, TeamMapper.TeamName);
-                  matchResource.AddResource("home-team", homeTeamResource);
-                  var awayTeamResource = teamMapper.Map(matchForCurrentTeam.AwayTeam, TeamMapper.TeamName);
-                  matchResource.AddResource("away-team", awayTeamResource);
-               }
+               var teamMapper = new TeamMapper(UriHelper);
+               var homeTeamResource = teamMapper.Map(matchForCurrentTeam.HomeTeam, TeamMapper.TeamName, TeamMapper.LeagueName, TeamMapper.CurrentLeaguePosition);
+               matchResource.AddResource("home-team", homeTeamResource);
+               var awayTeamResource = teamMapper.Map(matchForCurrentTeam.AwayTeam, TeamMapper.TeamName, TeamMapper.LeagueName, TeamMapper.CurrentLeaguePosition);
+               matchResource.AddResource("away-team", awayTeamResource);
 
                matchDayResource.AddResource("next-match", matchResource);
             }

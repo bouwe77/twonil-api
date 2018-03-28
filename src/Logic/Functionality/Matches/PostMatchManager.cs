@@ -34,7 +34,7 @@ namespace TwoNil.Logic.Functionality.Matches
 
          var seasonStatisticsManager = new SeasonStatisticsManager(_transactionManager, _repositoryFactory);
          var seasonTeamStatisticsManager = new SeasonTeamStatisticsManager(_transactionManager, _repositoryFactory, seasonId);
-         var leagueTableManager = new LeagueTableManager();
+         var leagueTableManager = new LeagueTableManager(_repositoryFactory);
 
          foreach (var round in rounds)
          {
@@ -51,7 +51,6 @@ namespace TwoNil.Logic.Functionality.Matches
 
                // Update the league table and current league table position of the team.
                leagueTableManager.UpdateLeagueTable(leagueTable, matchesForThisRound);
-               leagueTableManager.CorrectPositionsIfNecessary(leagueTable, _repositoryFactory);
                _transactionManager.RegisterUpdate(leagueTable);
                _transactionManager.RegisterUpdate(leagueTable.LeagueTablePositions);
                var teams = leagueTable.LeagueTablePositions.Select(x => x.Team).ToList();

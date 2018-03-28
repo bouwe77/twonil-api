@@ -19,7 +19,7 @@ namespace TwoNil.Logic.Functionality.Competitions
          _leagueManager = new LeagueManager();
       }
 
-      public void CreateFirstSeason(List<Team> teams, TransactionManager repository)
+      public void CreateFirstSeason(List<Team> teams, TransactionManager transactionManager)
       {
          // First check the number of teams can be evenly divided into the number of leagues.
          bool teamsOk = teams.Count % Constants.HowManyLeagues == 0;
@@ -50,10 +50,10 @@ namespace TwoNil.Logic.Functionality.Competitions
          var seasonAndCompetitionSchedules = CreateSeasonAndCompetitionSchedules(newSeasonInfo);
 
          // Insert the season and all competition schedules.
-         var season = InsertSeasonAndCompetitionSchedule(repository, seasonAndCompetitionSchedules);
+         InsertSeasonAndCompetitionSchedule(transactionManager, seasonAndCompetitionSchedules);
 
          // Insert statistics.
-         InsertStatistics(_repositoryFactory, repository, teams, seasonAndCompetitionSchedules);
+         InsertStatistics(transactionManager, teams, seasonAndCompetitionSchedules);
       }
 
       public void CreateNextSeason(Season previousSeason, TransactionManager repository)
@@ -69,10 +69,10 @@ namespace TwoNil.Logic.Functionality.Competitions
          };
 
          // Determine which teams promote and relegate.
-         IEnumerable<Team> allTeamsSortedOnLeagueAndPosition;
+         List<Team> allTeamsSortedOnLeagueAndPosition;
          using (var teamRepository = _repositoryFactory.CreateTeamRepository())
          {
-            allTeamsSortedOnLeagueAndPosition = teamRepository.GetTeams().OrderBy(x => x.CurrentLeagueCompetition.Order).ThenBy(x => x.CurrentLeaguePosition);
+            allTeamsSortedOnLeagueAndPosition = teamRepository.GetTeams().OrderBy(x => x.CurrentLeagueCompetition.Order).ThenBy(x => x.CurrentLeaguePosition).ToList();
          }
 
          var teamsGroupedPerLeague = allTeamsSortedOnLeagueAndPosition.GroupBy(t => t.CurrentLeagueCompetitionId).Select(grp => grp.ToList()).ToList();
@@ -97,10 +97,10 @@ namespace TwoNil.Logic.Functionality.Competitions
          InsertSeasonAndCompetitionSchedule(repository, seasonAndCompetitionSchedules);
 
          // Insert statistics.
-         InsertStatistics(_repositoryFactory, repository, allTeamsSortedOnLeagueAndPosition, seasonAndCompetitionSchedules);
+         InsertStatistics(repository, allTeamsSortedOnLeagueAndPosition, seasonAndCompetitionSchedules);
       }
 
-      private void InsertStatistics(DatabaseRepositoryFactory repositoryFactory, TransactionManager transactionManager, IEnumerable<Team> teams, SeasonAndCompetitionSchedules seasonAndCompetitionSchedules)
+      private void InsertStatistics(TransactionManager transactionManager, IEnumerable<Team> teams, SeasonAndCompetitionSchedules seasonAndCompetitionSchedules)
       {
          string league1LeagueTableId = seasonAndCompetitionSchedules.LeaguesSchedule.LeagueTables[0].Id;
          string league2LeagueTableId = seasonAndCompetitionSchedules.LeaguesSchedule.LeagueTables[1].Id;
@@ -137,7 +137,7 @@ namespace TwoNil.Logic.Functionality.Competitions
          }
       }
 
-      private Season InsertSeasonAndCompetitionSchedule(TransactionManager repository, SeasonAndCompetitionSchedules seasonAndCompetitionSchedules)
+      private void InsertSeasonAndCompetitionSchedule(TransactionManager repository, SeasonAndCompetitionSchedules seasonAndCompetitionSchedules)
       {
          // Insert the season.
          repository.RegisterInsert(seasonAndCompetitionSchedules.Season);
@@ -159,8 +159,6 @@ namespace TwoNil.Logic.Functionality.Competitions
 
          // Update the teams.
          repository.RegisterUpdate(seasonAndCompetitionSchedules.Teams);
-
-         return seasonAndCompetitionSchedules.Season;
       }
 
       private SeasonAndCompetitionSchedules CreateSeasonAndCompetitionSchedules(NewSeasonInfo newSeasonInfo)

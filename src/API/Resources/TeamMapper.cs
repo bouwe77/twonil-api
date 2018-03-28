@@ -12,6 +12,7 @@ namespace TwoNil.API.Resources
       public static string Rating = "rating";
       public static string RatingPercentage = "rating-percentage";
       public static string LeagueName = "league-name";
+      public static string CurrentLeaguePosition = "current-league-position";
 
       public TeamMapper(UriHelper uriHelper)
       {
@@ -41,6 +42,11 @@ namespace TwoNil.API.Resources
          if (properties.Contains(LeagueName))
          {
             resource.AddProperty(LeagueName, team.CurrentLeagueCompetition.Name);
+         }
+
+         if (properties.Contains(CurrentLeaguePosition))
+         {
+            resource.AddProperty(CurrentLeaguePosition, team.CurrentLeaguePosition);
          }
 
          return resource;

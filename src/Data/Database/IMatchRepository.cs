@@ -15,5 +15,6 @@ namespace TwoNil.Data.Database
       IEnumerable<Match> GetMatchesBetweenTeams(SeasonCompetition seasonCompetition, string team1Id, string team2Id);
       DateTime? GetNextMatchDay(string seasonId);
       IEnumerable<TeamRoundMatch> GetTeamRoundMatches(string gameId, string teamId, string seasonId);
+      Match GetMatch(string matchId);
    }
 }

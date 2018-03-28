@@ -38,11 +38,11 @@ namespace TwoNil.Data.Database
             leagueTable.SeasonCompetition = seasonCompetition;
          }
 
-         using (var teamRepository = repositoryFactory.CreateRepository<Team>())
+         using (var teamRepository = repositoryFactory.CreateTeamRepository())
          {
             foreach (var leagueTablePosition in leagueTable.LeagueTablePositions)
             {
-               var team = teamRepository.GetOne(leagueTablePosition.TeamId);
+               var team = teamRepository.GetTeam(leagueTablePosition.TeamId);
                leagueTablePosition.Team = team;
             }
          }
