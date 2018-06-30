@@ -12,6 +12,7 @@ namespace TwoNil.Shared.DomainObjects
       /// The order of the player within the team squad.
       /// </summary>
       public int TeamOrder { get; set; }
+      public bool InStartingEleven { get; set; }
 
       public int SkillGoalkeeping { get; set; }
       public int SkillDefending { get; set; }
@@ -35,23 +36,20 @@ namespace TwoNil.Shared.DomainObjects
       public int SkillIntelligence { get; set; }
 
       public string PlayerProfile { get; set; }
+
       public decimal Rating { get; set; }
+      public decimal RatingGoalkeeping { get; set; }
+      public decimal RatingDefence { get; set; }
+      public decimal RatingMidfield { get; set; }
+      public decimal RatingAttack { get; set; }
 
       private Team _team;
-      private Position _preferredPosition;
-      private Position _currentPosition;
-
       public string TeamId { get; private set; }
-      public string PreferredPositionId { get; private set; }
-      public string CurrentPositionId { get; private set; }
 
       [Ignore]
       public Team Team
       {
-         get
-         {
-            return _team;
-         }
+         get => _team;
          set
          {
             _team = value;
@@ -59,13 +57,13 @@ namespace TwoNil.Shared.DomainObjects
          }
       }
 
+      private Position _preferredPosition;
+      public string PreferredPositionId { get; private set; }
+
       [Ignore]
       public Position PreferredPosition
       {
-         get
-         {
-            return _preferredPosition;
-         }
+         get => _preferredPosition;
          set
          {
             _preferredPosition = value;
@@ -73,13 +71,13 @@ namespace TwoNil.Shared.DomainObjects
          }
       }
 
+      private Position _currentPosition;
+      public string CurrentPositionId { get; private set; }
+
       [Ignore]
       public Position CurrentPosition
       {
-         get
-         {
-            return _currentPosition;
-         }
+         get => _currentPosition;
          set
          {
             _currentPosition = value;

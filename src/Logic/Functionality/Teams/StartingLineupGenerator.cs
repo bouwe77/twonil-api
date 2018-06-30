@@ -37,7 +37,7 @@ namespace TwoNil.Logic.Functionality.Teams
          {
             throw new Exception("There are not enough players");
          }
-         
+
          // Sort the players on rating and then on name.
          players.Sort(delegate (Player p1, Player p2)
          {
@@ -147,9 +147,12 @@ namespace TwoNil.Logic.Functionality.Teams
          {
             if (newPlayers[i] == null)
             {
+               var positionWeNeed = formation.Positions[i];
+
                var playerForPos = bestFieldPlayers.FirstOrDefault();
                if (playerForPos != null)
                {
+                  playerForPos.CurrentPosition = positionWeNeed;
                   playerForPos.TeamOrder = i;
                   newPlayers[i] = playerForPos;
                   bestFieldPlayers.Remove(playerForPos);
@@ -159,6 +162,7 @@ namespace TwoNil.Logic.Functionality.Teams
                   playerForPos = otherFieldPlayers.FirstOrDefault();
                   if (playerForPos != null)
                   {
+                     playerForPos.CurrentPosition = positionWeNeed;
                      playerForPos.TeamOrder = i;
                      newPlayers[i] = playerForPos;
                      otherFieldPlayers.Remove(playerForPos);
@@ -168,6 +172,7 @@ namespace TwoNil.Logic.Functionality.Teams
                      playerForPos = goalkeepers.FirstOrDefault();
                      if (playerForPos != null)
                      {
+                        playerForPos.CurrentPosition = positionWeNeed;
                         playerForPos.TeamOrder = i;
                         newPlayers[i] = playerForPos;
                         goalkeepers.Remove(playerForPos);
@@ -197,6 +202,11 @@ namespace TwoNil.Logic.Functionality.Teams
             otherFieldPlayer.TeamOrder = teamOrder;
             newPlayers[teamOrder] = otherFieldPlayer;
             teamOrder++;
+         }
+
+         for (int i = 0; i < 11; i++)
+         {
+            newPlayers[i].InStartingEleven = true;
          }
 
          return newPlayers.ToList();

@@ -110,9 +110,20 @@ namespace TwoNil.Logic.Functionality.Players
          var determinedPosition = _positionDeterminator.Determine(skillScores);
          player.PreferredPosition = determinedPosition;
 
-         player.Rating = PlayerRater.GetRating(player);
+         DetermineRating(player);
 
          return player;
+      }
+
+      private static void DetermineRating(Player player)
+      {
+         var rating = PlayerRater.GetRating(player);
+
+         player.Rating = rating.rating;
+         player.RatingGoalkeeping = rating.ratingGoalkeeping;
+         player.RatingDefence = rating.ratingDefence;
+         player.RatingMidfield = rating.ratingMidfield;
+         player.RatingAttack = rating.ratingAttack;
       }
 
       public Player Generate()

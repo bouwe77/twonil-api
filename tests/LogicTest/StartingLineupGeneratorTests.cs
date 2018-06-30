@@ -158,6 +158,21 @@ namespace TwoNil.Logic
          bool emptyPositionsFound = players.Any(x => x == null);
          Assert.IsFalse(emptyPositionsFound);
 
+         // Assert the first 11 players have a CurrentPosition and a boolean indicating they are in the starting eleven, and all others have not.
+         for (int i = 0; i < players.Count; i++)
+         {
+            if (i <= 10)
+            {
+               Assert.IsNotNull(players[i].CurrentPosition);
+               Assert.IsTrue(players[i].InStartingEleven);
+            }
+            else
+            {
+               Assert.IsNull(players[i].CurrentPosition);
+               Assert.IsFalse(players[i].InStartingEleven);
+            }
+         }
+
          // Assert the PlayerId is unique.
          var uniquePlayers = players.Select(p => p.Id).Distinct().ToList();
          Assert.AreEqual(howManyPlayers, uniquePlayers.Count);

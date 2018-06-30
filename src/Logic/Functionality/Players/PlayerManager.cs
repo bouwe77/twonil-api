@@ -22,8 +22,8 @@ namespace TwoNil.Logic.Functionality.Players
 
          using (var lineRepository = new MemoryRepositoryFactory().CreateLineRepository())
          {
-            // Generate 2 goalkeepers.
-            int howMany = 2;
+            // Generate 2 or 3 goalkeepers.
+            int howMany = _numberRandomizer.GetNumber(2, 3);
             var line = lineRepository.GetGoalkeeper();
             squad.AddRange(GeneratePlayersForLine(line, howMany, averageRating));
 

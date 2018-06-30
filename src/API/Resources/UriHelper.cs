@@ -73,6 +73,12 @@ namespace TwoNil.API.Resources
          return uri;
       }
 
+      public string GetGameLinksUri(string gameId)
+      {
+         string uri = GetUri("/games/{0}/links", gameId);
+         return uri;
+      }
+
       public string GetGamesUri()
       {
          string uri = GetUri("/games");

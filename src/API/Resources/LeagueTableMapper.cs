@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Shally.Hal;
 using TwoNil.Shared.DomainObjects;
 
@@ -7,6 +8,8 @@ namespace TwoNil.API.Resources
    public class LeagueTableMapper : IResourceMapper<LeagueTable>
    {
       private readonly UriHelper _uriHelper;
+
+      public static string FullDetails = "FullDetails";
 
       public LeagueTableMapper(UriHelper uriHelper)
       {
@@ -31,18 +34,23 @@ namespace TwoNil.API.Resources
             position.AddProperty("position", leagueTablePosition.Position);
             position.AddProperty("played", leagueTablePosition.Matches);
             position.AddProperty("points", leagueTablePosition.Points);
-            position.AddProperty("wins", leagueTablePosition.Wins);
-            position.AddProperty("draws", leagueTablePosition.Draws);
-            position.AddProperty("losses", leagueTablePosition.Losses);
-            position.AddProperty("goals-scored", leagueTablePosition.GoalsScored);
-            position.AddProperty("goals-conceded", leagueTablePosition.GoalsConceded);
 
-            string goalDifference = leagueTablePosition.GoalDifference.ToString();
-            if (leagueTablePosition.GoalDifference > 0)
+            if (properties.Contains(FullDetails))
             {
-               goalDifference = $"+{goalDifference}";
+               position.AddProperty("wins", leagueTablePosition.Wins);
+               position.AddProperty("draws", leagueTablePosition.Draws);
+               position.AddProperty("losses", leagueTablePosition.Losses);
+               position.AddProperty("goals-scored", leagueTablePosition.GoalsScored);
+               position.AddProperty("goals-conceded", leagueTablePosition.GoalsConceded);
+
+               string goalDifference = leagueTablePosition.GoalDifference.ToString();
+               if (leagueTablePosition.GoalDifference > 0)
+               {
+                  goalDifference = $"+{goalDifference}";
+               }
+
+               position.AddProperty("goal-difference", goalDifference);
             }
-            position.AddProperty("goal-difference", goalDifference);
 
             positions.Add(position);
          }

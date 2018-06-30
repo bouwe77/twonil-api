@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Dolores.Http;
 using Dolores.Responses;
+using Shally.Forms;
 using Shally.Hal;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
 using TwoNil.API.Resources.TwoNil.API.Resources;
 using TwoNil.Logic.Exceptions;
-using TwoNil.Logic.Services;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Controllers
@@ -45,6 +44,8 @@ namespace TwoNil.API.Controllers
          }
 
          var response = new CreatedResponse(locationUri);
+         AddAccessControlAllowOriginHeader(response);
+
          return response;
       }
 
@@ -63,6 +64,8 @@ namespace TwoNil.API.Controllers
          }
 
          halDocument.AddResource("rel:matches-per-competition", matchResources);
+
+         AddPlayNextMatchDayForm(game, halDocument, matchDay);
 
          return GetResponse(halDocument);
       }
@@ -90,7 +93,10 @@ namespace TwoNil.API.Controllers
             MatchMapper.AwayScore,
             MatchMapper.PenaltiesTaken,
             MatchMapper.HomePenaltyScore,
-            MatchMapper.AwayPenaltyScore);
+            MatchMapper.AwayPenaltyScore,
+            MatchMapper.Date,
+            MatchMapper.Played,
+            MatchMapper.Round);
 
          var teamMapper = new TeamMapper(UriHelper);
          var homeTeamResource = teamMapper.Map(match.HomeTeam, TeamMapper.TeamName);
@@ -100,15 +106,37 @@ namespace TwoNil.API.Controllers
 
          halDocument.AddResource("rel:match", matchResource);
 
+         AddPlayNextMatchDayForm(gameInfo, halDocument, match.Date);
+
          // Add the other matches that are played on this match day. Unless there is only one match, then there's no need to add these matches.
-         var matchesPerCompetition = GetDayMatchesResources(gameInfo, match.Date, out int numberOfMatches);
-         if (numberOfMatches > 1)
-         {
-            halDocument.AddResource("rel:matches-per-competition", matchesPerCompetition);
-         }
+         //var matchesPerCompetition = GetDayMatchesResources(gameInfo, match.Date, out int numberOfMatches);
+         //if (numberOfMatches > 1)
+         //{
+         //   halDocument.AddResource("rel:matches-per-competition", matchesPerCompetition);
+         //}
 
          var response = GetResponse(halDocument);
          return response;
+      }
+
+      private void AddPlayNextMatchDayForm(GameInfo gameInfo, Resource halDocument, DateTime matchDate)
+      {
+         var seasonService = ServiceFactory.CreateSeasonService(gameInfo);
+         var matchService = ServiceFactory.CreateMatchService(gameInfo);
+
+         var currentSeason = seasonService.GetCurrentSeason();
+         var nextMatchDate = matchService.GetNextMatchDate(currentSeason.Id);
+         if (nextMatchDate.HasValue && matchDate == nextMatchDate)
+         {
+            // Add a form to play the match day.
+            var matchDayResourceFactory = new MatchDayResourceFactory(UriHelper, gameInfo.Id, nextMatchDate.Value);
+            var form = matchDayResourceFactory.GetForm();
+            halDocument.AddForm(form);
+
+            // Also add a link to the match day.
+            var link = matchDayResourceFactory.GetLink();
+            halDocument.AddLink("rel:next-match-day", link);
+         }
       }
 
       public Response GetTeamMatches(string gameId, string seasonId, string teamId)

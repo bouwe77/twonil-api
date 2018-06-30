@@ -10,6 +10,10 @@ namespace TwoNil.API.Resources
       private readonly UriHelper _uriHelper;
       public static string TeamName = "name";
       public static string Rating = "rating";
+      public static string RatingGoalkeeper = "rating-goalkeeper";
+      public static string RatingDefence = "rating-defence";
+      public static string RatingMidfield = "rating-midfield";
+      public static string RatingAttack = "rating-attack";
       public static string RatingPercentage = "rating-percentage";
       public static string LeagueName = "league-name";
       public static string CurrentLeaguePosition = "current-league-position";
@@ -31,6 +35,26 @@ namespace TwoNil.API.Resources
          if (properties.Contains(Rating))
          {
             resource.AddProperty(Rating, team.Rating);
+         }
+
+         if (properties.Contains(RatingGoalkeeper))
+         {
+            resource.AddProperty(RatingGoalkeeper, team.RatingGoalkeeper);
+         }
+
+         if (properties.Contains(RatingDefence))
+         {
+            resource.AddProperty(RatingDefence, team.RatingDefence);
+         }
+
+         if (properties.Contains(RatingMidfield))
+         {
+            resource.AddProperty(RatingMidfield, team.RatingMidfield);
+         }
+
+         if (properties.Contains(RatingAttack))
+         {
+            resource.AddProperty(RatingAttack, team.RatingAttack);
          }
 
          if (properties.Contains(RatingPercentage))

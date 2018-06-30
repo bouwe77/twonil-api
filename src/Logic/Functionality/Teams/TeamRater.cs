@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using TwoNil.Data;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Functionality.Teams
@@ -9,17 +10,24 @@ namespace TwoNil.Logic.Functionality.Teams
    /// </summary>
    internal class TeamRater
    {
-      /// <summary>
-      /// Gets the average rating for the given players.
-      /// These players are typically all players in a specific line.
-      /// </summary>
-      /// <param name="players"></param>
-      /// <returns></returns>
-      public static decimal GetRating(IEnumerable<Player> players)
+      public static (decimal ratingGoalkeeper, decimal ratingDefence, decimal ratingMidfield, decimal ratingAttack, decimal ratingTeam) GetRating(List<Player> players)
       {
-         // For now, team rating is the average rating of all players.
-         var average = players.Average(player => player.Rating);
-         return average;
+         using (var lineRepository = new MemoryRepositoryFactory().CreateLineRepository())
+         {
+            var goalkeeper = lineRepository.GetGoalkeeper();
+            var defence = lineRepository.GetDefence();
+            var midfield = lineRepository.GetMidfield();
+            var attack = lineRepository.GetAttack();
+
+            decimal ratingGoalkeeper = players.Single(p => p.CurrentPosition.Line.Equals(goalkeeper)).RatingGoalkeeping;
+            decimal ratingDefence = players.Where(p => p.CurrentPosition.Line.Equals(defence)).Select(p => p.RatingDefence).Average();
+            decimal ratingMidfield = players.Where(p => p.CurrentPosition.Line.Equals(midfield)).Select(p => p.RatingMidfield).Average();
+            decimal ratingAttack = players.Where(p => p.CurrentPosition.Line.Equals(attack)).Select(p => p.RatingAttack).Average();
+
+            decimal ratingTeam = (ratingGoalkeeper + ratingDefence + ratingMidfield + ratingAttack) / 4;
+
+            return (ratingGoalkeeper, ratingDefence, ratingMidfield, ratingAttack, ratingTeam);
+         }
       }
    }
 }

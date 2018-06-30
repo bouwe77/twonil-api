@@ -50,11 +50,11 @@ namespace TwoNil.Data.Database
          return matches;
       }
 
-      public DateTime? GetNextMatchDay(string seasonId)
+      public DateTime? GetNextMatchDate(string seasonId)
       {
          DateTime? nextMatchDay = null;
 
-         var matches = GetByMatchStatus(seasonId, MatchStatus.NotStarted);
+         var matches = GetByMatchStatus(seasonId, MatchStatus.NotStarted).ToList();
          if (matches.Any())
          {
             nextMatchDay = matches.Min(match => match.Date);

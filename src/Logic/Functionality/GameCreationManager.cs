@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Randomization;
 using TwoNil.Data;
 using TwoNil.Data.Memory;
 using TwoNil.Logic.Functionality.Competitions;
@@ -71,7 +72,9 @@ namespace TwoNil.Logic.Functionality
 
             // ===================================================================
             //TODO OK, let MODDERVOKKIN op
-            gameInfo.CurrentTeam = teamsAndPlayers.Teams.First();
+            var numberRandomizer = new NumberRandomizer();
+            int randomIndex = numberRandomizer.GetNumber(0, Constants.HowManyTeamsPerLeague * Constants.HowManyLeagues - 1);
+            gameInfo.CurrentTeam = teamsAndPlayers.Teams[randomIndex];
             // ===================================================================
 
             // Insert teams.
@@ -110,6 +113,9 @@ namespace TwoNil.Logic.Functionality
 
          var averageRatingsPerLeague = new[] { 5, 9, 13, 17 };
          int averageRatingIndex = 0;
+
+         var startingLineupGenerator = new StartingLineupGenerator();
+
          foreach (var team in teams)
          {
             int teamIndex = teams.IndexOf(team);
@@ -119,10 +125,13 @@ namespace TwoNil.Logic.Functionality
             }
 
             int currentAverageRating = averageRatingsPerLeague[averageRatingIndex];
-            var players = playerManager.GenerateSquad(team, currentAverageRating);
-            teamsAndPlayers.Players.AddRange(players);
+            var players = playerManager.GenerateSquad(team, currentAverageRating).ToList();
 
-            teamManager.UpdateRating(team, players);
+            var players2 = startingLineupGenerator.GenerateStartingLineup(players, team.Formation);
+
+            teamsAndPlayers.Players.AddRange(players2);
+
+            teamManager.UpdateRating(team, players.Where(p => p.InStartingEleven).ToList());
          }
 
          return teamsAndPlayers;

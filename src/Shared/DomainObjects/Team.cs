@@ -15,8 +15,11 @@ namespace TwoNil.Shared.DomainObjects
       private Formation _formation;
       public string FormationId { get; private set; }
 
-      // deze is denk ik tijdelijk, maar ik had even wat nodig om globaal aan tegeven hoe goed of slecht een team is...
       public decimal Rating { get; set; }
+      public decimal RatingGoalkeeper { get; set; }
+      public decimal RatingDefence { get; set; }
+      public decimal RatingMidfield { get; set; }
+      public decimal RatingAttack { get; set; }
 
       [Ignore]
       public Competition CurrentLeagueCompetition

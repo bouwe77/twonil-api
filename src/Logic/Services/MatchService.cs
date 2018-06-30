@@ -46,11 +46,11 @@ namespace TwoNil.Logic.Services
          }
       }
 
-      public DateTime? GetNextMatchDay(string seasonId)
+      public DateTime? GetNextMatchDate(string seasonId)
       {
          using (var matchRepository = RepositoryFactory.CreateMatchRepository())
          {
-            return matchRepository.GetNextMatchDay(seasonId);
+            return matchRepository.GetNextMatchDate(seasonId);
          }
       }
 
@@ -72,20 +72,20 @@ namespace TwoNil.Logic.Services
          }
       }
 
-      public void PlayMatchDay(DateTime matchDay)
+      public void PlayMatchDay(DateTime matchDate)
       {
          // First check if the given matchDay is the "next" match day in this season.
          var currentSeason = _seasonService.GetCurrentSeason();
-         var nextMatchDay = GetNextMatchDay(currentSeason.Id);
-         if (!nextMatchDay.Equals(matchDay))
+         var nextMatchDate = GetNextMatchDate(currentSeason.Id);
+         if (!nextMatchDate.Equals(matchDate))
          {
-            throw new ConflictException("These matches can't be played now");
+            throw new ConflictException("This date is not the next match date");
          }
 
-         var matchesToPlay = GetByMatchDay(matchDay).ToList();
+         var matchesToPlay = GetByMatchDay(matchDate).ToList();
          if (!matchesToPlay.Any())
          {
-            throw new NotFoundException("There are no matches on this day");
+            throw new NotFoundException("There are no matches on this date");
          }
 
          foreach (var match in matchesToPlay)

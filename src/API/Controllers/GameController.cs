@@ -9,6 +9,7 @@ using Shally.Forms;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
 using TwoNil.Logic.Functionality;
+using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Controllers
 {
@@ -47,6 +48,7 @@ namespace TwoNil.API.Controllers
          halDocument.AddResource("rel:games", gameResources);
 
          var response = GetResponse(halDocument);
+
          return response;
       }
 
@@ -63,7 +65,7 @@ namespace TwoNil.API.Controllers
 
          var halDocument = CreateHalDocument(UriHelper.GetGameUri(gameId), gameInfo);
 
-         var teamResource = new TeamMapper(UriHelper).Map(gameInfo.CurrentTeam, TeamMapper.TeamName, TeamMapper.Rating, TeamMapper.RatingPercentage);
+         var teamResource = new TeamMapper(UriHelper).Map(gameInfo.CurrentTeam, TeamMapper.TeamName, TeamMapper.Rating, TeamMapper.RatingGoalkeeper, TeamMapper.RatingDefence, TeamMapper.RatingMidfield, TeamMapper.RatingAttack, TeamMapper.RatingPercentage);
          halDocument.AddResource("rel:my-team", teamResource);
 
          var seasonService = ServiceFactory.CreateSeasonService(gameInfo);
@@ -94,15 +96,16 @@ namespace TwoNil.API.Controllers
          halDocument.AddResource("rel:season-team-statistics", seasonTeamStatisticsResource);
 
          var matchService = ServiceFactory.CreateMatchService(gameInfo);
-         var nextMatchDay = matchService.GetNextMatchDay(currentSeason.Id);
+         var nextMatchDate = matchService.GetNextMatchDate(currentSeason.Id);
 
-         if (nextMatchDay.HasValue)
+         if (nextMatchDate.HasValue)
          {
-            string matchDayId = nextMatchDay.Value.ToString("yyyyMMddHH");
-            var matchDayResource = new MatchDayResourceFactory(UriHelper).Create(gameId, matchDayId);
+            var matchDayResourceFactory = new MatchDayResourceFactory(UriHelper, gameId, nextMatchDate.Value);
+
+            var matchDayResource = matchDayResourceFactory.Create();
 
             // Add a resource for the match of the current team.
-            var matchForCurrentTeam = matchService.GetByMatchDayAndTeam(nextMatchDay.Value, gameInfo.CurrentTeamId);
+            var matchForCurrentTeam = matchService.GetByMatchDayAndTeam(nextMatchDate.Value, gameInfo.CurrentTeamId);
             if (matchForCurrentTeam != null)
             {
                var matchResource = new MatchMapper(UriHelper).Map(
@@ -113,22 +116,28 @@ namespace TwoNil.API.Controllers
                   MatchMapper.Round);
 
                var teamMapper = new TeamMapper(UriHelper);
+
                var homeTeamResource = teamMapper.Map(matchForCurrentTeam.HomeTeam, TeamMapper.TeamName, TeamMapper.LeagueName, TeamMapper.CurrentLeaguePosition);
                matchResource.AddResource("home-team", homeTeamResource);
+
                var awayTeamResource = teamMapper.Map(matchForCurrentTeam.AwayTeam, TeamMapper.TeamName, TeamMapper.LeagueName, TeamMapper.CurrentLeaguePosition);
                matchResource.AddResource("away-team", awayTeamResource);
+
+               matchResource.AddResource("your-opponent", gameInfo.CurrentTeam.Equals(matchForCurrentTeam.HomeTeam) ? awayTeamResource : homeTeamResource);
 
                matchDayResource.AddResource("next-match", matchResource);
             }
 
-            var form = new Form("play-match-day");
-            form.Action = UriHelper.GetMatchDayUri(gameId, matchDayId);
-            form.Method = "post";
-            form.Title = "Play matches";
-            matchDayResource.AddForm(form);
+            var playNextMatchDayForm = matchDayResourceFactory.GetForm();
+            matchDayResource.AddForm(playNextMatchDayForm);
 
             halDocument.AddResource("rel:next-match-day", matchDayResource);
          }
+
+         var leagueTableService = ServiceFactory.CreateLeagueTableService(gameInfo);
+         var leagueTable = leagueTableService.GetBySeasonAndCompetition(currentSeason.Id, gameInfo.CurrentTeam.CurrentLeagueCompetitionId);
+         var leagueTableResource = new LeagueTableMapper(UriHelper).Map(leagueTable);
+         halDocument.AddResource("rel:leaguetable", leagueTableResource);
 
          var response = GetResponse(halDocument);
          return response;

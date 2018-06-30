@@ -1,6 +1,5 @@
 ﻿using Shally.Hal;
 using System.Collections.Generic;
-using System.Linq;
 using Dolores.Responses;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
@@ -13,42 +12,6 @@ namespace TwoNil.API.Controllers
 
    public class LeagueTableController : ControllerBase
    {
-      public Response GetBySeasonAndCompetition(string gameId, string seasonId, string competitionId)
-      {
-         var game = GetGameInfo(gameId);
-
-         RequestHelper.ValidateId(seasonId);
-         RequestHelper.ValidateId(competitionId);
-
-         //TODO Check season exists and belongs to user.
-         var seasonService = ServiceFactory.CreateSeasonService(game);
-         var season = seasonService.Get(seasonId);
-
-         // Check competition exists.
-         var competitionService = ServiceFactory.CreateCompetitionService();
-         var competition = competitionService.Get(competitionId);
-         if (competition == null)
-         {
-            throw ResponseHelper.Get404NotFound($"Competition with id '{competitionId}' does not exist");
-         }
-
-         LeagueTable leagueTable;
-         try
-         {
-            var leagueTableService = ServiceFactory.CreateLeagueTableService(game);
-            leagueTable = leagueTableService.GetBySeasonAndCompetition(seasonId, competitionId);
-         }
-         catch (BusinessLogicException businessLogicException)
-         {
-            throw Handle(businessLogicException);
-         }
-
-         var leagueTableResource = new LeagueTableMapper(UriHelper).Map(leagueTable);
-
-         var response = GetResponse(leagueTableResource);
-         return response;
-      }
-
       public Response GetBySeason(string gameId, string seasonId)
       {
          var game = GetGameInfo(gameId);
@@ -56,8 +19,8 @@ namespace TwoNil.API.Controllers
          RequestHelper.ValidateId(seasonId);
 
          //TODO Check season exists and belongs to user.
-         var seasonService = ServiceFactory.CreateSeasonService(game);
-         var season = seasonService.Get(seasonId);
+         //var seasonService = ServiceFactory.CreateSeasonService(game);
+         //var season = seasonService.Get(seasonId);
 
          IEnumerable<LeagueTable> leagueTables;
          try
@@ -74,7 +37,7 @@ namespace TwoNil.API.Controllers
          var leagueTableResources = new List<Resource>();
          foreach (var leagueTable in leagueTables)
          {
-            var resource = mapper.Map(leagueTable);
+            var resource = mapper.Map(leagueTable, LeagueTableMapper.FullDetails);
             leagueTableResources.Add(resource);
          }
 

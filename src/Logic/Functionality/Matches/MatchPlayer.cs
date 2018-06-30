@@ -6,23 +6,27 @@ namespace TwoNil.Logic.Functionality.Matches
    internal class MatchPlayer
    {
       private readonly IMatchPlayerRandomizer _randomizer;
+      private readonly IPenaltyTaker _penaltyTaker;
 
       public MatchPlayer()
-         : this(new MatchPlayerRandomizer())
+         : this(new MatchPlayerRandomizer(), new PenaltyTaker())
       {
       }
 
-      internal MatchPlayer(IMatchPlayerRandomizer randomizer)
+      internal MatchPlayer(IMatchPlayerRandomizer randomizer, IPenaltyTaker penaltyTaker)
       {
          _randomizer = randomizer;
+         _penaltyTaker = penaltyTaker;
       }
 
       public void Play(Match match)
       {
          // Determine randomly, though weighted, which team wins based on the Team Rating.
-         var stuff = new Dictionary<bool, float>();
-         stuff.Add(true, (float)match.HomeTeam.Rating);
-         stuff.Add(false, (float)match.AwayTeam.Rating);
+         var stuff = new Dictionary<bool, float>
+         {
+            { true, (float)match.HomeTeam.Rating },
+            { false, (float)match.AwayTeam.Rating }
+         };
          bool homeTeamWins = _randomizer.HomeTeamWins(stuff);
 
          // Determine the score of the match.
@@ -36,26 +40,7 @@ namespace TwoNil.Logic.Functionality.Matches
          bool matchEndedInDraw = match.HomeScore == match.AwayScore;
          if (matchEndedInDraw && !match.DrawPermitted)
          {
-            var possiblePenaltyScores = new Dictionary<int, float> { { 5, 5 }, { 4, 5 }, { 3, 4 }, { 2, 1 }, { 1, 1 } };
-
-            match.HomePenaltyScore = _randomizer.HomePenaltyScore(possiblePenaltyScores);
-            match.AwayPenaltyScore = _randomizer.AwayPenaltyScore(possiblePenaltyScores);
-            match.PenaltiesTaken = true;
-
-            // Randomly pick a winner if the penalty shootout also ended undecisive.
-            bool penaltyDraw = match.HomePenaltyScore == match.AwayPenaltyScore;
-            if (penaltyDraw)
-            {
-               bool homeTeamWinsPenalties = _randomizer.HomeTeamWinsPenalties();
-               if (homeTeamWinsPenalties)
-               {
-                  match.HomePenaltyScore++;
-               }
-               else
-               {
-                  match.AwayPenaltyScore++;
-               }
-            }
+            _penaltyTaker.TakePenalties(match);
          }
 
          // Swap home and awayscore if necessary.

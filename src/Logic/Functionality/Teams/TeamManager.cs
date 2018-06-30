@@ -35,10 +35,15 @@ namespace TwoNil.Logic.Functionality.Teams
          return teams;
       }
 
-      public void UpdateRating(Team team, IEnumerable<Player> squad)
+      public void UpdateRating(Team team, List<Player> squad)
       {
-         decimal teamRating = TeamRater.GetRating(squad);
-         team.Rating = teamRating;
+         var teamRating = TeamRater.GetRating(squad);
+
+         team.Rating = teamRating.ratingTeam;
+         team.RatingGoalkeeper = teamRating.ratingGoalkeeper;
+         team.RatingDefence = teamRating.ratingDefence;
+         team.RatingMidfield = teamRating.ratingMidfield;
+         team.RatingAttack = teamRating.ratingAttack;
       }
 
       public void UpdateRating(Team team)
@@ -46,10 +51,10 @@ namespace TwoNil.Logic.Functionality.Teams
          IEnumerable<Player> players;
          using (var playerRepository = _repositoryFactory.CreatePlayerRepository())
          {
-            players = playerRepository.GetPlayersByTeam(team, false);
+            players = playerRepository.GetPlayersByTeam(team, false).Where(p => p.InStartingEleven);
          }
 
-         UpdateRating(team, players);
+         UpdateRating(team, players.ToList());
       }
    }
 }

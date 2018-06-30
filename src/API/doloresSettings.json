@@ -32,6 +32,10 @@
         "post": {
           "type": "TwoNil.API.Controllers.GameController, TwoNil.API",
           "method": "Post"
+        },
+        "options": {
+          "type": "TwoNil.API.Controllers.OptionsController, TwoNil.API",
+          "method": "Options"
         }
       },
       {
@@ -40,14 +44,6 @@
         "get": {
           "type": "TwoNil.API.Controllers.LeagueTableController, TwoNil.API",
           "method": "GetBySeason"
-        }
-      },
-      {
-        "identifier": "leaguetable-by-season-and-competition-route",
-        "uriTemplate": "/games/{gameId}/seasons/{seasonId}/competitions/{competitionId}/leaguetable",
-        "get": {
-          "type": "TwoNil.API.Controllers.LeagueTableController, TwoNil.API",
-          "method": "GetBySeasonAndCompetition"
         }
       },
       {
@@ -76,6 +72,10 @@
         "post": {
           "type": "TwoNil.API.Controllers.MatchController, TwoNil.API",
           "method": "PostPlayDayMatches"
+        },
+        "options": {
+          "type": "TwoNil.API.Controllers.OptionsController, TwoNil.API",
+          "method": "Options"
         }
       },
       {
@@ -104,6 +104,10 @@
         "post": {
           "type": "TwoNil.API.Controllers.SeasonController, TwoNil.API",
           "method": "PostEndSeasonItem"
+        },
+        "options": {
+          "type": "TwoNil.API.Controllers.OptionsController, TwoNil.API",
+          "method": "Options"
         }
       },
       {
@@ -128,6 +132,10 @@
         "post": {
           "type": "TwoNil.API.Controllers.UserController, TwoNil.API",
           "method": "PostAddUser"
+        },
+        "options": {
+          "type": "TwoNil.API.Controllers.OptionsController, TwoNil.API",
+          "method": "Options"
         }
       },
       {
@@ -144,6 +152,18 @@
         "post": {
           "type": "TwoNil.API.Controllers.LoginController, TwoNil.API",
           "method": "Post"
+        },
+        "options": {
+          "type": "TwoNil.API.Controllers.OptionsController, TwoNil.API",
+          "method": "Options"
+        }
+      },
+      {
+        "identifier": "game-links-route",
+        "uriTemplate": "/games/{gameId}/links",
+        "get": {
+          "type": "TwoNil.API.Controllers.GameLinkController, TwoNil.API",
+          "method": "GetCollection"
         }
       }
     ]

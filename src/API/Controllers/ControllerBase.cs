@@ -4,8 +4,8 @@ using System.Net.Http;
 using System.Text;
 using Dolores;
 using Dolores.Exceptions;
+using Dolores.Http;
 using Dolores.Responses;
-using Microsoft.AspNetCore.Http;
 using Shally.Hal;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
@@ -72,8 +72,14 @@ namespace TwoNil.API.Controllers
          };
 
          response.SetContentTypeHeader("application/hal+json; charset=utf-8");
-         
+         AddAccessControlAllowOriginHeader(response);
+
          return response;
+      }
+
+      protected static void AddAccessControlAllowOriginHeader(Response response)
+      {
+         response.SetHeader(HttpResponseHeaderFields.AccessControlAllowOrigin, "http://localhost:3000");
       }
 
       protected Resource CreateHalDocument(string selfHref, GameInfo gameInfo = null)
