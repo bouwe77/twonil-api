@@ -74,18 +74,17 @@ namespace TwoNil.Logic.Functionality.Competitions
             awayTeam.Points += awayPoints;
          }
 
-         bool checkMatchResults = leagueTable.LeagueTablePositions.All(ltp => ltp.Matches > 1);
          var matchRepository = _repositoryFactory.CreateMatchRepository();
+         bool matchesHaveBeenPlayed = leagueTable.LeagueTablePositions.All(ltp => ltp.Matches > 1);
 
          // Sort the league table.
          leagueTable.LeagueTablePositions.Sort((pos1, pos2) =>
          {
             int result = SortOnPointsAndGoals(pos1, pos2);
 
-            // If both teams still have the same results they will be sorted alphabetically to determine which team goes first.
             if (result == 0)
             {
-               if (checkMatchResults)
+               if (matchesHaveBeenPlayed)
                {
                   result = CheckMatchResults(leagueTable, pos1, pos2, matchRepository);
                }
