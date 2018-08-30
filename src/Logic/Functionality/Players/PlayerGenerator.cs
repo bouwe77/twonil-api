@@ -25,19 +25,19 @@ namespace TwoNil.Logic.Functionality.Players
          _listRandomizer = new ListRandomizer();
          _positionDeterminator = new PositionDeterminator();
 
-         var memoryRepositoryFactory = new MemoryRepositoryFactory();
+         var repositoryFactory = new RepositoryFactory();
 
-         using (var lineRepository = memoryRepositoryFactory.CreateLineRepository())
+         using (var lineRepository = repositoryFactory.CreateLineRepository())
          {
             _lines = lineRepository.GetAll();
          }
 
-         using (var positionRepository = memoryRepositoryFactory.CreatePositionRepository())
+         using (var positionRepository = repositoryFactory.CreatePositionRepository())
          {
             _positions = positionRepository.GetAll();
          }
 
-         using (var playerProfileRepository = memoryRepositoryFactory.CreatePlayerProfileRepository())
+         using (var playerProfileRepository = repositoryFactory.CreatePlayerProfileRepository())
          {
             _playerProfiles = playerProfileRepository.GetAll();
          }
@@ -85,7 +85,7 @@ namespace TwoNil.Logic.Functionality.Players
                                  ? _profileScoreCalculator.Calculate(startNumber, playerProfile, age)
                                  : _profileScoreCalculator.Calculate(playerProfile, age);
 
-         using (var playerSkillRepo = new MemoryRepositoryFactory().CreatePlayerSkillRepository())
+         using (var playerSkillRepo = new RepositoryFactory().CreatePlayerSkillRepository())
          {
             player.SkillGoalkeeping = skillScores.Single(x => x.PlayerSkill.Id == playerSkillRepo.GetGoalkeeping().Id).Score;
             player.SkillDefending = skillScores.Single(x => x.PlayerSkill.Id == playerSkillRepo.GetDefending().Id).Score;

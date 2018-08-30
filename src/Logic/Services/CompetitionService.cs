@@ -8,7 +8,7 @@ namespace TwoNil.Logic.Services
    {
       public IEnumerable<Competition> GetAll()
       {
-         using (var competitionRepository = new MemoryRepositoryFactory().CreateCompetitionRepository())
+         using (var competitionRepository = new RepositoryFactory().CreateCompetitionRepository())
          {
             var competitions = competitionRepository.GetAll();
             return competitions;
@@ -17,7 +17,7 @@ namespace TwoNil.Logic.Services
 
       public Competition Get(string competitionId)
       {
-         using (var competitionRepository = new MemoryRepositoryFactory().CreateCompetitionRepository())
+         using (var competitionRepository = new RepositoryFactory().CreateCompetitionRepository())
          {
             var competition = competitionRepository.GetOne(competitionId);
             return competition;

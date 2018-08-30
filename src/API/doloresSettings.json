@@ -112,7 +112,7 @@
       },
       {
         "identifier": "season-team-statistics-route",
-        "uriTemplate": "/games/{gameId}/seasons/{seasonId}/teams/{teamId}",
+        "uriTemplate": "/games/{gameId}/seasons/{seasonId}/teams/{teamId}/stats",
         "get": {
           "type": "TwoNil.API.Controllers.SeasonController, TwoNil.API",
           "method": "GetSeasonTeamStats"

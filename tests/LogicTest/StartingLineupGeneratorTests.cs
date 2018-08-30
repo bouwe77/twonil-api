@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TwoNil.Data;
-using TwoNil.Data.Memory;
+using TwoNil.Data.Repositories;
 using TwoNil.Logic.Functionality.Teams;
 using TwoNil.Shared.DomainObjects;
 
@@ -18,7 +18,7 @@ namespace TwoNil.Logic
       public void Initialize()
       {
          // No need to mock this repositories as they do not connect to the database but have their data in-memory.
-         var repositoryFactory = new MemoryRepositoryFactory();
+         var repositoryFactory = new RepositoryFactory();
          _positionRepository = repositoryFactory.CreatePositionRepository();
          _formationRepository = repositoryFactory.CreateFormationRepository();
       }

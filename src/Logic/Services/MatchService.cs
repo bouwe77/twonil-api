@@ -124,12 +124,12 @@ namespace TwoNil.Logic.Services
       public IEnumerable<TeamRoundMatch> GetTeamRoundMatches(string teamId, string seasonId, string leagueCompetitionId)
       {
          using (var matchRepository = RepositoryFactory.CreateMatchRepository())
-         using (var competitionRepository = new MemoryRepositoryFactory().CreateCompetitionRepository())
+         using (var competitionRepository = new RepositoryFactory().CreateCompetitionRepository())
          {
             var matches = matchRepository.GetTeamRoundMatches(GameInfo.Id, teamId, seasonId);
 
             // For league competitions only the team's current league must be included.
-            var leagueCompetitionsToSkip = competitionRepository.GetByCompetitionType(CompetitionType.League).Where(c => c.Id != leagueCompetitionId).Select(c => c.Id);
+            var leagueCompetitionsToSkip = competitionRepository.GetLeagues().Where(c => c.Id != leagueCompetitionId).Select(c => c.Id);
             return matches.Where(m => !leagueCompetitionsToSkip.Contains(m.CompetitionId));
          }
       }

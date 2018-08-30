@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TwoNil.Data;
-using TwoNil.Data.Database;
+using TwoNil.Data.Repositories;
 using TwoNil.Logic.Functionality.Competitions;
 using TwoNil.Shared.DomainObjects;
 using Match = TwoNil.Shared.DomainObjects.Match;
@@ -12,14 +12,14 @@ namespace TwoNil.Logic
    [TestClass]
    public class LeagueTableManagerTests
    {
-      private Mock<IDatabaseRepositoryFactory> _repositoryFactory;
+      private Mock<IRepositoryFactory> _repositoryFactory;
       private Mock<IMatchRepository> _matchRepository;
 
       [TestInitialize]
       public void TestInitialize()
       {
          _matchRepository = new Mock<IMatchRepository>(MockBehavior.Strict);
-         _repositoryFactory = new Mock<IDatabaseRepositoryFactory>(MockBehavior.Strict);
+         _repositoryFactory = new Mock<IRepositoryFactory>(MockBehavior.Strict);
       }
 
       [TestCleanup]

@@ -8,7 +8,7 @@ namespace TwoNil.Logic.Services
    {
       public IEnumerable<Position> GetAll()
       {
-         using (var positionRepository = new MemoryRepositoryFactory().CreatePositionRepository())
+         using (var positionRepository = new RepositoryFactory().CreatePositionRepository())
          {
             var positions = positionRepository.GetAll();
             return positions;
@@ -17,7 +17,7 @@ namespace TwoNil.Logic.Services
 
       public IEnumerable<Position> GetByLine(Line line)
       {
-         using (var positionRepository = new MemoryRepositoryFactory().CreatePositionRepository())
+         using (var positionRepository = new RepositoryFactory().CreatePositionRepository())
          {
             var positions = positionRepository.Find(x => x.Line.Equals(line));
             return positions;

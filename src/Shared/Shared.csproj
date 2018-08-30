@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DomainObjects\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="sqlite-net-pcl" Version="1.4.118" />
   </ItemGroup>
 

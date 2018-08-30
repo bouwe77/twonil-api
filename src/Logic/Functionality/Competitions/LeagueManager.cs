@@ -13,7 +13,7 @@ namespace TwoNil.Logic.Functionality.Competitions
       {
          var competitionSchedule = new CompetitionSchedule();
 
-         using (var competitionRepository = new MemoryRepositoryFactory().CreateCompetitionRepository())
+         using (var competitionRepository = new RepositoryFactory().CreateCompetitionRepository())
          {
             // Create the leagues with the teams.
             CreateLeague(competitionSchedule, competitionRepository.GetLeague1(), teamsLeague1, season, matchDateManager);
@@ -108,6 +108,7 @@ namespace TwoNil.Logic.Functionality.Competitions
          {
             CompetitionName = leagueCompetition.Name,
             SeasonCompetition = leagueSeasonCompetition,
+            SeasonId = leagueSeasonCompetition.SeasonId
          };
 
          leagueTable.LeagueTablePositions = new List<LeagueTablePosition>();

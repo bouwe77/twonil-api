@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using TwoNil.Data;
-using TwoNil.Data.Database;
+using TwoNil.Data.Repositories;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Functionality.Competitions
 {
    internal class LeagueTableManager
    {
-      private readonly IDatabaseRepositoryFactory _repositoryFactory;
+      private readonly IRepositoryFactory _repositoryFactory;
 
-      public LeagueTableManager(IDatabaseRepositoryFactory repositoryFactory)
+      public LeagueTableManager(IRepositoryFactory repositoryFactory)
       {
          _repositoryFactory = repositoryFactory;
       }

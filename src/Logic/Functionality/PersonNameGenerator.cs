@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Randomization;
 using TwoNil.Data;
-using TwoNil.Data.Memory;
+using TwoNil.Data.Repositories;
 
 namespace TwoNil.Logic.Functionality
 {
@@ -12,7 +12,7 @@ namespace TwoNil.Logic.Functionality
 
       public PersonNameGenerator()
       {
-         _nameRepository = new MemoryRepositoryFactory().CreateNameRepository();
+         _nameRepository = new RepositoryFactory().CreateNameRepository();
          _numberRandomizer = new NumberRandomizer();
       }
 

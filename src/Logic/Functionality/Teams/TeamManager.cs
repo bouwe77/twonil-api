@@ -9,9 +9,9 @@ namespace TwoNil.Logic.Functionality.Teams
    internal class TeamManager
    {
       private readonly ListRandomizer _listRandomizer;
-      private readonly DatabaseRepositoryFactory _repositoryFactory;
+      private readonly RepositoryFactory _repositoryFactory;
 
-      public TeamManager(DatabaseRepositoryFactory repositoryFactory)
+      public TeamManager(RepositoryFactory repositoryFactory)
       {
          _repositoryFactory = repositoryFactory;
          _listRandomizer = new ListRandomizer();
@@ -21,7 +21,7 @@ namespace TwoNil.Logic.Functionality.Teams
       {
          var teams = new List<Team>();
 
-         using (var formationRepository = new MemoryRepositoryFactory().CreateFormationRepository())
+         using (var formationRepository = new RepositoryFactory().CreateFormationRepository())
          {
             var formations = formationRepository.GetAll().ToList();
 

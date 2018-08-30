@@ -70,7 +70,7 @@ namespace TwoNil.API.Controllers
 
          var seasonService = ServiceFactory.CreateSeasonService(gameInfo);
          var currentSeason = seasonService.GetCurrentSeason();
-         var seasonResource = new SeasonMapper(UriHelper).Map(currentSeason, SeasonMapper.SeasonName);
+         var seasonResource = new SeasonMapper(UriHelper).Map(currentSeason, SeasonMapper.SeasonShortName, SeasonMapper.SeasonLongName);
 
          bool endOfSeason = seasonService.DetermineSeasonEnded(currentSeason.Id);
          if (endOfSeason)
@@ -88,7 +88,8 @@ namespace TwoNil.API.Controllers
          var seasonTeamStatistics = statisticsService.GetSeasonTeamStatistics(currentSeason.Id, gameInfo.CurrentTeamId);
          var seasonTeamStatisticsResource = new SeasonTeamStatisticsMapper(UriHelper).Map(
             seasonTeamStatistics,
-            SeasonTeamStatisticsMapper.SeasonName,
+            SeasonTeamStatisticsMapper.SeasonLongName,
+            SeasonTeamStatisticsMapper.SeasonShortName,
             SeasonTeamStatisticsMapper.LeagueName,
             SeasonTeamStatisticsMapper.CurrentLeagueTablePosition,
             SeasonTeamStatisticsMapper.LeagueTablePositions,

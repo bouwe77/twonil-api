@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TwoNil.Data;
-using TwoNil.Data.Database;
+using TwoNil.Data.Repositories;
 using TwoNil.Logic.Functionality.Competitions;
 using TwoNil.Logic.Functionality.Teams;
 using TwoNil.Shared.DomainObjects;
@@ -14,9 +14,9 @@ namespace TwoNil.Logic.Functionality.Matches
    internal class PostMatchManager
    {
       private readonly TransactionManager _transactionManager;
-      private readonly IDatabaseRepositoryFactory _repositoryFactory;
+      private readonly IRepositoryFactory _repositoryFactory;
 
-      public PostMatchManager(TransactionManager transactionManager, IDatabaseRepositoryFactory repositoryFactory)
+      public PostMatchManager(TransactionManager transactionManager, IRepositoryFactory repositoryFactory)
       {
          _transactionManager = transactionManager;
          _repositoryFactory = repositoryFactory;
@@ -60,7 +60,7 @@ namespace TwoNil.Logic.Functionality.Matches
                seasonTeamStatisticsManager.Update(seasonId, matchesForThisRound, leagueTable);
 
                // If all league matches have been played, update the season statistics.
-               using (var competitionRepository = new MemoryRepositoryFactory().CreateCompetitionRepository())
+               using (var competitionRepository = new RepositoryFactory().CreateCompetitionRepository())
                {
                   if (round.CompetitionId == competitionRepository.GetLeague1().Id)
                   {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Randomization;
 using TwoNil.Data;
-using TwoNil.Data.Memory;
+using TwoNil.Data.Repositories;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Functionality.Players
@@ -16,7 +16,7 @@ namespace TwoNil.Logic.Functionality.Players
       public PositionDeterminator()
       {
          _listRandomizer = new ListRandomizer();
-         _positionRepository = new MemoryRepositoryFactory().CreatePositionRepository();
+         _positionRepository = new RepositoryFactory().CreatePositionRepository();
       }
 
       internal PositionDeterminator(IPositionRepository positionRepository, IListRandomizer listRandomizer)

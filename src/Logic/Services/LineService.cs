@@ -8,7 +8,7 @@ namespace TwoNil.Logic.Services
    {
       public IEnumerable<Line> GetAll()
       {
-         using (var lineRepository = new MemoryRepositoryFactory().CreateLineRepository())
+         using (var lineRepository = new RepositoryFactory().CreateLineRepository())
          {
             var lines = lineRepository.GetAll();
             return lines;

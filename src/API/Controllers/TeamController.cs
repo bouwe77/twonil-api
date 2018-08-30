@@ -38,7 +38,8 @@ namespace TwoNil.API.Controllers
          var seasonTeamStatistics = statisticsService.GetSeasonTeamStatistics(currentSeason.Id, teamId);
          var seasonTeamStatisticsResource = new SeasonTeamStatisticsMapper(UriHelper).Map(
             seasonTeamStatistics,
-            SeasonTeamStatisticsMapper.SeasonName,
+            SeasonTeamStatisticsMapper.SeasonShortName,
+            SeasonTeamStatisticsMapper.SeasonLongName,
             SeasonTeamStatisticsMapper.LeagueName,
             SeasonTeamStatisticsMapper.CurrentLeagueTablePosition,
             SeasonTeamStatisticsMapper.LeagueTablePositions,

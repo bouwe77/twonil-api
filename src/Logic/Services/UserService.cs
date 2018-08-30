@@ -32,7 +32,7 @@ namespace TwoNil.Logic.Services
 
       public User GetUser(string userId)
       {
-         using (var userRepository = new MasterRepositoryFactory().CreateUserRepository())
+         using (var userRepository = new RepositoryFactory().CreateUserRepository())
          {
             return userRepository.GetOne(userId);
          }
@@ -69,7 +69,7 @@ namespace TwoNil.Logic.Services
             PasswordHash = "moio"
          };
 
-         using (var repository = new MasterRepositoryFactory().CreateTransactionManager())
+         using (var repository = new RepositoryFactory().CreateTransactionManager())
          {
             repository.RegisterInsert(user);
             repository.Save();
@@ -80,7 +80,7 @@ namespace TwoNil.Logic.Services
 
       private User GetByUsername(string username)
       {
-         using (var userRepository = new MasterRepositoryFactory().CreateUserRepository())
+         using (var userRepository = new RepositoryFactory().CreateUserRepository())
          {
             return userRepository.Find(x => x.Username.Equals(username, StringComparison.OrdinalIgnoreCase)).SingleOrDefault();
          }

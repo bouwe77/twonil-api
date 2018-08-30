@@ -1,17 +1,17 @@
 ﻿using TwoNil.Data;
-using TwoNil.Data.Database;
+using TwoNil.Data.Repositories;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Functionality.Competitions
 {
    internal class SeasonStatisticsManager
    {
-      private readonly TransactionManager _repository;
-      private IDatabaseRepositoryFactory _repositoryFactory;
+      private readonly TransactionManager _transactionManager;
+      private IRepositoryFactory _repositoryFactory;
 
-      public SeasonStatisticsManager(TransactionManager repository, IDatabaseRepositoryFactory repositoryFactory)
+      public SeasonStatisticsManager(TransactionManager transactionManager, IRepositoryFactory repositoryFactory)
       {
-         _repository = repository;
+         _transactionManager = transactionManager;
          _repositoryFactory = repositoryFactory;
       }
 
@@ -22,7 +22,7 @@ namespace TwoNil.Logic.Functionality.Competitions
          {
             seasonStatistics = seasonStatisticsRepository.GetBySeason(seasonId);
             seasonStatistics.NationalSuperCupWinner = winner;
-            _repository.RegisterUpdate(seasonStatistics);
+            _transactionManager.RegisterUpdate(seasonStatistics);
          }
       }
 
@@ -34,7 +34,7 @@ namespace TwoNil.Logic.Functionality.Competitions
             seasonStatistics = seasonStatisticsRepository.GetBySeason(seasonId);
             seasonStatistics.CupWinner = winner;
             seasonStatistics.CupRunnerUp = runnerUp;
-            _repository.RegisterUpdate(seasonStatistics);
+            _transactionManager.RegisterUpdate(seasonStatistics);
          }
       }
 
@@ -45,7 +45,7 @@ namespace TwoNil.Logic.Functionality.Competitions
             var seasonStatistics = seasonStatisticsRepository.GetBySeason(seasonId);
             seasonStatistics.NationalChampion = nationalChampion;
             seasonStatistics.NationalChampionRunnerUp = nationalChampionRunnerUp;
-            _repository.RegisterUpdate(seasonStatistics);
+            _transactionManager.RegisterUpdate(seasonStatistics);
          }
       }
    }

@@ -12,7 +12,7 @@ namespace TwoNil.Logic.Functionality.Teams
    {
       public static (decimal ratingGoalkeeper, decimal ratingDefence, decimal ratingMidfield, decimal ratingAttack, decimal ratingTeam) GetRating(List<Player> players)
       {
-         using (var lineRepository = new MemoryRepositoryFactory().CreateLineRepository())
+         using (var lineRepository = new RepositoryFactory().CreateLineRepository())
          {
             var goalkeeper = lineRepository.GetGoalkeeper();
             var defence = lineRepository.GetDefence();

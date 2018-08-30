@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Randomization;
-using TwoNil.Data.Memory;
+using TwoNil.Data.Repositories;
 using TwoNil.Logic.Functionality.Players;
 using TwoNil.Shared.DomainObjects;
 

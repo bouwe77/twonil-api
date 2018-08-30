@@ -12,7 +12,7 @@ namespace TwoNil.Logic.Functionality.Competitions
       {
          var competitionSchedule = new CompetitionSchedule();
 
-         using (var competitionRepository = new MemoryRepositoryFactory().CreateCompetitionRepository())
+         using (var competitionRepository = new RepositoryFactory().CreateCompetitionRepository())
          {
             // Create a super cup season competition and round and save it to the database.
             var superCupCompetition = competitionRepository.GetNationalSuperCup();

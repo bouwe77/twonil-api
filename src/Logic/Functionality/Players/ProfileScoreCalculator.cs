@@ -9,7 +9,7 @@ namespace TwoNil.Logic.Functionality.Players
     {
         private static readonly Randomizer Randomizer = new Randomizer();
 
-        private const int MaxScore = 20;
+        private const int MaxScore = 100;
 
         public List<PlayerSkillScore> Calculate(int startNumberR1, PlayerProfile profile, int age)
         {

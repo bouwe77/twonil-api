@@ -20,7 +20,7 @@ namespace TwoNil.Logic.Functionality.Players
       {
          var squad = new List<Player>();
 
-         using (var lineRepository = new MemoryRepositoryFactory().CreateLineRepository())
+         using (var lineRepository = new RepositoryFactory().CreateLineRepository())
          {
             // Generate 2 or 3 goalkeepers.
             int howMany = _numberRandomizer.GetNumber(2, 3);

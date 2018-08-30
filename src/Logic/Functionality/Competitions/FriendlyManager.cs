@@ -12,16 +12,16 @@ namespace TwoNil.Logic.Functionality.Competitions
    {
       private readonly Randomizer _randomizer;
       private readonly NumberRandomizer _numberRandomizer;
-      private IDatabaseRepositoryFactory _repositoryFactory;
+      private IRepositoryFactory _repositoryFactory;
       private Competition _competition;
 
-      public FriendlyManager(IDatabaseRepositoryFactory repositoryFactory)
+      public FriendlyManager(IRepositoryFactory repositoryFactory)
       {
          _repositoryFactory = repositoryFactory;
          _randomizer = new Randomizer();
          _numberRandomizer = new NumberRandomizer();
 
-         using (var competitionRepository = new MemoryRepositoryFactory().CreateCompetitionRepository())
+         using (var competitionRepository = new RepositoryFactory().CreateCompetitionRepository())
          {
             _competition = competitionRepository.GetFriendly();
          }
@@ -37,7 +37,7 @@ namespace TwoNil.Logic.Functionality.Competitions
 
          // Create a friendly season competition for all friendlies in the season.
          SeasonCompetition friendlySeasonCompetition;
-         using (var competitionRepository = new MemoryRepositoryFactory().CreateCompetitionRepository())
+         using (var competitionRepository = new RepositoryFactory().CreateCompetitionRepository())
          {
             friendlySeasonCompetition = new SeasonCompetition
             {

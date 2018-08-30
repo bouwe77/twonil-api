@@ -5,39 +5,45 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Resources
 {
-   public class SeasonMapper : IResourceMapper<Season>
-   {
-      private readonly UriHelper _uriHelper;
-      public static string SeasonName = "name";
+    public class SeasonMapper : IResourceMapper<Season>
+    {
+        private readonly UriHelper _uriHelper;
+        public static string SeasonShortName = "short-name";
+        public static string SeasonLongName = "long-name";
 
-      public SeasonMapper(UriHelper uriHelper)
-      {
-         _uriHelper = uriHelper;
-      }
+        public SeasonMapper(UriHelper uriHelper)
+        {
+            _uriHelper = uriHelper;
+        }
 
-      public Resource Map(Season season, params string[] properties)
-      {
-         var resource = new Resource(new Link(_uriHelper.GetSeasonUri(season.GameId, season.Id)));
+        public Resource Map(Season season, params string[] properties)
+        {
+            var resource = new Resource(new Link(_uriHelper.GetSeasonUri(season.GameId, season.Id)));
 
-         if (properties.Contains(SeasonName))
-         {
-            resource.AddProperty(SeasonName, season.Name);
-         }
+            if (properties.Contains(SeasonShortName))
+            {
+                resource.AddProperty(SeasonShortName, season.ShortName);
+            }
 
-         return resource;
-      }
+            if (properties.Contains(SeasonLongName))
+            {
+                resource.AddProperty(SeasonLongName, season.LongName);
+            }
 
-      public IEnumerable<Resource> Map(IEnumerable<Season> seasons, params string[] properties)
-      {
-         var resources = new List<Resource>();
+            return resource;
+        }
 
-         foreach (var season in seasons)
-         {
-            var resource = Map(season, properties);
-            resources.Add(resource);
-         }
+        public IEnumerable<Resource> Map(IEnumerable<Season> seasons, params string[] properties)
+        {
+            var resources = new List<Resource>();
 
-         return resources;
-      }
-   }
+            foreach (var season in seasons)
+            {
+                var resource = Map(season, properties);
+                resources.Add(resource);
+            }
+
+            return resources;
+        }
+    }
 }

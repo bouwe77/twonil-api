@@ -12,7 +12,7 @@ namespace TwoNil.Logic.Services
       /// </summary>
       public PlayerProfile PickRandom()
       {
-         using (var playerProfileRepository = new MemoryRepositoryFactory().CreatePlayerProfileRepository())
+         using (var playerProfileRepository = new RepositoryFactory().CreatePlayerProfileRepository())
          {
             var playerProfiles = playerProfileRepository.GetAll();
             var pickedPlayerProfile = GetRandomPlayerProfile(playerProfiles);
@@ -26,7 +26,7 @@ namespace TwoNil.Logic.Services
       /// </summary>
       public PlayerProfile PickRandom(Position position)
       {
-         using (var playerProfileRepository = new MemoryRepositoryFactory().CreatePlayerProfileRepository())
+         using (var playerProfileRepository = new RepositoryFactory().CreatePlayerProfileRepository())
          {
             var playerProfiles = playerProfileRepository.Find(playerProfile => playerProfile.Positions.Contains(position)).ToList();
             var pickedPlayerProfile = GetRandomPlayerProfile(playerProfiles);

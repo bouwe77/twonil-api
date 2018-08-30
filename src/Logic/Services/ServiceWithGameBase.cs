@@ -6,7 +6,7 @@ namespace TwoNil.Logic.Services
 {
    public abstract class ServiceWithGameBase : ServiceBase
    {
-      protected DatabaseRepositoryFactory RepositoryFactory;
+      protected RepositoryFactory RepositoryFactory;
       protected GameInfo GameInfo;
 
       public ServiceWithGameBase(GameInfo gameInfo)
@@ -17,7 +17,7 @@ namespace TwoNil.Logic.Services
          }
 
          GameInfo = gameInfo;
-         RepositoryFactory = new DatabaseRepositoryFactory(gameInfo.Id);
+         RepositoryFactory = new RepositoryFactory(gameInfo.Id);
       }
    }
 }

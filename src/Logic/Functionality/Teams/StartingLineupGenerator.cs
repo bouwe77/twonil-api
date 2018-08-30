@@ -12,7 +12,7 @@ namespace TwoNil.Logic.Functionality.Teams
 
       public StartingLineupGenerator()
       {
-         using (var positionRepository = new MemoryRepositoryFactory().CreatePositionRepository())
+         using (var positionRepository = new RepositoryFactory().CreatePositionRepository())
          {
             _alternativePositions = new Dictionary<string, List<Position>>
             {
@@ -51,7 +51,7 @@ namespace TwoNil.Logic.Functionality.Teams
 
          // Split the players into three lists: the goalkeepers, the best 10 and the rest.
          Position goalkeeperPosition;
-         using (var positionRepository = new MemoryRepositoryFactory().CreatePositionRepository())
+         using (var positionRepository = new RepositoryFactory().CreatePositionRepository())
          {
             goalkeeperPosition = positionRepository.GetGoalkeeper();
          }

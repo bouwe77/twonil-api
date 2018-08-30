@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using TwoNil.Data;
-using TwoNil.Data.Database;
+using TwoNil.Data.Repositories;
 using TwoNil.Logic.Functionality.Matches;
 using TwoNil.Shared.DomainObjects;
 
@@ -9,13 +9,13 @@ namespace TwoNil.Logic.Functionality.Teams
 {
    internal class SeasonTeamStatisticsManager
    {
-      private readonly IDatabaseRepositoryFactory _repositoryFactory;
-      private readonly TransactionManager _repository;
+      private readonly IRepositoryFactory _repositoryFactory;
+      private readonly TransactionManager _transactionManager;
       private readonly IDictionary<string, SeasonTeamStatistics> _seasonTeamStatistics;
 
-      public SeasonTeamStatisticsManager(TransactionManager repository, IDatabaseRepositoryFactory repositoryFactory, string seasonId)
+      public SeasonTeamStatisticsManager(TransactionManager transactionManager, IRepositoryFactory repositoryFactory, string seasonId)
       {
-         _repository = repository;
+         _transactionManager = transactionManager;
          _repositoryFactory = repositoryFactory;
 
          // Add all SeasonTeamStatistics of the season to a dictionary on TeamId.
@@ -42,7 +42,7 @@ namespace TwoNil.Logic.Functionality.Teams
          // Register all SeasonTeamStatistics for update because they all have changed.
          foreach (var sts in _seasonTeamStatistics)
          {
-            _repository.RegisterUpdate(sts.Value);
+            _transactionManager.RegisterUpdate(sts.Value);
          }
       }
 
