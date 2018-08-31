@@ -35,13 +35,22 @@ namespace TwoNil.Data.Repositories
             using (var transactionManager = new RepositoryFactory().CreateTransactionManager())
             {
                 var game = GetGame(gameId);
-                transactionManager.RegisterDelete(game);
-                transactionManager.Save();
+
+                if (game != null)
+                {
+                    Connection.Delete(game);
+                }
             }
 
             // Delete the game database.
             var gameDatabaseManager = new RepositoryFactory(gameId).CreateGameDatabaseManager();
             gameDatabaseManager.Delete();
+        }
+
+        public void InsertGame(Game game)
+        {
+            game.LastModified = GetLastModified();
+            Connection.Insert(game);
         }
     }
 }

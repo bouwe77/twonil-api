@@ -114,11 +114,6 @@ namespace TwoNil.Data
          Connection.Delete(domainObject);
       }
 
-      private string GetLastModified()
-      {
-         return Format(DateTime.UtcNow);
-      }
-      
       private void Assert(DomainObjectBase domainObject)
       {
          if (domainObject == null)

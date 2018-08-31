@@ -41,12 +41,11 @@ namespace TwoNil.Logic.Functionality
             return game;
         }
 
-        private static void InsertGame(Game game)
+        private void InsertGame(Game game)
         {
-            using (var repository = new RepositoryFactory().CreateTransactionManager())
+            using (var gameRepository = new RepositoryFactory().CreateGameRepository())
             {
-                repository.RegisterInsert(game);
-                repository.Save();
+                gameRepository.InsertGame(game);
             }
         }
 
