@@ -1,4 +1,4 @@
-﻿namespace ApiTest.GamePlaySimulator
+﻿namespace ApiTest.GamePlaySimulator.Interfaces
 {
     public interface IUrlParser
     {

@@ -1,15 +1,16 @@
 ﻿using Dolores.Http;
 using Dolores.Responses;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using TwoNil.API.Controllers;
 
-namespace ApiTest
+namespace ApiTest.GamePlaySimulator.Controllers
 {
-    internal class RequestHandler
+    internal class ControllerHandler
     {
         private string _gameId;
 
-        public RequestHandler(string gameId)
+        public ControllerHandler(string gameId)
         {
             _gameId = gameId;
         }
@@ -25,6 +26,17 @@ namespace ApiTest
             return response;
         }
 
+        public Response GetLeagueTables(string seasonId)
+        {
+            var controller = new LeagueTableController();
+
+            var response = controller.GetBySeason(_gameId, seasonId);
+
+            Assert.AreEqual(HttpStatusCode.Ok, response.StatusCode);
+
+            return response;
+        }
+
         public Response PlayMatchDay(string dayId)
         {
             var controller = new MatchController();
@@ -34,6 +46,14 @@ namespace ApiTest
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
 
             return response;
+        }
+
+        public string GetCurrentSeasonId()
+        {
+            //var controller = new SeasonController();
+            //var response = controller.GetSeasonCollection(_gameId);
+            //Assert.AreEqual(HttpStatusCode.Ok, response.StatusCode);
+            throw new NotImplementedException();
         }
     }
 }

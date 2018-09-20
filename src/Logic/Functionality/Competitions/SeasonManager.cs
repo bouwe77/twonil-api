@@ -4,6 +4,8 @@ using System.Linq;
 using TwoNil.Data;
 using TwoNil.Data.Repositories;
 using TwoNil.Logic.Exceptions;
+using TwoNil.Logic.Functionality.Calendar;
+using TwoNil.Logic.Functionality.Competitions.Friendlies;
 using TwoNil.Logic.Functionality.Teams;
 using TwoNil.Shared.DomainObjects;
 
@@ -53,6 +55,8 @@ namespace TwoNil.Logic.Functionality.Competitions
             // Insert the season and all competition schedules.
             InsertSeasonAndCompetitionSchedule(transactionManager, seasonAndCompetitionSchedules);
 
+            InsertGameDateTimes(transactionManager, seasonAndCompetitionSchedules.MatchDates);
+
             // Insert statistics.
             InsertSeasonRelatedStatistics(transactionManager, teams, seasonAndCompetitionSchedules);
             InsertTeamStatistics(transactionManager, teams);
@@ -97,6 +101,8 @@ namespace TwoNil.Logic.Functionality.Competitions
 
             // Insert the season and all competition schedules.
             InsertSeasonAndCompetitionSchedule(transactionManager, seasonAndCompetitionSchedules);
+
+            InsertGameDateTimes(transactionManager, seasonAndCompetitionSchedules.MatchDates);
 
             // Insert statistics.
             InsertSeasonRelatedStatistics(transactionManager, allTeamsSortedOnLeagueAndPosition, seasonAndCompetitionSchedules);
@@ -174,22 +180,24 @@ namespace TwoNil.Logic.Functionality.Competitions
 
         private SeasonAndCompetitionSchedules CreateSeasonAndCompetitionSchedules(NewSeasonInfo newSeasonInfo)
         {
-            var seasonAndCompetitionSchedules = new SeasonAndCompetitionSchedules();
-
-            // Create a new season.
-            var seasonNames = GetSeasonName(newSeasonInfo.StartYear);
-            var season = new Season
-            {
-                LongName = seasonNames.longName,
-                ShortName = seasonNames.shortName,
-                StartYear = newSeasonInfo.StartYear,
-                SeasonStatus = SeasonStatus.Started
-            };
-
-            seasonAndCompetitionSchedules.Season = season;
-
             var matchDateManager = new MatchDateManager(newSeasonInfo.StartYear);
             matchDateManager.Initialize();
+
+            // The season officially ends a day after the last match so there is a possibility to add events between the last match and the end of the season.
+            var endSeasonDateTime = matchDateManager.GetAllMatchDates().Last().AddDays(1);
+
+            var season = new Season
+            {
+                StartYear = newSeasonInfo.StartYear,
+                SeasonStatus = SeasonStatus.Started,
+                EndDateTime = endSeasonDateTime
+            };
+
+            var seasonAndCompetitionSchedules = new SeasonAndCompetitionSchedules { Season = season };
+
+            // Add all dates that are determined here to the schedule so the datetime navigation can be updated.
+            seasonAndCompetitionSchedules.MatchDates = matchDateManager.GetAllMatchDates();
+            seasonAndCompetitionSchedules.OtherDates = new List<DateTime> { endSeasonDateTime };
 
             // Create leagues and schedule.
             var leagueManager = new LeagueManager();
@@ -200,13 +208,14 @@ namespace TwoNil.Logic.Functionality.Competitions
             seasonAndCompetitionSchedules.NationalCupSchedule = nationalCupManager.CreateSchedule(newSeasonInfo.AllTeams.ToList(), season, matchDateManager);
 
             // Create pre-season friendlies.
-            var friendlyManager = new FriendlyManager(_repositoryFactory);
-            seasonAndCompetitionSchedules.PreSeasonFriendliesSchedule = friendlyManager.CreatePreSeasonSchedule(newSeasonInfo.AllTeams.ToList(), Constants.HowManyPreSeasonFriendlies, season, matchDateManager);
+            var preSeasonFriendlyManager = new PreSeasonFriendlyManager();
+            seasonAndCompetitionSchedules.PreSeasonFriendliesSchedule = preSeasonFriendlyManager.CreatePreSeasonSchedule(newSeasonInfo.AllTeams.ToList(), season, matchDateManager);
 
             // Create friendlies during the season.
             // Determine on which dates these friendlies can be played. For now, this is only during the national cup tournament, except the first round and the final.
             var cupDates = seasonAndCompetitionSchedules.NationalCupSchedule.Rounds.Select(r => r.MatchDate).Skip(1).Take(seasonAndCompetitionSchedules.NationalCupSchedule.Rounds.Count - 2).ToList();
-            seasonAndCompetitionSchedules.DuringSeasonFriendliesSchedule = friendlyManager.CreateDuringSeasonSchedule(seasonAndCompetitionSchedules.PreSeasonFriendliesSchedule.SeasonCompetitions.First(), cupDates, Constants.HowManyPreSeasonFriendlies + 1);
+            var friendlyRoundsManager = new DuringSeasonFriendlyRoundsManager();
+            seasonAndCompetitionSchedules.DuringSeasonFriendliesSchedule = friendlyRoundsManager.CreateDuringSeasonFriendlyRounds(seasonAndCompetitionSchedules.PreSeasonFriendliesSchedule.SeasonCompetitions.First(), cupDates, Constants.HowManyPreSeasonFriendlies + 1);
 
             // Create Super Cup.
             var nationalSuperCupManager = new NationalSuperCupManager();
@@ -215,7 +224,7 @@ namespace TwoNil.Logic.Functionality.Competitions
             var awayTeam = newSeasonInfo.PreviousSeasonStatistics.NationalChampion.Equals(newSeasonInfo.PreviousSeasonStatistics.CupWinner) ? newSeasonInfo.PreviousSeasonStatistics.NationalChampionRunnerUp : newSeasonInfo.PreviousSeasonStatistics.CupWinner;
             seasonAndCompetitionSchedules.NationalSuperCupSchedule = nationalSuperCupManager.CreateSchedule(homeTeam, awayTeam, season, matchDateManager);
 
-            // In the mean time data of the teams has changed, so add them to the SeasonAndCompetitionSchedules object so they can be updated in the database.
+            // In the meantime data of the teams has changed, so add them to the SeasonAndCompetitionSchedules object so they can be updated in the database.
             seasonAndCompetitionSchedules.Teams = newSeasonInfo.AllTeams;
 
             return seasonAndCompetitionSchedules;
@@ -253,14 +262,18 @@ namespace TwoNil.Logic.Functionality.Competitions
             transactionManager.RegisterInsert(competitionSchedule.Matches);
         }
 
-        private (string shortName, string longName) GetSeasonName(int startYear)
+        private static void InsertGameDateTimes(TransactionManager transactionManager, IEnumerable<DateTime> matchDates)
         {
-            int endYear = startYear + 1;
+            var gameDateTimes = new List<GameDateTime>();
+            foreach (var matchDate in matchDates)
+            {
+                var gameDateTime = GameDateTimeFactory.Create(matchDate, GameDateTimeEventStatus.ToDo);
+                gameDateTimes.Add(gameDateTime);
+            }
 
-            var shortName = $"{startYear.ToString().Substring(2)}/{endYear.ToString().Substring(2)}";
-            var longName = $"{startYear}/{endYear}";
+            gameDateTimes.OrderBy(g => g.DateTime).First().Status = GameDateTimeStatus.Now;
 
-            return (shortName, longName);
+            transactionManager.RegisterInsert(gameDateTimes);
         }
     }
 }

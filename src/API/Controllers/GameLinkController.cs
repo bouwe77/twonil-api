@@ -12,63 +12,62 @@ namespace TwoNil.API.Controllers
 {
     public class GameLinkController : ControllerBase
     {
-       public Response GetCollection(string gameId)
-       {
-          RequestHelper.ValidateId(gameId);
+        public Response GetCollection(string gameId)
+        {
+            RequestHelper.ValidateId(gameId);
 
-          var gameInfo = GetGameInfo(gameId);
+            var gameInfo = GetGameInfo(gameId);
 
-         var halDocument = CreateHalDocument(UriHelper.GetGameLinksUri(gameId), gameInfo);
+            var halDocument = CreateHalDocument(UriHelper.GetGameLinksUri(gameId), gameInfo);
 
-          CreateGameMenu(gameInfo, halDocument);
+            CreateGameMenu(gameInfo, halDocument);
 
-          var response = GetResponse(halDocument);
+            var response = GetResponse(halDocument);
 
-          return response;
+            return response;
+        }
 
-      }
+        private void CreateGameMenu(GameInfo gameInfo, Resource halDocument)
+        {
+            var serviceFactory = new ServiceFactory();
 
-       private void CreateGameMenu(GameInfo gameInfo, Resource halDocument)
-       {
-          var serviceFactory = new ServiceFactory();
+            // Create the game menu.
+            var gameLinks = new List<Link>();
 
-          // Create the game menu.
-          var gameLinks = new List<Link>();
+            // The game dashboard.
+            var gameLink = new Link(UriHelper.GetGameUri(gameInfo.Id)) { Title = "Dashboard" };
+            gameLinks.Add(gameLink);
 
-          // The game dashboard.
-          var gameLink = new Link(UriHelper.GetGameUri(gameInfo.Id)) { Title = "Dashboard" };
-          gameLinks.Add(gameLink);
-
-         /*
-
+            /*
 
 
-          // The manager's squad.
-          var teamPlayersLink = new Link(UriHelper.GetTeamPlayersUri(gameInfo.Id, gameInfo.CurrentTeamId)) { Title = "Players" };
-          gameLinks.Add(teamPlayersLink);
 
-          // League tables for the current season.
-          var seasonService = serviceFactory.CreateSeasonService(gameInfo);
-          var currentSeason = seasonService.GetCurrentSeason();
-          var leagueTableLink = new Link(UriHelper.GetSeasonLeagueTablesUri(gameInfo.Id, currentSeason.Id)) { Title = "League Tables" };
-          gameLinks.Add(leagueTableLink);
+             // The manager's squad.
+             var teamPlayersLink = new Link(UriHelper.GetTeamPlayersUri(gameInfo.Id, gameInfo.CurrentTeamId)) { Title = "Players" };
+             gameLinks.Add(teamPlayersLink);
 
-          // Matches of the manager's team in the current season.
-          var teamMatchesLink = new Link(UriHelper.GetSeasonTeamMatchesUri(gameInfo.Id, currentSeason.Id, gameInfo.CurrentTeamId)) { Title = "Matches" };
-          gameLinks.Add(teamMatchesLink);
+             // League tables for the current season.
+             var seasonService = serviceFactory.CreateSeasonService(gameInfo);
+             var currentSeason = seasonService.GetCurrentSeason();
+             var leagueTableLink = new Link(UriHelper.GetSeasonLeagueTablesUri(gameInfo.Id, currentSeason.Id)) { Title = "League Tables" };
+             gameLinks.Add(leagueTableLink);
 
-          // Other teams, starting with the manager's team.
-          var otherTeamsLink = new Link(UriHelper.GetTeamUri(gameInfo.Id, gameInfo.CurrentTeamId)) { Title = "Other Teams" };
-          gameLinks.Add(otherTeamsLink);
+             // Matches of the manager's team in the current season.
+             var teamMatchesLink = new Link(UriHelper.GetSeasonTeamMatchesUri(gameInfo.Id, currentSeason.Id, gameInfo.CurrentTeamId)) { Title = "Matches" };
+             gameLinks.Add(teamMatchesLink);
 
-          // Seasons, starting with the current season.
-          var seasonLink = new Link(UriHelper.GetSeasonUri(gameInfo.Id, currentSeason.Id)) { Title = "Seasons" };
-          gameLinks.Add(seasonLink);
+             // Other teams, starting with the manager's team.
+             var otherTeamsLink = new Link(UriHelper.GetTeamUri(gameInfo.Id, gameInfo.CurrentTeamId)) { Title = "Other Teams" };
+             gameLinks.Add(otherTeamsLink);
+
+             // Seasons, starting with the current season.
+             var seasonLink = new Link(UriHelper.GetSeasonUri(gameInfo.Id, currentSeason.Id)) { Title = "Seasons" };
+             gameLinks.Add(seasonLink);
 
 
-   */
+      */
 
-          halDocument.AddLink("game", gameLinks);
-       }
-   }
+            halDocument.AddLink("game", gameLinks);
+        }
+    }
 }

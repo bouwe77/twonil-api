@@ -18,11 +18,11 @@ namespace TwoNil.Shared.DomainObjects
 
       private SeasonCompetition _seasonCompetition;
 
-      public string SeasonCompetitionId { get; private set; }
+      public string SeasonCompetitionId { get; set; }
 
       private Season _season;
 
-      public string SeasonId { get; private set; }
+      public string SeasonId { get; set; }
 
       public int Order { get; set; }
 

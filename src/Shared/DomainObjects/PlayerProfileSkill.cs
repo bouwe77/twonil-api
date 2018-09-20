@@ -8,7 +8,7 @@
          SkillPriority = profileSkillPriority;
       }
 
-      public PlayerSkill Skill { get; private set; }
+      public PlayerSkill Skill { get; set; }
       public ProfileSkillPriority SkillPriority { get; set; }
    }
 }

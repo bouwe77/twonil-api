@@ -21,34 +21,36 @@ namespace TwoNil.API.Resources
 
         public Resource Map(SeasonTeamStatistics seasonTeamStatistics, params string[] properties)
         {
+            bool applyAllProperties = !properties.Any();
+
             var resource = new Resource(new Link(_uriHelper.GetSeasonTeamStatsUri(seasonTeamStatistics.GameId, seasonTeamStatistics.SeasonId, seasonTeamStatistics.TeamId)));
 
-            if (properties.Contains(SeasonShortName))
+            if (applyAllProperties || properties.Contains(SeasonShortName))
             {
                 resource.AddProperty(SeasonShortName, seasonTeamStatistics.Season.ShortName);
             }
 
-            if (properties.Contains(SeasonLongName))
+            if (applyAllProperties || properties.Contains(SeasonLongName))
             {
                 resource.AddProperty(SeasonLongName, seasonTeamStatistics.Season.LongName);
             }
 
-            if (properties.Contains(CurrentLeagueTablePosition))
+            if (applyAllProperties || properties.Contains(CurrentLeagueTablePosition))
             {
                 resource.AddProperty(CurrentLeagueTablePosition, seasonTeamStatistics.CurrentLeagueTablePosition);
             }
 
-            if (properties.Contains(LeagueTablePositions))
+            if (applyAllProperties || properties.Contains(LeagueTablePositions))
             {
                 resource.AddProperty(LeagueTablePositions, seasonTeamStatistics.LeagueTablePositions);
             }
 
-            if (properties.Contains(LeagueName))
+            if (applyAllProperties || properties.Contains(LeagueName))
             {
                 resource.AddProperty(LeagueName, seasonTeamStatistics.LeagueName);
             }
 
-            if (properties.Contains(MatchResults))
+            if (applyAllProperties || properties.Contains(MatchResults))
             {
                 resource.AddProperty(MatchResults, seasonTeamStatistics.MatchResults);
             }

@@ -36,6 +36,7 @@ namespace TwoNil.Data
                 connection.CreateTable<SeasonStatistics>();
                 connection.CreateTable<SeasonTeamStatistics>();
                 connection.CreateTable<TeamStatistics>();
+                connection.CreateTable<GameDateTime>();
             }
         }
 

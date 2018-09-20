@@ -137,14 +137,19 @@ namespace TwoNil.Data
             return new NameRepository();
         }
 
+        public GameDateTimeRepository CreateGameDateTimeRepository()
+        {
+            return new GameDateTimeRepository(_gameDatabaseFilePath, _gameId);
+        }
+
         private static string GetGameDatabaseLocation(string gameId)
         {
-            return $@"D:\Mijn Databases\TwoNil\{gameId}.db";
+            return $@"D:\Mijn Databases\TwoNil\{gameId}.sqlite";
         }
 
         private static string GetMasterDatabaseLocation()
         {
-            return "D:\\Mijn Databases\\TwoNil\\twonil.db";
+            return "D:\\Mijn Databases\\TwoNil\\twonil.sqlite";
         }
     }
 }

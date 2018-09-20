@@ -8,12 +8,12 @@ namespace TwoNil.Shared.DomainObjects
       public string Name { get; set; }
 
       private Competition _currentLeagueCompetition;
-      public string CurrentLeagueCompetitionId { get; private set; }
+      public string CurrentLeagueCompetitionId { get; set; }
 
       public int CurrentLeaguePosition { get; set; }
 
       private Formation _formation;
-      public string FormationId { get; private set; }
+      public string FormationId { get; set; }
 
       public decimal Rating { get; set; }
       public decimal RatingGoalkeeper { get; set; }

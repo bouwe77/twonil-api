@@ -125,5 +125,10 @@ namespace TwoNil.Logic.Functionality.Competitions
 
             return nextDateTime;
         }
+
+        public IEnumerable<DateTime> GetAllMatchDates()
+        {
+            return _cupDates.Concat(_friendlyDates).Concat(_leagueDates);
+        }
     }
 }

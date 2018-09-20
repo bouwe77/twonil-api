@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace ApiTest.GamePlaySimulator
+namespace ApiTest.GamePlaySimulator.Interfaces
 {
-public interface IFormHandler
+    public interface IFormHandler
     {
         JToken GetForm(JObject json);
     }

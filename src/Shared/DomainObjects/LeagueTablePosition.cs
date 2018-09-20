@@ -6,7 +6,7 @@ namespace TwoNil.Shared.DomainObjects
    public class LeagueTablePosition : DomainObjectBase
    {
       private Team _team;
-      public string TeamId { get; private set; }
+      public string TeamId { get; set; }
 
       [Ignore]
       public Team Team
@@ -20,7 +20,7 @@ namespace TwoNil.Shared.DomainObjects
       }
 
       private LeagueTable _leagueTable;
-      public string LeagueTableId { get; private set; }
+      public string LeagueTableId { get; set; }
 
       [Ignore]
       public LeagueTable LeagueTable

@@ -44,7 +44,7 @@ namespace TwoNil.Shared.DomainObjects
       public decimal RatingAttack { get; set; }
 
       private Team _team;
-      public string TeamId { get; private set; }
+      public string TeamId { get; set; }
 
       [Ignore]
       public Team Team
@@ -58,7 +58,7 @@ namespace TwoNil.Shared.DomainObjects
       }
 
       private Position _preferredPosition;
-      public string PreferredPositionId { get; private set; }
+      public string PreferredPositionId { get; set; }
 
       [Ignore]
       public Position PreferredPosition
@@ -72,7 +72,7 @@ namespace TwoNil.Shared.DomainObjects
       }
 
       private Position _currentPosition;
-      public string CurrentPositionId { get; private set; }
+      public string CurrentPositionId { get; set; }
 
       [Ignore]
       public Position CurrentPosition

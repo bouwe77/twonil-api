@@ -21,39 +21,41 @@ namespace TwoNil.API.Resources
 
         public Resource Map(SeasonStatistics seasonStatistics, params string[] properties)
         {
+            bool applyAllProperties = !properties.Any();
+
             var teamMapper = new TeamMapper(_uriHelper);
 
             var resource = new Resource(new Link(_uriHelper.GetSeasonUri(seasonStatistics.GameId, seasonStatistics.Id)));
 
-            if (properties.Contains(SeasonShortName))
+            if (applyAllProperties || properties.Contains(SeasonShortName))
             {
                 resource.AddProperty(SeasonShortName, seasonStatistics.Season.ShortName);
             }
 
-            if (properties.Contains(SeasonLongName))
+            if (applyAllProperties || properties.Contains(SeasonLongName))
             {
                 resource.AddProperty(SeasonLongName, seasonStatistics.Season.LongName);
             }
 
-            if (properties.Contains(NationalChampion) && seasonStatistics.NationalChampion != null)
+            if (applyAllProperties || properties.Contains(NationalChampion) && seasonStatistics.NationalChampion != null)
             {
                 var team = teamMapper.Map(seasonStatistics.NationalChampion, TeamMapper.TeamName);
                 resource.AddResource(NationalChampion, team);
             }
 
-            if (properties.Contains(NationalChampionRunnerUp) && seasonStatistics.NationalChampionRunnerUp != null)
+            if (applyAllProperties || properties.Contains(NationalChampionRunnerUp) && seasonStatistics.NationalChampionRunnerUp != null)
             {
                 var team = teamMapper.Map(seasonStatistics.NationalChampionRunnerUp, TeamMapper.TeamName);
                 resource.AddResource(NationalChampionRunnerUp, team);
             }
 
-            if (properties.Contains(NationalCupWinner) && seasonStatistics.CupWinner != null)
+            if (applyAllProperties || properties.Contains(NationalCupWinner) && seasonStatistics.CupWinner != null)
             {
                 var team = teamMapper.Map(seasonStatistics.CupWinner, TeamMapper.TeamName);
                 resource.AddResource(NationalCupWinner, team);
             }
 
-            if (properties.Contains(NationalCupRunnerUp) && seasonStatistics.CupRunnerUp != null)
+            if (applyAllProperties || properties.Contains(NationalCupRunnerUp) && seasonStatistics.CupRunnerUp != null)
             {
                 var team = teamMapper.Map(seasonStatistics.CupRunnerUp, TeamMapper.TeamName);
                 resource.AddResource(NationalCupRunnerUp, team);

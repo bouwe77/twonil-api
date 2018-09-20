@@ -54,15 +54,12 @@ namespace TwoNil.Logic.Functionality
             using (var transactionManager = repositoryFactory.CreateTransactionManager())
             {
                 // Create GameInfo.
+                // Overrule the GameInfo Id with the Game Id.
                 var gameInfo = new GameInfo
                 {
                     Name = DateTime.Now.ToString("yyyyMMddHHmmss"),
                     Id = gameId
                 };
-
-                // Overrule the GameInfo Id with the Game Id.
-
-                transactionManager.RegisterInsert(gameInfo);
 
                 // Create teams and players.
                 var teamsAndPlayers = CreateTeamsAndPlayers(repositoryFactory);
@@ -73,6 +70,8 @@ namespace TwoNil.Logic.Functionality
                 int randomIndex = numberRandomizer.GetNumber(0, Constants.HowManyTeamsPerLeague * Constants.HowManyLeagues - 1);
                 gameInfo.CurrentTeam = teamsAndPlayers.Teams[randomIndex];
                 // ===================================================================
+
+                transactionManager.RegisterInsert(gameInfo);
 
                 // Insert teams.
                 transactionManager.RegisterInsert(teamsAndPlayers.Teams);

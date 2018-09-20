@@ -17,7 +17,7 @@ namespace TwoNil.Shared.DomainObjects
         public string LeagueTablePositions { get; set; }
 
         private Team _team;
-        public string TeamId { get; private set; }
+        public string TeamId { get; set; }
 
         [Ignore]
         public Team Team

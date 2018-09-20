@@ -11,19 +11,47 @@ namespace TwoNil.API.Resources
             _routeHelper = routeHelper;
         }
 
-        //TODO Dolores RouteHelper hier gebruiken!!!
-
         private string GetUri(string uri, params object[] parameters)
         {
             string formattedUri = string.Format(uri, parameters);
             return formattedUri;
         }
 
-        public string GetSubstitutionUri(string teamId, string gameId)
+        public string GetPastGameDateTimeUri(string gameId, string gameDateTimeId)
         {
-            string uri = GetUri("/games/{0}/teams/{1}/substitution", gameId, teamId);
-            return uri;
+            return GetUri("/games/{0}/pastgamedatetimes/{1}", gameId, gameDateTimeId);
         }
+
+        public string GetPresentGameDateTimeUri(string gameId, string gameDateTimeId)
+        {
+            return GetUri("/games/{0}/presentgamedatetimes/{1}", gameId, gameDateTimeId);
+        }
+
+        public string GetFutureGameDateTimeUri(string gameId, string gameDateTimeId)
+        {
+            return GetUri("/games/{0}/futuregamedatetimes/{1}", gameId, gameDateTimeId);
+        }
+
+        public string GetPastGameDateTimesUri(string gameId)
+        {
+            return GetUri("/games/{0}/pastgamedatetimes", gameId);
+        }
+
+        public string GetPresentGameDateTimesUri(string gameId)
+        {
+            return GetUri("/games/{0}/presentgamedatetimes", gameId);
+        }
+
+        public string GetFutureGameDateTimesUri(string gameId)
+        {
+            return GetUri("/games/{0}/futuregamedatetimes", gameId);
+        }
+
+        //public string GetSubstitutionUri(string gameId, string teamId)
+        //{
+        //    string uri = GetUri("/games/{0}/teams/{1}/substitution", gameId, teamId);
+        //    return uri;
+        //}
 
         public string GetUserTeamUri(string gameId, string userId)
         {
@@ -126,9 +154,15 @@ namespace TwoNil.API.Resources
             return uri;
         }
 
-        public string GetSeasonStatsUri(string gameId, string seasonId)
+        public string GetSeasonsUri(string gameId)
         {
-            string uri = GetUri("/games/{0}/seasons/{1}/stats", gameId, seasonId);
+            string uri = GetUri("/games/{0}/seasons", gameId);
+            return uri;
+        }
+
+        public string GetTeamStatsUri(string gameId, string teamId)
+        {
+            string uri = GetUri("/games/{0}/teams/{1}/stats", gameId, teamId);
             return uri;
         }
 

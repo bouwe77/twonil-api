@@ -8,8 +8,8 @@ namespace TwoNil.Shared.DomainObjects
       private SeasonCompetition _seasonCompetition;
       private Team _team;
 
-      public string SeasonCompetitionId { get; private set; }
-      public string TeamId { get; private set; }
+      public string SeasonCompetitionId { get; set; }
+      public string TeamId { get; set; }
 
       [Ignore]
       public SeasonCompetition SeasonCompetition

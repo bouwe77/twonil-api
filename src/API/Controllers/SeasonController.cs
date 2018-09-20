@@ -1,5 +1,6 @@
 ﻿using Dolores.Http;
 using Dolores.Responses;
+using System.Linq;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
 using TwoNil.API.Resources.TwoNil.API.Resources;
@@ -48,12 +49,13 @@ namespace TwoNil.API.Controllers
         public Response GetSeasonItem(string gameId, string seasonId)
         {
             RequestHelper.ValidateId(gameId);
+            RequestHelper.ValidateId(seasonId);
 
             var gameInfo = GetGameInfo(gameId);
             RequestHelper.ValidateId(seasonId);
 
-            var seasonService = ServiceFactory.CreateStatisticsService(gameInfo);
-            var seasonStatistics = seasonService.GetSeasonStatistics(seasonId);
+            var statisticsService = ServiceFactory.CreateStatisticsService(gameInfo);
+            var seasonStatistics = statisticsService.GetSeasonStatistics(seasonId);
 
             if (seasonStatistics == null)
             {
@@ -62,14 +64,7 @@ namespace TwoNil.API.Controllers
 
             var halDocument = CreateHalDocument(UriHelper.GetSeasonUri(gameId, seasonId), gameInfo);
 
-            var resource = new SeasonStatisticsMapper(UriHelper).Map(
-               seasonStatistics,
-               SeasonStatisticsMapper.SeasonShortName,
-               SeasonStatisticsMapper.SeasonLongName,
-               SeasonStatisticsMapper.NationalChampion,
-               SeasonStatisticsMapper.NationalChampionRunnerUp,
-               SeasonStatisticsMapper.NationalCupWinner,
-               SeasonStatisticsMapper.NationalCupRunnerUp);
+            var resource = new SeasonStatisticsMapper(UriHelper).Map(seasonStatistics);
             halDocument.AddResource("rel:season", resource);
 
             var seasonListResourceFactory = new SeasonListResourceFactory(gameInfo, UriHelper, UriHelper.GetSeasonUri(gameId, "###seasonid###"));
@@ -79,9 +74,22 @@ namespace TwoNil.API.Controllers
             return response;
         }
 
-        public Response GetSeasonTeamStats(string gameId, string seasonId, string teamId)
+        public Response GetSeasonCollection(string gameId)
         {
-            return new Response(HttpStatusCode.NotImplemented);
+            RequestHelper.ValidateId(gameId);
+
+            var gameInfo = GetGameInfo(gameId);
+
+            var seasonService = ServiceFactory.CreateSeasonService(gameInfo);
+            var seasons = seasonService.GetAll();
+
+            var halDocument = CreateHalDocument(UriHelper.GetSeasonsUri(gameId), gameInfo);
+
+            var seasonListResourceFactory = new SeasonListResourceFactory(gameInfo, UriHelper, UriHelper.GetSeasonUri(gameId, "###seasonid###"));
+            halDocument.AddResource("rel:seasons", seasonListResourceFactory.Create());
+
+            var response = GetResponse(halDocument);
+            return response;
         }
     }
 }

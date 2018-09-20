@@ -1,171 +1,179 @@
 ﻿{
-  "dolores": {
-    "errorDetailsInResponses": "All",
-    "routes": [
-      {
-        "identifier": "home-route",
-        "uriTemplate": "",
-        "get": {
-          "type": "TwoNil.API.Controllers.HomeController, TwoNil.API",
-          "method": "Home"
-        }
-      },
-      {
-        "identifier": "game-route",
-        "uriTemplate": "/games/{gameId}",
-        "get": {
-          "type": "TwoNil.API.Controllers.GameController, TwoNil.API",
-          "method": "GetItem"
-        },
-        "delete": {
-          "type": "TwoNil.API.Controllers.GameController, TwoNil.API",
-          "method": "DeleteItem"
-        }
-      },
-      {
-        "identifier": "games-route",
-        "uriTemplate": "/games",
-        "get": {
-          "type": "TwoNil.API.Controllers.GameController, TwoNil.API",
-          "method": "GetCollection"
-        },
-        "post": {
-          "type": "TwoNil.API.Controllers.GameController, TwoNil.API",
-          "method": "Post"
-        },
-        "options": {
-          "type": "TwoNil.API.Controllers.OptionsController, TwoNil.API",
-          "method": "Options"
-        }
-      },
-      {
-        "identifier": "leaguetables-by-season-route",
-        "uriTemplate": "/games/{gameId}/seasons/{seasonId}/leaguetables",
-        "get": {
-          "type": "TwoNil.API.Controllers.LeagueTableController, TwoNil.API",
-          "method": "GetBySeason"
-        }
-      },
-      {
-        "identifier": "match-route",
-        "uriTemplate": "/games/{gameId}/matches/{matchId}",
-        "get": {
-          "type": "TwoNil.API.Controllers.MatchController, TwoNil.API",
-          "method": "GetItem"
-        }
-      },
-      {
-        "identifier": "team-matches-route",
-        "uriTemplate": "/games/{gameId}/seasons/{seasonId}/teams/{teamId}/matches",
-        "get": {
-          "type": "TwoNil.API.Controllers.MatchController, TwoNil.API",
-          "method": "GetTeamMatches"
-        }
-      },
-      {
-        "identifier": "day-matches-route",
-        "uriTemplate": "/games/{gameId}/days/{dayId}/matches",
-        "get": {
-          "type": "TwoNil.API.Controllers.MatchController, TwoNil.API",
-          "method": "GetDayMatches"
-        },
-        "post": {
-          "type": "TwoNil.API.Controllers.MatchController, TwoNil.API",
-          "method": "PostPlayDayMatches"
-        },
-        "options": {
-          "type": "TwoNil.API.Controllers.OptionsController, TwoNil.API",
-          "method": "Options"
-        }
-      },
-      {
-        "identifier": "team-players-route",
-        "uriTemplate": "/games/{gameId}/teams/{teamId}/players",
-        "get": {
-          "type": "TwoNil.API.Controllers.PlayerController, TwoNil.API",
-          "method": "GetTeamPlayers"
-        }
-      },
-      {
-        "identifier": "relation-route",
-        "uriTemplate": "/rels/{relationName}",
-        "get": {
-          "type": "TwoNil.API.Controllers.RelationController, TwoNil.API",
-          "method": "GetRelationItem"
-        }
-      },
-      {
-        "identifier": "season-route",
-        "uriTemplate": "/games/{gameId}/seasons/{seasonId}",
-        "get": {
-          "type": "TwoNil.API.Controllers.SeasonController, TwoNil.API",
-          "method": "GetSeasonItem"
-        },
-        "post": {
-          "type": "TwoNil.API.Controllers.SeasonController, TwoNil.API",
-          "method": "PostEndSeasonItem"
-        },
-        "options": {
-          "type": "TwoNil.API.Controllers.OptionsController, TwoNil.API",
-          "method": "Options"
-        }
-      },
-      {
-        "identifier": "season-team-statistics-route",
-        "uriTemplate": "/games/{gameId}/seasons/{seasonId}/teams/{teamId}/stats",
-        "get": {
-          "type": "TwoNil.API.Controllers.SeasonController, TwoNil.API",
-          "method": "GetSeasonTeamStats"
-        }
-      },
-      {
-        "identifier": "team-route",
-        "uriTemplate": "/games/{gameId}/teams/{teamId}",
-        "get": {
-          "type": "TwoNil.API.Controllers.TeamController, TwoNil.API",
-          "method": "GetTeamItem"
-        }
-      },
-      {
-        "identifier": "users-route",
-        "uriTemplate": "/users",
-        "post": {
-          "type": "TwoNil.API.Controllers.UserController, TwoNil.API",
-          "method": "PostAddUser"
-        },
-        "options": {
-          "type": "TwoNil.API.Controllers.OptionsController, TwoNil.API",
-          "method": "Options"
-        }
-      },
-      {
-        "identifier": "user-route",
-        "uriTemplate": "/users/{userId}",
-        "get": {
-          "type": "TwoNil.API.Controllers.UserController, TwoNil.API",
-          "method": "GetUserItem"
-        }
-      },
-      {
-        "identifier": "logins-route",
-        "uriTemplate": "/logins",
-        "post": {
-          "type": "TwoNil.API.Controllers.LoginController, TwoNil.API",
-          "method": "Post"
-        },
-        "options": {
-          "type": "TwoNil.API.Controllers.OptionsController, TwoNil.API",
-          "method": "Options"
-        }
-      },
-      {
-        "identifier": "game-links-route",
-        "uriTemplate": "/games/{gameId}/links",
-        "get": {
-          "type": "TwoNil.API.Controllers.GameLinkController, TwoNil.API",
-          "method": "GetCollection"
-        }
-      }
-    ]
-  }
+    "dolores": {
+        "errorDetailsInResponses": "All",
+        "routes": [
+            {
+                "identifier": "home-route",
+                "uriTemplate": "",
+                "get": {
+                    "type": "TwoNil.API.Controllers.HomeController, TwoNil.API",
+                    "method": "Home"
+                }
+            },
+            {
+                "identifier": "game-route",
+                "uriTemplate": "/games/{gameId}",
+                "get": {
+                    "type": "TwoNil.API.Controllers.GameController, TwoNil.API",
+                    "method": "GetItem"
+                },
+                "delete": {
+                    "type": "TwoNil.API.Controllers.GameController, TwoNil.API",
+                    "method": "DeleteItem"
+                }
+            },
+            {
+                "identifier": "games-route",
+                "uriTemplate": "/games",
+                "get": {
+                    "type": "TwoNil.API.Controllers.GameController, TwoNil.API",
+                    "method": "GetCollection"
+                },
+                "post": {
+                    "type": "TwoNil.API.Controllers.GameController, TwoNil.API",
+                    "method": "Post"
+                },
+                "options": {
+                    "type": "TwoNil.API.Controllers.OptionsController, TwoNil.API",
+                    "method": "Options"
+                }
+            },
+            {
+                "identifier": "leaguetables-by-season-route",
+                "uriTemplate": "/games/{gameId}/seasons/{seasonId}/leaguetables",
+                "get": {
+                    "type": "TwoNil.API.Controllers.LeagueTableController, TwoNil.API",
+                    "method": "GetBySeason"
+                }
+            },
+            {
+                "identifier": "match-route",
+                "uriTemplate": "/games/{gameId}/matches/{matchId}",
+                "get": {
+                    "type": "TwoNil.API.Controllers.MatchController, TwoNil.API",
+                    "method": "GetItem"
+                }
+            },
+            {
+                "identifier": "team-matches-route",
+                "uriTemplate": "/games/{gameId}/seasons/{seasonId}/teams/{teamId}/matches",
+                "get": {
+                    "type": "TwoNil.API.Controllers.MatchController, TwoNil.API",
+                    "method": "GetTeamMatches"
+                }
+            },
+            {
+                "identifier": "day-matches-route",
+                "uriTemplate": "/games/{gameId}/days/{dayId}/matches",
+                "get": {
+                    "type": "TwoNil.API.Controllers.MatchController, TwoNil.API",
+                    "method": "GetDayMatches"
+                },
+                "post": {
+                    "type": "TwoNil.API.Controllers.MatchController, TwoNil.API",
+                    "method": "PostPlayDayMatches"
+                },
+                "options": {
+                    "type": "TwoNil.API.Controllers.OptionsController, TwoNil.API",
+                    "method": "Options"
+                }
+            },
+            {
+                "identifier": "team-players-route",
+                "uriTemplate": "/games/{gameId}/teams/{teamId}/players",
+                "get": {
+                    "type": "TwoNil.API.Controllers.PlayerController, TwoNil.API",
+                    "method": "GetTeamPlayers"
+                }
+            },
+            {
+                "identifier": "relation-route",
+                "uriTemplate": "/rels/{relationName}",
+                "get": {
+                    "type": "TwoNil.API.Controllers.RelationController, TwoNil.API",
+                    "method": "GetRelationItem"
+                }
+            },
+            {
+                "identifier": "season-route",
+                "uriTemplate": "/games/{gameId}/seasons/{seasonId}",
+                "get": {
+                    "type": "TwoNil.API.Controllers.SeasonController, TwoNil.API",
+                    "method": "GetSeasonItem"
+                },
+                "post": {
+                    "type": "TwoNil.API.Controllers.SeasonController, TwoNil.API",
+                    "method": "PostEndSeasonItem"
+                },
+                "options": {
+                    "type": "TwoNil.API.Controllers.OptionsController, TwoNil.API",
+                    "method": "Options"
+                }
+            },
+            {
+                "identifier": "seasons-route",
+                "uriTemplate": "/games/{gameId}/seasons",
+                "get": {
+                    "type": "TwoNil.API.Controllers.SeasonController, TwoNil.API",
+                    "method": "GetSeasonCollection"
+                }
+            },
+            {
+                "identifier": "team-route",
+                "uriTemplate": "/games/{gameId}/teams/{teamId}",
+                "get": {
+                    "type": "TwoNil.API.Controllers.TeamController, TwoNil.API",
+                    "method": "GetTeamItem"
+                }
+            },
+            {
+                "identifier": "users-route",
+                "uriTemplate": "/users",
+                "post": {
+                    "type": "TwoNil.API.Controllers.UserController, TwoNil.API",
+                    "method": "PostAddUser"
+                },
+                "options": {
+                    "type": "TwoNil.API.Controllers.OptionsController, TwoNil.API",
+                    "method": "Options"
+                }
+            },
+            {
+                "identifier": "user-route",
+                "uriTemplate": "/users/{userId}",
+                "get": {
+                    "type": "TwoNil.API.Controllers.UserController, TwoNil.API",
+                    "method": "GetUserItem"
+                }
+            },
+            {
+                "identifier": "logins-route",
+                "uriTemplate": "/logins",
+                "post": {
+                    "type": "TwoNil.API.Controllers.LoginController, TwoNil.API",
+                    "method": "Post"
+                },
+                "options": {
+                    "type": "TwoNil.API.Controllers.OptionsController, TwoNil.API",
+                    "method": "Options"
+                }
+            },
+            {
+                "identifier": "game-links-route",
+                "uriTemplate": "/games/{gameId}/links",
+                "get": {
+                    "type": "TwoNil.API.Controllers.GameLinkController, TwoNil.API",
+                    "method": "GetCollection"
+                }
+            },
+            {
+                "identifier": "pastgamedatetimes-route",
+                "uriTemplate": "/games/{gameId}/pastgamedatetimes",
+                "post": {
+                    "type": "TwoNil.API.Controllers.GameDateTimeController, TwoNil.API",
+                    "method": "PostEnd"
+                }
+            }
+        ]
+    }
 }

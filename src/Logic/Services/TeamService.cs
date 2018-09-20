@@ -29,11 +29,11 @@ namespace TwoNil.Logic.Services
          return teams;
       }
 
-      public IEnumerable<Team> GetBySeasonCompetition(SeasonCompetition seasonCompetition)
+      public IEnumerable<Team> GetBySeasonCompetition(string seasonCompetitionId)
       {
          using (var teamRepository = RepositoryFactory.CreateTeamRepository())
          {
-            var teams = teamRepository.GetTeamsBySeasonCompetition(seasonCompetition);
+            var teams = teamRepository.GetTeamsBySeasonCompetition(seasonCompetitionId);
             return teams;
          }
       }

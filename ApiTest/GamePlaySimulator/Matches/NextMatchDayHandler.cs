@@ -1,20 +1,19 @@
-﻿using Dolores.Http;
+﻿using ApiTest.GamePlaySimulator.Hypermedia;
+using ApiTest.GamePlaySimulator.Interfaces;
+using Dolores.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using TwoNil.API.Controllers;
 
-namespace ApiTest.GamePlaySimulator
+namespace ApiTest.GamePlaySimulator.Matches
 {
     public class NextMatchDayHandler : IFormHandler, IUrlParser
     {
         public void InvokeControllerMethod(string url)
         {
-            // Example URL: /games/xa4pv/days/0001101120/matches
-            var splittedUrl = url.Split('/', System.StringSplitOptions.RemoveEmptyEntries);
-            string gameId = splittedUrl[1];
-            string dayId = splittedUrl[3];
+            var parsedUrl = UrlParser.Parse(url);
 
-            var response = new MatchController().PostPlayDayMatches(gameId, dayId);
+            var response = new MatchController().PostPlayDayMatches(parsedUrl["games"], parsedUrl["days"]);
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
         }
 

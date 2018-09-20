@@ -29,7 +29,7 @@ namespace TwoNil.Shared.DomainObjects
       public string League4LeagueTableId { get; set; }
 
       private Season _season;
-      public string SeasonId { get; private set; }
+      public string SeasonId { get; set; }
 
       [Ignore]
       public Season Season
@@ -46,7 +46,7 @@ namespace TwoNil.Shared.DomainObjects
       }
 
       private Team _cupWinner;
-      public string CupWinnerTeamId { get; private set; }
+      public string CupWinnerTeamId { get; set; }
 
       [Ignore]
       public Team CupWinner
@@ -63,7 +63,7 @@ namespace TwoNil.Shared.DomainObjects
       }
 
       private Team _cupRunnerUp;
-      public string CupRunnerUpTeamId { get; private set; }
+      public string CupRunnerUpTeamId { get; set; }
 
       [Ignore]
       public Team CupRunnerUp
@@ -80,7 +80,7 @@ namespace TwoNil.Shared.DomainObjects
       }
 
       private Team _nationalChampion;
-      public string NationalChampionTeamId { get; private set; }
+      public string NationalChampionTeamId { get; set; }
 
       [Ignore]
       public Team NationalChampion
@@ -97,7 +97,7 @@ namespace TwoNil.Shared.DomainObjects
       }
 
       private Team _nationalChampionRunnerUp;
-      public string NationalChampionRunnerUpTeamId { get; private set; }
+      public string NationalChampionRunnerUpTeamId { get; set; }
 
       [Ignore]
       public Team NationalChampionRunnerUp
@@ -114,7 +114,7 @@ namespace TwoNil.Shared.DomainObjects
       }
 
       private Team _nationalSuperCupWinner;
-      public string NationalSuperCupWinnerTeamId { get; private set; }
+      public string NationalSuperCupWinnerTeamId { get; set; }
 
       [Ignore]
       public Team NationalSuperCupWinner

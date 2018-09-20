@@ -22,9 +22,7 @@ namespace TwoNil.API.Resources
 
       public Resource Create()
       {
-         var resource = new Resource(new Link(_uriHelper.GetMatchDayUri(_gameId, _matchDayId)));
-
-         return resource;
+         return new Resource(new Link(_uriHelper.GetMatchDayUri(_gameId, _matchDayId)));
       }
 
       public Form GetForm()

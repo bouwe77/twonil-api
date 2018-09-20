@@ -11,7 +11,7 @@ namespace TwoNil.Shared.DomainObjects
         [Ignore]
         public List<LeagueTablePosition> LeagueTablePositions { get; set; }
 
-        public string SeasonCompetitionId { get; private set; }
+        public string SeasonCompetitionId { get; set; }
         public string CompetitionName { get; set; }
         public string SeasonId { get; set; }
 

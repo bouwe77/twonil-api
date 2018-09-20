@@ -2,8 +2,8 @@
 {
    public class Line : DomainObjectBase
    {
-      public string Name { get; private set; }
-      public bool IsField { get; private set; }
+      public string Name { get; set; }
+      public bool IsField { get; set; }
 
       public Line(string name, bool isField)
       {

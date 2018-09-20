@@ -26,7 +26,7 @@ namespace TwoNil.Shared.DomainObjects
         public string LeagueName { get; set; }
 
         private Season _season;
-        public string SeasonId { get; private set; }
+        public string SeasonId { get; set; }
 
         [Ignore]
         public Season Season
@@ -43,7 +43,7 @@ namespace TwoNil.Shared.DomainObjects
         }
 
         private Team _team;
-        public string TeamId { get; private set; }
+        public string TeamId { get; set; }
 
         [Ignore]
         public Team Team

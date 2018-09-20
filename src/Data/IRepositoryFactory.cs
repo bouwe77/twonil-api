@@ -26,5 +26,6 @@ namespace TwoNil.Data
         PlayerProfileRepository CreatePlayerProfileRepository();
         IPositionRepository CreatePositionRepository();
         NameRepository CreateNameRepository();
+        GameDateTimeRepository CreateGameDateTimeRepository();
     }
 }

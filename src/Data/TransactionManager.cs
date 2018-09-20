@@ -5,136 +5,136 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Data
 {
-   public class TransactionManager : SqliteRepository, IDisposable
-   {
-      private readonly List<Transaction> _transactions;
+    public class TransactionManager : SqliteRepository, ITransactionManager, IDisposable
+    {
+        private readonly List<Transaction> _transactions;
 
-      internal TransactionManager(string databaseFilePath)
-         : base(databaseFilePath)
-      {
-         _transactions = new List<Transaction>();
-      }
+        internal TransactionManager(string databaseFilePath)
+           : base(databaseFilePath)
+        {
+            _transactions = new List<Transaction>();
+        }
 
-      private void AddTransaction(DomainObjectBase domainObject, Action<DomainObjectBase> operation)
-      {
-         Assert(domainObject);
+        private void AddTransaction(DomainObjectBase domainObject, Action<DomainObjectBase> operation)
+        {
+            Assert(domainObject);
 
-         var transaction = new Transaction
-         {
-            DomainObject = domainObject,
-            Operation = operation
-         };
-
-         _transactions.Add(transaction);
-      }
-
-      public void RegisterInsert(DomainObjectBase domainObject)
-      {
-         RegisterInsert(new [] { domainObject });
-      }
-
-      public void RegisterInsert(IEnumerable<DomainObjectBase> domainObjects)
-      {
-         foreach (var domainObject in domainObjects)
-         {
-            AddTransaction(domainObject, Insert);
-         }
-      }
-
-      public void RegisterUpdate(DomainObjectBase domainObject)
-      {
-         RegisterUpdate(new[] { domainObject });
-      }
-
-      public void RegisterUpdate(IEnumerable<DomainObjectBase> domainObjects)
-      {
-         foreach (var domainObject in domainObjects)
-         {
-            AddTransaction(domainObject, Update);
-         }
-      }
-
-      public void RegisterDelete(DomainObjectBase domainObject)
-      {
-         RegisterDelete(new[] { domainObject });
-      }
-
-      public void RegisterDelete(IEnumerable<DomainObjectBase> domainObjects)
-      {
-         foreach (var domainObject in domainObjects)
-         {
-            AddTransaction(domainObject, Delete);
-         }
-      }
-
-      public void Save()
-      {
-         // Do not connect until the actual save is requested.
-         Connect();
-
-         try
-         {
-            StartTransaction();
-
-            foreach (var transaction in _transactions)
+            var transaction = new Transaction
             {
-               transaction.Operation.Invoke(transaction.DomainObject);
+                DomainObject = domainObject,
+                Operation = operation
+            };
+
+            _transactions.Add(transaction);
+        }
+
+        public void RegisterInsert(DomainObjectBase domainObject)
+        {
+            RegisterInsert(new[] { domainObject });
+        }
+
+        public void RegisterInsert(IEnumerable<DomainObjectBase> domainObjects)
+        {
+            foreach (var domainObject in domainObjects)
+            {
+                AddTransaction(domainObject, Insert);
             }
+        }
 
-            CommitTransaction();
+        public void RegisterUpdate(DomainObjectBase domainObject)
+        {
+            RegisterUpdate(new[] { domainObject });
+        }
 
-            _transactions.Clear();
-         }
-         catch (Exception)
-         {
-            RollbackTransaction();
-            throw;
-         }
-      }
+        public void RegisterUpdate(IEnumerable<DomainObjectBase> domainObjects)
+        {
+            foreach (var domainObject in domainObjects)
+            {
+                AddTransaction(domainObject, Update);
+            }
+        }
 
-      public IEnumerable<Transaction> GetTransactions()
-      {
-         return _transactions;
-      }
+        public void RegisterDelete(DomainObjectBase domainObject)
+        {
+            RegisterDelete(new[] { domainObject });
+        }
 
-      private void Insert(DomainObjectBase domainObject)
-      {
-         domainObject.LastModified = GetLastModified();
-         Connection.Insert(domainObject);
-      }
+        public void RegisterDelete(IEnumerable<DomainObjectBase> domainObjects)
+        {
+            foreach (var domainObject in domainObjects)
+            {
+                AddTransaction(domainObject, Delete);
+            }
+        }
 
-      private void Update(DomainObjectBase domainObject)
-      {
-         domainObject.LastModified = GetLastModified();
-         Connection.Update(domainObject);
-      }
+        public void Save()
+        {
+            // Do not connect until the actual save is requested.
+            Connect();
 
-      private void Delete(DomainObjectBase domainObject)
-      {
-         Connection.Delete(domainObject);
-      }
+            try
+            {
+                StartTransaction();
 
-      private void Assert(DomainObjectBase domainObject)
-      {
-         if (domainObject == null)
-         {
-            throw new ArgumentNullException(nameof(domainObject));
-         }
-      }
+                foreach (var transaction in _transactions)
+                {
+                    transaction.Operation.Invoke(transaction.DomainObject);
+                }
 
-      private void StartTransaction()
-      {
-         Connection.BeginTransaction();
-      }
+                CommitTransaction();
 
-      private void CommitTransaction()
-      {
-         Connection.Commit();
-      }
+                _transactions.Clear();
+            }
+            catch (Exception)
+            {
+                RollbackTransaction();
+                throw;
+            }
+        }
 
-      private void RollbackTransaction()
-      {
-         Connection.Rollback();
-      }
-   }
+        public IEnumerable<Transaction> GetTransactions()
+        {
+            return _transactions;
+        }
+
+        private void Insert(DomainObjectBase domainObject)
+        {
+            domainObject.LastModified = GetLastModified();
+            Connection.Insert(domainObject);
+        }
+
+        private void Update(DomainObjectBase domainObject)
+        {
+            domainObject.LastModified = GetLastModified();
+            Connection.Update(domainObject);
+        }
+
+        private void Delete(DomainObjectBase domainObject)
+        {
+            Connection.Delete(domainObject);
+        }
+
+        private void Assert(DomainObjectBase domainObject)
+        {
+            if (domainObject == null)
+            {
+                throw new ArgumentNullException(nameof(domainObject));
+            }
+        }
+
+        private void StartTransaction()
+        {
+            Connection.BeginTransaction();
+        }
+
+        private void CommitTransaction()
+        {
+            Connection.Commit();
+        }
+
+        private void RollbackTransaction()
+        {
+            Connection.Rollback();
+        }
+    }
 }

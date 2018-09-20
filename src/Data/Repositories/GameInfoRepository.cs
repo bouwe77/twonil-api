@@ -3,32 +3,31 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Data.Repositories
 {
-   public class GameInfoRepository : ReadRepository<GameInfo>
-   {
-      internal GameInfoRepository(string databaseFilePath, string gameId)
-         : base(databaseFilePath, gameId)
-      {
-      }
+    public class GameInfoRepository : ReadRepository<GameInfo>
+    {
+        internal GameInfoRepository(string databaseFilePath, string gameId)
+           : base(databaseFilePath, gameId)
+        {
+        }
 
-      public GameInfo GetGameInfo()
-      {
-         // The GameInfo table contains only one record.
-         var gameInfo = GetAll().First();
+        public GameInfo GetGameInfo()
+        {
+            // The GameInfo table contains only one record.
+            var gameInfo = GetAll().First();
 
-         GetReferencedData(gameInfo);
+            GetReferencedData(gameInfo);
 
-         return gameInfo;
-      }
+            return gameInfo;
+        }
 
-
-      private void GetReferencedData(GameInfo gameInfo)
-      {
-         var repositoryFactory = new RepositoryFactory(gameInfo.Id);
-         using (var teamRepository = repositoryFactory.CreateRepository<Team>())
-         {
-            var team = teamRepository.GetOne(gameInfo.CurrentTeamId);
-            gameInfo.CurrentTeam = team;
-         }
-      }
-   }
+        private void GetReferencedData(GameInfo gameInfo)
+        {
+            var repositoryFactory = new RepositoryFactory(gameInfo.Id);
+            using (var teamRepository = repositoryFactory.CreateRepository<Team>())
+            {
+                var team = teamRepository.GetOne(gameInfo.CurrentTeamId);
+                gameInfo.CurrentTeam = team;
+            }
+        }
+    }
 }
