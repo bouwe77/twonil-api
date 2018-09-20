@@ -55,7 +55,7 @@ namespace TwoNil.Logic.Functionality.Competitions
             // Insert the season and all competition schedules.
             InsertSeasonAndCompetitionSchedule(transactionManager, seasonAndCompetitionSchedules);
 
-            InsertGameDateTimes(transactionManager, seasonAndCompetitionSchedules.MatchDates);
+            InsertGameDateTimes(transactionManager, seasonAndCompetitionSchedules.MatchDates, seasonAndCompetitionSchedules.EndOfSeasonDate);
 
             // Insert statistics.
             InsertSeasonRelatedStatistics(transactionManager, teams, seasonAndCompetitionSchedules);
@@ -102,7 +102,7 @@ namespace TwoNil.Logic.Functionality.Competitions
             // Insert the season and all competition schedules.
             InsertSeasonAndCompetitionSchedule(transactionManager, seasonAndCompetitionSchedules);
 
-            InsertGameDateTimes(transactionManager, seasonAndCompetitionSchedules.MatchDates);
+            InsertGameDateTimes(transactionManager, seasonAndCompetitionSchedules.MatchDates, seasonAndCompetitionSchedules.EndOfSeasonDate);
 
             // Insert statistics.
             InsertSeasonRelatedStatistics(transactionManager, allTeamsSortedOnLeagueAndPosition, seasonAndCompetitionSchedules);
@@ -184,7 +184,7 @@ namespace TwoNil.Logic.Functionality.Competitions
             matchDateManager.Initialize();
 
             // The season officially ends a day after the last match so there is a possibility to add events between the last match and the end of the season.
-            var endSeasonDateTime = matchDateManager.GetAllMatchDates().Last().AddDays(1);
+            var endSeasonDateTime = matchDateManager.GetAllMatchDates().OrderBy(d => d).Last().AddDays(1);
 
             var season = new Season
             {
@@ -197,7 +197,7 @@ namespace TwoNil.Logic.Functionality.Competitions
 
             // Add all dates that are determined here to the schedule so the datetime navigation can be updated.
             seasonAndCompetitionSchedules.MatchDates = matchDateManager.GetAllMatchDates();
-            seasonAndCompetitionSchedules.OtherDates = new List<DateTime> { endSeasonDateTime };
+            seasonAndCompetitionSchedules.EndOfSeasonDate = endSeasonDateTime;
 
             // Create leagues and schedule.
             var leagueManager = new LeagueManager();
@@ -243,6 +243,10 @@ namespace TwoNil.Logic.Functionality.Competitions
             // End the season by updating the status.
             season.SeasonStatus = SeasonStatus.Ended;
             transactionManager.RegisterUpdate(season);
+
+            // Mark the end of season date as completed.
+            var gameDateTimeManager = new GameDateTimeMutationManager(transactionManager, _repositoryFactory);
+            gameDateTimeManager.UpdateEndOfSeasonStatus(season.EndDateTime);
         }
 
         private void SaveCompetitionSchedule(CompetitionSchedule competitionSchedule, TransactionManager transactionManager)
@@ -262,18 +266,10 @@ namespace TwoNil.Logic.Functionality.Competitions
             transactionManager.RegisterInsert(competitionSchedule.Matches);
         }
 
-        private static void InsertGameDateTimes(TransactionManager transactionManager, IEnumerable<DateTime> matchDates)
+        private void InsertGameDateTimes(TransactionManager transactionManager, IEnumerable<DateTime> matchDates, DateTime endOfSeasonDate)
         {
-            var gameDateTimes = new List<GameDateTime>();
-            foreach (var matchDate in matchDates)
-            {
-                var gameDateTime = GameDateTimeFactory.Create(matchDate, GameDateTimeEventStatus.ToDo);
-                gameDateTimes.Add(gameDateTime);
-            }
-
-            gameDateTimes.OrderBy(g => g.DateTime).First().Status = GameDateTimeStatus.Now;
-
-            transactionManager.RegisterInsert(gameDateTimes);
+            var gameDateTimeNanager = new GameDateTimeMutationManager(transactionManager, _repositoryFactory);
+            gameDateTimeNanager.CreateNewForSeason(matchDates, endOfSeasonDate);
         }
     }
 }

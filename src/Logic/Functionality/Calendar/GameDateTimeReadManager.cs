@@ -16,11 +16,14 @@ namespace TwoNil.Logic.Functionality.Calendar
             _repositoryFactory = repositoryFactory;
         }
 
-        public GameDateTime GetNow()
+        public GameDateTime GetNow(bool allowNonExisting = false)
         {
             using (var repo = _repositoryFactory.CreateGameDateTimeRepository())
             {
-                return repo.GetByStatus(GameDateTimeStatus.Now).First();
+                if (allowNonExisting)
+                    return repo.GetByStatus(GameDateTimeStatus.Now).FirstOrDefault();
+                else
+                    return repo.GetByStatus(GameDateTimeStatus.Now).First();
             }
         }
 

@@ -24,8 +24,8 @@ namespace ApiTest.GamePlaySimulator
             // =========== CONFIG ===============================================================================
             // Note that it might not always be necessary to execute this simulation when running all unit tests
             const bool enableSimulation = true;
-            const string gameId = "nczmy";
-            const int howManySeasons = 1;
+            const string gameId = "xnaar";
+            const int howManySeasons = 3;
             // ==================================================================================================
 
             if (!enableSimulation)
@@ -80,7 +80,7 @@ namespace ApiTest.GamePlaySimulator
                     PlayMatches(nextMatchUrl);
                 else
                 {
-                    // Navigating to the next GameDateTime is not yet possible, there are no matches to play,
+                    // Navigating to the next GameDateTime is not yet possible and there are no matches to play,
                     // so the only possibility now is that the season can be ended.
                     string endSeasonUrl = _forms.GetFormUrl(new EndOfSeasonHandler());
                     Assert.IsNotNull(endSeasonUrl);

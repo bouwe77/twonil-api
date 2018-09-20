@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Functionality.Competitions
@@ -14,6 +15,6 @@ namespace TwoNil.Logic.Functionality.Competitions
         public CompetitionSchedule NationalSuperCupSchedule { get; set; }
         public IEnumerable<Team> Teams { get; set; }
         public IEnumerable<DateTime> MatchDates { get; set; }
-        public IEnumerable<DateTime> OtherDates { get; set; }
+        public DateTime EndOfSeasonDate { get; set; }
     }
 }

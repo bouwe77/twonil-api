@@ -7,14 +7,33 @@ namespace TwoNil.Logic.Functionality.Calendar
 {
     internal class GameDateTimeFactory
     {
-        public static GameDateTime Create(DateTime dateTime, GameDateTimeEventStatus eventStatus)
+        public static GameDateTime CreateForMatches(DateTime dateTime)
+        {
+            var gameDateTime = CreateWithoutEvents(dateTime);
+
+            gameDateTime.Matches = GameDateTimeEventStatus.ToDo;
+
+            return gameDateTime;
+        }
+
+        public static GameDateTime CreateForEndOfSeason(DateTime dateTime)
+        {
+            var gameDateTime = CreateWithoutEvents(dateTime);
+
+            gameDateTime.EndOfSeason = GameDateTimeEventStatus.ToDo;
+
+            return gameDateTime;
+        }
+
+        public static GameDateTime CreateWithoutEvents(DateTime dateTime)
         {
             return new GameDateTime
             {
                 DateTime = dateTime,
                 Date = dateTime.ToString("yyyy-MM-dd"),
-                Matches = eventStatus,
-                Status = GameDateTimeStatus.Future
+                Status = GameDateTimeStatus.Future,
+                Matches = GameDateTimeEventStatus.NotApplicable,
+                EndOfSeason = GameDateTimeEventStatus.NotApplicable
             };
         }
     }

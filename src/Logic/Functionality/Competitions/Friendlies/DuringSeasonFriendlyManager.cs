@@ -27,10 +27,6 @@ namespace TwoNil.Logic.Functionality.Competitions.Friendlies
 
         public void CreateDuringSeasonFriendlies(Round currentCupRound, IEnumerable<Team> teamsInNextCupRound)
         {
-            //TODO Kan ik niet i.p.v. currentCupRound de NEXT cup round meegeven aan deze methode?
-            //TODO Deze methode moet geunittest worden, dus verplaatsen...
-
-            // Determine next cup round.
             using (var roundRepository = _repositoryFactory.CreateRoundRepository())
             using (var teamRepository = _repositoryFactory.CreateTeamRepository())
             {

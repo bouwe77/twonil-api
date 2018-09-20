@@ -24,8 +24,7 @@ namespace TwoNil.API.Resources
 
             if (!properties.Any() || properties.Contains(Date))
             {
-                resource.AddProperty(Date, gameDateTime.DateTime);
-                //TODO format WITHOUT time
+                resource.AddProperty(Date, gameDateTime.Date);
             }
 
             if (!properties.Any() || properties.Contains(DateTime))
