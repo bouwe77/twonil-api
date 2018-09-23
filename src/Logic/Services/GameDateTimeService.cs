@@ -23,8 +23,10 @@ namespace TwoNil.Logic.Services
         public void EndNow()
         {
             var transactionManager = RepositoryFactory.CreateTransactionManager();
+
             var manager = new GameDateTimeMutationManager(transactionManager, RepositoryFactory);
             manager.GoToNext();
+
             transactionManager.Save();
         }
     }

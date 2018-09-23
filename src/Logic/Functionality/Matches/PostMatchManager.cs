@@ -36,6 +36,7 @@ namespace TwoNil.Logic.Functionality.Matches
             var seasonStatisticsManager = new SeasonStatisticsManager(_transactionManager, _repositoryFactory);
             var seasonTeamStatisticsManager = new SeasonTeamStatisticsManager(_transactionManager, _repositoryFactory, seasonId);
             var leagueTableManager = new LeagueTableManager(_repositoryFactory);
+            var gameDateTimeManager = new GameDateTimeMutationManager(_transactionManager, _repositoryFactory);
 
             foreach (var round in rounds)
             {
@@ -78,11 +79,20 @@ namespace TwoNil.Logic.Functionality.Matches
                 // Handle National Cup related stuff.
                 else if (round.CompetitionType == CompetitionType.NationalCup)
                 {
+                    Team managersTeam;
+                    using (var gameInfoRepository = _repositoryFactory.CreateGameInfoRepository())
+                    {
+                        managersTeam = gameInfoRepository.GetGameInfo().CurrentTeam;
+                    }
+
                     // If the round is a cup round: draw the next round.
                     var nationalCupManager = new NationalCupManager(_repositoryFactory);
                     var cupMatches = matches.Where(m => m.RoundId == round.Id);
                     var matchesNextRound = nationalCupManager.DrawNextRound(round, cupMatches, season);
                     _transactionManager.RegisterInsert(matchesNextRound);
+
+                    if (matchesNextRound.Any(m => m.TeamPlaysMatch(managersTeam)))
+                        gameDateTimeManager.UpdateManagerPlaysMatch(matchesNextRound.Select(m => m.Date).First());
 
                     // If the final has been played: update the winner to the season statistics.
                     if (round.Name == Round.Final)
@@ -98,8 +108,12 @@ namespace TwoNil.Logic.Functionality.Matches
                         var teamsInNextCupRound = matchesNextRound.Select(m => m.HomeTeam).ToList();
                         teamsInNextCupRound.AddRange(matchesNextRound.Select(m => m.AwayTeam));
 
-                        var friendlyManager = new DuringSeasonFriendlyManager(_repositoryFactory, _transactionManager);
-                        friendlyManager.CreateDuringSeasonFriendlies(round, teamsInNextCupRound);
+                        var friendlyManager = new DuringSeasonFriendlyManager(_repositoryFactory);
+                        var duringSeasonFriendlies = friendlyManager.CreateDuringSeasonFriendlies(round, teamsInNextCupRound);
+                        _transactionManager.RegisterInsert(duringSeasonFriendlies);
+
+                        if (duringSeasonFriendlies.Any(m => m.TeamPlaysMatch(managersTeam)))
+                            gameDateTimeManager.UpdateManagerPlaysMatch(matchesNextRound.Select(m => m.Date).First());
                     }
                 }
 
@@ -114,7 +128,6 @@ namespace TwoNil.Logic.Functionality.Matches
             }
 
             // Update match status in the calendar.
-            var gameDateTimeManager = new GameDateTimeMutationManager(_transactionManager, _repositoryFactory);
             var matchDateTime = rounds.Select(x => x.MatchDate).First();
             gameDateTimeManager.UpdateMatchStatus(matchDateTime);
         }

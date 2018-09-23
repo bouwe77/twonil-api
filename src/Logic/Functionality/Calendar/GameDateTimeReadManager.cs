@@ -27,6 +27,14 @@ namespace TwoNil.Logic.Functionality.Calendar
             }
         }
 
+        public GameDateTime GetByDateTime(DateTime dateTime)
+        {
+            using (var repo = _repositoryFactory.CreateGameDateTimeRepository())
+            {
+                return repo.Find(g => g.DateTime == dateTime).First();
+            }
+        }
+
         internal GameDateTime GetNext()
         {
             using (var repo = _repositoryFactory.CreateGameDateTimeRepository())

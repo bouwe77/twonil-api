@@ -13,18 +13,10 @@ namespace TwoNil.Shared.DomainObjects
 
         public GameDateTimeEventStatus Matches { get; set; }
 
+        public bool ManagerPlaysMatch { get; set; }
+
         public GameDateTimeEventStatus EndOfSeason { get; set; }
 
         public string Date { get; set; }
-
-        [Ignore]
-        public bool CanNavigateToNext
-        {
-            get
-            {
-                return Matches != GameDateTimeEventStatus.ToDo 
-                       && EndOfSeason != GameDateTimeEventStatus.ToDo;
-            }
-        }
     }
 }

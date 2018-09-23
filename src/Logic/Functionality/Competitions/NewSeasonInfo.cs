@@ -7,7 +7,6 @@ namespace TwoNil.Logic.Functionality.Competitions
     internal class NewSeasonInfo
     {
         public int StartYear { get; set; }
-        //public int SeasonNumber { get; set; }
         public List<Team> TeamsLeague1 { get; set; }
         public List<Team> TeamsLeague2 { get; set; }
         public List<Team> TeamsLeague3 { get; set; }

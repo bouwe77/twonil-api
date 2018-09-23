@@ -2,6 +2,7 @@
 using System.Linq;
 using Shally.Forms;
 using Shally.Hal;
+using TwoNil.Logic.Functionality.Calendar;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Resources
@@ -34,7 +35,7 @@ namespace TwoNil.API.Resources
 
             if (!properties.Any() || properties.Contains(NavigationForm))
             {
-                AddForm(resource, gameDateTime.GameId, gameDateTime.CanNavigateToNext);
+                AddForm(resource, gameDateTime.GameId, gameDateTime.CanNavigateToNext());
             }
 
             return resource;

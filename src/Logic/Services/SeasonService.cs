@@ -50,7 +50,13 @@ namespace TwoNil.Logic.Services
 
         public void EndSeasonAndCreateNext(string seasonId)
         {
-            var seasonManager = new SeasonManager(RepositoryFactory);
+            Team managersTeam;
+            using (var repo = RepositoryFactory.CreateGameInfoRepository())
+            {
+                managersTeam = repo.GetGameInfo().CurrentTeam;
+            }
+
+            var seasonManager = new SeasonManager(RepositoryFactory, managersTeam);
 
             Season season;
             using (var seasonRepository = RepositoryFactory.CreateSeasonRepository())

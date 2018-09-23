@@ -50,7 +50,7 @@ namespace TwoNil.Logic.Functionality.Calendar
         {
             var now = _readManager.GetNow();
 
-            if (!now.CanNavigateToNext)
+            if (!now.CanNavigateToNext())
                 throw new ConflictException($"Now {now.DateTime} is not finished yet");
 
             now.Status = GameDateTimeStatus.Past;
@@ -61,14 +61,19 @@ namespace TwoNil.Logic.Functionality.Calendar
             _transactionManager.RegisterUpdate(next);
         }
 
-        public void CreateNewForSeason(IEnumerable<DateTime> matchDates, DateTime endOfSeasonDate)
+        public void CreateNewForSeason(IEnumerable<DateTime> matchDatesManagersTeam, IEnumerable<DateTime> matchDatesOtherTeams, DateTime endOfSeasonDate)
         {
             var gameDateTimes = new List<GameDateTime>();
 
             // Add dates for all matches.
-            foreach (var matchDate in matchDates)
+            foreach (var matchDate in matchDatesManagersTeam)
             {
-                gameDateTimes.Add(GameDateTimeFactory.CreateForMatches(matchDate));
+                gameDateTimes.Add(GameDateTimeFactory.CreateForManagersMatches(matchDate));
+            }
+
+            foreach (var matchDate in matchDatesOtherTeams)
+            {
+                gameDateTimes.Add(GameDateTimeFactory.CreateForOtherTeamsMatches(matchDate));
             }
 
             // Add the date when the season can be ended.
@@ -78,6 +83,15 @@ namespace TwoNil.Logic.Functionality.Calendar
 
             _transactionManager.RegisterInsert(gameDateTimes);
 
+        }
+
+        public void UpdateManagerPlaysMatch(DateTime dateTime)
+        {
+            var gameDateTime = _readManager.GetByDateTime(dateTime);
+
+            gameDateTime.ManagerPlaysMatch = true;
+
+            _transactionManager.RegisterUpdate(gameDateTime);
         }
 
         private void SetFirstDateToNowIfNecessary(List<GameDateTime> gameDateTimes)

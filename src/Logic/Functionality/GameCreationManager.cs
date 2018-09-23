@@ -80,7 +80,7 @@ namespace TwoNil.Logic.Functionality
                 transactionManager.RegisterInsert(teamsAndPlayers.Players);
 
                 // Create a season with match schedules.
-                var seasonManager = new SeasonManager(repositoryFactory);
+                var seasonManager = new SeasonManager(repositoryFactory, gameInfo.CurrentTeam);
                 seasonManager.CreateFirstSeason(teamsAndPlayers.Teams, transactionManager);
 
                 transactionManager.Save();

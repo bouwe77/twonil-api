@@ -63,24 +63,35 @@ namespace TwoNil.Logic.Functionality.Matches
          match.AwayTeam = temp;
       }
 
-      /// <summary>
-      /// Determines whether the specified team already plays a match (either home or away) in the given list of matches.
-      /// </summary>
-      /// <param name="matches">The matches.</param>
-      /// <param name="team">The team.</param>
-      /// <returns>True or false.</returns>
-      public static bool TeamPlaysMatch(this List<Match> matches, Team team)
-      {
-         return matches.Any(match => match.HomeTeam.Equals(team) || match.AwayTeam.Equals(team));
-      }
+        /// <summary>
+        /// Determines whether the specified team already plays a match (either home or away) in the given list of matches.
+        /// </summary>
+        /// <param name="matches">The matches.</param>
+        /// <param name="team">The team.</param>
+        /// <returns>True or false.</returns>
+        public static bool TeamPlaysMatch(this List<Match> matches, Team team)
+        {
+            return matches.Any(match => match.HomeTeam.Equals(team) || match.AwayTeam.Equals(team));
+        }
 
-      /// <summary>
-      /// Determines whether the specified match already exists in the list of matches by looking at the home and away teams.
-      /// </summary>
-      /// <param name="matches">The matches.</param>
-      /// <param name="match">The match.</param>
-      /// <returns>True or false.</returns>
-      public static bool MatchExists(this List<Match> matches, Match match)
+        /// <summary>
+        /// Determines whether the specified team plays a match (either home or away) in the given match.
+        /// </summary>
+        /// <param name="matches">The match.</param>
+        /// <param name="team">The team.</param>
+        /// <returns>True or false.</returns>
+        public static bool TeamPlaysMatch(this Match match, Team team)
+        {
+            return match.HomeTeam.Equals(team) || match.AwayTeam.Equals(team);
+        }
+
+        /// <summary>
+        /// Determines whether the specified match already exists in the list of matches by looking at the home and away teams.
+        /// </summary>
+        /// <param name="matches">The matches.</param>
+        /// <param name="match">The match.</param>
+        /// <returns>True or false.</returns>
+        public static bool MatchExists(this List<Match> matches, Match match)
       {
          return matches.Any(m => (m.HomeTeam.Equals(match.HomeTeam) && m.AwayTeam.Equals(match.AwayTeam))
                                       || (m.HomeTeam.Equals(match.AwayTeam) && m.AwayTeam.Equals(match.HomeTeam)));

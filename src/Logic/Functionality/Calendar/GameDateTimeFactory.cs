@@ -1,17 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Functionality.Calendar
 {
     internal class GameDateTimeFactory
     {
-        public static GameDateTime CreateForMatches(DateTime dateTime)
+        public static GameDateTime CreateForOtherTeamsMatches(DateTime dateTime)
         {
             var gameDateTime = CreateWithoutEvents(dateTime);
-
             gameDateTime.Matches = GameDateTimeEventStatus.ToDo;
+
+            return gameDateTime;
+        }
+
+        public static GameDateTime CreateForManagersMatches(DateTime dateTime)
+        {
+            var gameDateTime = CreateForOtherTeamsMatches(dateTime);
+            gameDateTime.ManagerPlaysMatch = true;
 
             return gameDateTime;
         }
@@ -19,7 +24,6 @@ namespace TwoNil.Logic.Functionality.Calendar
         public static GameDateTime CreateForEndOfSeason(DateTime dateTime)
         {
             var gameDateTime = CreateWithoutEvents(dateTime);
-
             gameDateTime.EndOfSeason = GameDateTimeEventStatus.ToDo;
 
             return gameDateTime;
@@ -33,6 +37,7 @@ namespace TwoNil.Logic.Functionality.Calendar
                 Date = dateTime.ToString("yyyy-MM-dd"),
                 Status = GameDateTimeStatus.Future,
                 Matches = GameDateTimeEventStatus.NotApplicable,
+                ManagerPlaysMatch = false,
                 EndOfSeason = GameDateTimeEventStatus.NotApplicable
             };
         }

@@ -6,6 +6,7 @@ using TwoNil.Data.Repositories;
 using TwoNil.Logic.Exceptions;
 using TwoNil.Logic.Functionality.Calendar;
 using TwoNil.Logic.Functionality.Competitions.Friendlies;
+using TwoNil.Logic.Functionality.Matches;
 using TwoNil.Logic.Functionality.Teams;
 using TwoNil.Shared.DomainObjects;
 
@@ -15,10 +16,12 @@ namespace TwoNil.Logic.Functionality.Competitions
     {
         private readonly LeagueManager _leagueManager;
         private readonly RepositoryFactory _repositoryFactory;
+        private readonly Team _managersTeam;
 
-        public SeasonManager(RepositoryFactory repositoryFactory)
+        public SeasonManager(RepositoryFactory repositoryFactory, Team managersTeam)
         {
             _repositoryFactory = repositoryFactory;
+            _managersTeam = managersTeam;
             _leagueManager = new LeagueManager();
         }
 
@@ -55,7 +58,7 @@ namespace TwoNil.Logic.Functionality.Competitions
             // Insert the season and all competition schedules.
             InsertSeasonAndCompetitionSchedule(transactionManager, seasonAndCompetitionSchedules);
 
-            InsertGameDateTimes(transactionManager, seasonAndCompetitionSchedules.MatchDates, seasonAndCompetitionSchedules.EndOfSeasonDate);
+            InsertGameDateTimes(transactionManager, seasonAndCompetitionSchedules);
 
             // Insert statistics.
             InsertSeasonRelatedStatistics(transactionManager, teams, seasonAndCompetitionSchedules);
@@ -102,7 +105,7 @@ namespace TwoNil.Logic.Functionality.Competitions
             // Insert the season and all competition schedules.
             InsertSeasonAndCompetitionSchedule(transactionManager, seasonAndCompetitionSchedules);
 
-            InsertGameDateTimes(transactionManager, seasonAndCompetitionSchedules.MatchDates, seasonAndCompetitionSchedules.EndOfSeasonDate);
+            InsertGameDateTimes(transactionManager, seasonAndCompetitionSchedules);
 
             // Insert statistics.
             InsertSeasonRelatedStatistics(transactionManager, allTeamsSortedOnLeagueAndPosition, seasonAndCompetitionSchedules);
@@ -195,10 +198,6 @@ namespace TwoNil.Logic.Functionality.Competitions
 
             var seasonAndCompetitionSchedules = new SeasonAndCompetitionSchedules { Season = season };
 
-            // Add all dates that are determined here to the schedule so the datetime navigation can be updated.
-            seasonAndCompetitionSchedules.MatchDates = matchDateManager.GetAllMatchDates();
-            seasonAndCompetitionSchedules.EndOfSeasonDate = endSeasonDateTime;
-
             // Create leagues and schedule.
             var leagueManager = new LeagueManager();
             seasonAndCompetitionSchedules.LeaguesSchedule = leagueManager.CreateSchedules(newSeasonInfo.TeamsLeague1, newSeasonInfo.TeamsLeague2, newSeasonInfo.TeamsLeague3, newSeasonInfo.TeamsLeague4, season, matchDateManager);
@@ -266,10 +265,16 @@ namespace TwoNil.Logic.Functionality.Competitions
             transactionManager.RegisterInsert(competitionSchedule.Matches);
         }
 
-        private void InsertGameDateTimes(TransactionManager transactionManager, IEnumerable<DateTime> matchDates, DateTime endOfSeasonDate)
+        private void InsertGameDateTimes(TransactionManager transactionManager, SeasonAndCompetitionSchedules schedules)
         {
+            // Determine the match dates the manager's team plays.
+            var managersMatchDates = schedules.AllMatches.Where(m => m.TeamPlaysMatch(_managersTeam)).Select(m => m.Date);
+
+            // Determine when the manager's team does not play: all dates in the season except the ones that were just determined.
+            var otherTeamsMatchDates = schedules.AllMatchDates.Except(managersMatchDates);
+
             var gameDateTimeNanager = new GameDateTimeMutationManager(transactionManager, _repositoryFactory);
-            gameDateTimeNanager.CreateNewForSeason(matchDates, endOfSeasonDate);
+            gameDateTimeNanager.CreateNewForSeason(managersMatchDates, otherTeamsMatchDates, schedules.Season.EndDateTime);
         }
     }
 }
