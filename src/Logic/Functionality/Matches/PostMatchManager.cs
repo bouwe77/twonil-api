@@ -117,7 +117,7 @@ namespace TwoNil.Logic.Functionality.Matches
                     }
                 }
 
-                // If the round is a National Super Cup: save the winner to the season statistics.
+                // Handle National Super Cup related stuff.
                 else if (round.CompetitionType == CompetitionType.NationalSuperCup)
                 {
                     var match = matches.Single(m => m.RoundId == round.Id);

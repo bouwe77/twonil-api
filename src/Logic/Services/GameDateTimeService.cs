@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using TwoNil.Data;
+﻿using TwoNil.Data;
 using TwoNil.Logic.Functionality.Calendar;
 using TwoNil.Shared.DomainObjects;
 
@@ -20,14 +17,42 @@ namespace TwoNil.Logic.Services
             return manager.GetNow();
         }
 
-        public void EndNow()
+        public void NavigateToNext()
         {
-            var transactionManager = RepositoryFactory.CreateTransactionManager();
+            var readManager = new GameDateTimeReadManager(RepositoryFactory);
 
-            var manager = new GameDateTimeMutationManager(transactionManager, RepositoryFactory);
-            manager.GoToNext();
+            var now = readManager.GetNow();
+            if (now.ManagerPlaysMatch || now.Matches != GameDateTimeEventStatus.ToDo)
+            {
+                GoToNext();
+            }
+            else
+            {
+                var matchService = new ServiceFactory().CreateMatchService(GameInfo);
 
-            transactionManager.Save();
+                // Keep on playing matches until a current GameDateTime indicates the manager plays a match. 
+                while (!now.ManagerPlaysMatch && now.Matches == GameDateTimeEventStatus.ToDo)
+                {
+                    using (var transactionManager = RepositoryFactory.CreateTransactionManager())
+                    {
+                        matchService.PlayMatchDay(now.DateTime, transactionManager);
+                        transactionManager.Save();
+                    }
+
+                    GoToNext();
+                    now = readManager.GetNow();
+                }
+            }
+        }
+
+        private void GoToNext()
+        {
+            using (var transactionManager = RepositoryFactory.CreateTransactionManager())
+            {
+                var mutationManager = new GameDateTimeMutationManager(transactionManager, RepositoryFactory);
+                mutationManager.GoToNext();
+                transactionManager.Save();
+            }
         }
     }
 }

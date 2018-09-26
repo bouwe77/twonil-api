@@ -74,6 +74,15 @@ namespace TwoNil.Logic.Services
 
         public void PlayMatchDay(DateTime matchDate)
         {
+            using (var transactionManager = RepositoryFactory.CreateTransactionManager())
+            {
+                PlayMatchDay(matchDate, transactionManager);
+                transactionManager.Save();
+            }
+        }
+
+        public void PlayMatchDay(DateTime matchDate, TransactionManager transactionManager)
+        {
             // First check if the given matchDay is the "next" match day in this season.
             var currentSeason = _seasonService.GetCurrentSeason();
             var nextMatchDate = GetNextMatchDate(currentSeason.Id);
@@ -83,42 +92,21 @@ namespace TwoNil.Logic.Services
             }
 
             var matchesToPlay = GetByMatchDay(matchDate).ToList();
-            if (!matchesToPlay.Any())
+            if (!matchesToPlay.Any() || matchesToPlay.All(m => m.MatchStatus == MatchStatus.Ended))
             {
                 throw new NotFoundException("There are no matches on this date");
             }
 
-            foreach (var match in matchesToPlay)
+            foreach (var match in matchesToPlay.Where(m => m.MatchStatus == MatchStatus.NotStarted))
             {
-                Play(match);
-            }
-
-            using (var transactionManager = RepositoryFactory.CreateTransactionManager())
-            {
-                transactionManager.RegisterUpdate(matchesToPlay);
-
-                // After matches have been played a lot of stuff must be determined and updated.
-                var postMatchManager = new PostMatchManager(transactionManager, RepositoryFactory);
-                postMatchManager.Handle(currentSeason.Id, matchesToPlay);
-
-                transactionManager.Save();
-            }
-        }
-
-        private void Play(Match match)
-        {
-            // Check whether match still has to be played.
-            bool matchCanBePlayed = match.MatchStatus == MatchStatus.NotStarted;
-            if (matchCanBePlayed)
-            {
-                // Play match.
                 new MatchPlayer().Play(match);
             }
-            else
-            {
-                string message = $"Match with ID '{match.Id}' has already been played";
-                throw new ConflictException(message);
-            }
+
+            transactionManager.RegisterUpdate(matchesToPlay);
+
+            // After matches have been played a lot of stuff must be determined and updated.
+            var postMatchManager = new PostMatchManager(transactionManager, RepositoryFactory);
+            postMatchManager.Handle(currentSeason.Id, matchesToPlay);
         }
 
         public IEnumerable<TeamRoundMatch> GetTeamRoundMatches(string teamId, string seasonId, string leagueCompetitionId)

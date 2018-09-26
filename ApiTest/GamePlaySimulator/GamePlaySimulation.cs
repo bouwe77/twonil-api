@@ -22,11 +22,11 @@ namespace ApiTest.GamePlaySimulator
         [TestMethod]
         public void StartGamePlaySimulation()
         {
-            const bool enableSimulation = false;
+            const bool enableSimulation = true;
 
             var config = new Config(
-                gameId: "28csb6",
-                howManySeasons: 1,
+                gameId: "h7d1g",
+                howManySeasons: 3,
                 checkLeagueTables: true);
 
             if (!enableSimulation)

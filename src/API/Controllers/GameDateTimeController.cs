@@ -20,7 +20,7 @@ namespace TwoNil.API.Controllers
 
             try
             {
-                service.EndNow();
+                service.NavigateToNext();
             }
             catch (BusinessLogicException businessLogicException)
             {
