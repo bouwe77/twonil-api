@@ -1,7 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using TwoNil.Logic.Functionality.Calendar;
 using TwoNil.Shared.DomainObjects;
 
@@ -10,18 +7,6 @@ namespace TwoNil.Logic.Calendar
     [TestClass]
     public class CanNavigateToNextTests
     {
-        [TestMethod]
-        public void CanNavigateToNext_WhenPast_ReturnsFalse()
-        {
-            var gameDateTime = GetDefaultGameDateTime();
-
-            gameDateTime.Status = GameDateTimeStatus.Past;
-
-            bool result = gameDateTime.CanNavigateToNext();
-
-            Assert.IsFalse(result);
-        }
-
         [TestMethod]
         public void CanNavigateToNext_WhenFuture_ReturnsFalse()
         {

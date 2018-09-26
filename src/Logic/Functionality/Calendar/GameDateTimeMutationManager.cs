@@ -53,8 +53,7 @@ namespace TwoNil.Logic.Functionality.Calendar
             if (!now.CanNavigateToNext())
                 throw new ConflictException($"Now {now.DateTime} is not finished yet");
 
-            now.Status = GameDateTimeStatus.Past;
-            _transactionManager.RegisterUpdate(now);
+            _transactionManager.RegisterDelete(now);
 
             var next = _readManager.GetNext();
             next.Status = GameDateTimeStatus.Now;
