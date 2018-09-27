@@ -76,5 +76,18 @@ namespace TwoNil.Logic.Services
                 gameRepository.DeleteGame(gameId);
             }
         }
+
+        public void DeleteAllGames()
+        {
+            // Delete all games from the database.
+            using (var gameRepository = new RepositoryFactory().CreateGameRepository())
+            {
+                var games = gameRepository.GetAll();
+                foreach (var game in games)
+                {
+                    gameRepository.DeleteGame(game.Id);
+                }
+            }
+        }
     }
 }

@@ -171,6 +171,26 @@ namespace TwoNil.API.Controllers
             return new Response(HttpStatusCode.NoContent);
         }
 
+        public Response DeleteCollection()
+        {
+#if !DEBUG
+                return new Response(HttpStatusCode.MethodNotAllowed);
+#endif
+
+            var param = Request.GetQueryStringValue("param");
+
+            string expectedTimestamp = DateTime.Now.ToString("yyyyMMddHHmm");
+            if (string.IsNullOrWhiteSpace(param) || param != expectedTimestamp)
+            {
+                return new Response(HttpStatusCode.MethodNotAllowed);
+            }
+
+            var gameService = ServiceFactory.CreateGameService();
+            gameService.DeleteAllGames();
+
+            return new Response(HttpStatusCode.NoContent);
+        }
+
         public Response Post()
         {
             try

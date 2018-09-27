@@ -36,6 +36,10 @@
                 "options": {
                     "type": "TwoNil.API.Controllers.OptionsController, TwoNil.API",
                     "method": "Options"
+                },
+                "delete": {
+                    "type": "TwoNil.API.Controllers.GameController, TwoNil.API",
+                    "method": "DeleteCollection"
                 }
             },
             {
