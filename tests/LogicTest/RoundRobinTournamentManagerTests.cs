@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TwoNil.Logic.Functionality.Competitions;
+using TwoNil.Logic.Competitions;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic

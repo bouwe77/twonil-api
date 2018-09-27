@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using TwoNil.Data;
 using TwoNil.Data.Repositories;
-using TwoNil.Logic.Functionality.Players;
+using TwoNil.Logic.Players;
 
 namespace TwoNil.Logic
 {

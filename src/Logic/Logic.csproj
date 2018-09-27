@@ -7,12 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Services\Interfaces\**" />
-    <EmbeddedResource Remove="Services\Interfaces\**" />
-    <None Remove="Services\Interfaces\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Data\Data.csproj" />
     <ProjectReference Include="..\Randomization\Randomization.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />

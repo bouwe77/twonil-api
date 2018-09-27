@@ -2,7 +2,7 @@
 using System.Linq;
 using Shally.Forms;
 using Shally.Hal;
-using TwoNil.Logic.Functionality.Calendar;
+using TwoNil.Logic.Calendar;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Resources

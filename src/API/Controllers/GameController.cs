@@ -8,7 +8,7 @@ using Shally.Hal;
 using Shally.Forms;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
-using TwoNil.Logic.Functionality;
+using TwoNil.Logic;
 
 namespace TwoNil.API.Controllers
 {

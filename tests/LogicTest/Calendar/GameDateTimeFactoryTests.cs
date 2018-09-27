@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TwoNil.Logic.Functionality.Calendar;
+using TwoNil.Logic.Calendar;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Calendar

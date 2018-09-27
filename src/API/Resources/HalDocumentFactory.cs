@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Shally.Hal;
-using TwoNil.Logic.Services;
+using TwoNil.Services;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Resources

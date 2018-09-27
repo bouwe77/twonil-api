@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TwoNil.Data;
 using TwoNil.Data.Repositories;
-using TwoNil.Logic.Functionality.Competitions;
+using TwoNil.Logic.Competitions;
 using TwoNil.Shared.DomainObjects;
 using Match = TwoNil.Shared.DomainObjects.Match;
 

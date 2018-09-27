@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TwoNil.Logic.Functionality.Matches;
+using TwoNil.Logic.Matches;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic

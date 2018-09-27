@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>TwoNil.Services</AssemblyName>
+    <RootNamespace>TwoNil.Services</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\Data\Data.csproj" />
+    <ProjectReference Include="..\src\Logic\Logic.csproj" />
+    <ProjectReference Include="..\src\Shared\Shared.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TwoNil.Logic.Functionality.Calendar;
+using TwoNil.Logic.Calendar;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Calendar

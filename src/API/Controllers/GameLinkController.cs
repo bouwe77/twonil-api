@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Dolores.Responses;
 using Shally.Hal;
 using TwoNil.API.Helpers;
-using TwoNil.Logic.Services;
+using TwoNil.Services;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Controllers

@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TwoNil.Data;
 using TwoNil.Data.Repositories;
-using TwoNil.Logic.Functionality.Teams;
+using TwoNil.Logic.Teams;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic

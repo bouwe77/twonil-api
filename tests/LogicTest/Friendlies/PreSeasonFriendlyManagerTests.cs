@@ -2,8 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TwoNil.Logic.Functionality.Competitions;
-using TwoNil.Logic.Functionality.Competitions.Friendlies;
+using TwoNil.Logic.Competitions;
+using TwoNil.Logic.Competitions.Friendlies;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic

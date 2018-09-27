@@ -10,7 +10,7 @@ using Shally.Hal;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
 using TwoNil.Logic.Exceptions;
-using TwoNil.Logic.Services;
+using TwoNil.Services;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Controllers
