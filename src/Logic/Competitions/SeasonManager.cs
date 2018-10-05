@@ -235,8 +235,9 @@ namespace TwoNil.Logic.Competitions
             using (var leagueTableRepository = _repositoryFactory.CreateLeagueTableRepository())
             {
                 var leagueTables = leagueTableRepository.GetBySeason(season.Id);
-                var teamStatisticsManager = new TeamStatisticsManager(transactionManager, _repositoryFactory);
-                teamStatisticsManager.Update(leagueTables);
+                //TODO POSTMATCH fix this
+                //var teamStatisticsManager = new TeamStatisticsManager(transactionManager, _repositoryFactory);
+                //teamStatisticsManager.Update(leagueTables);
             }
 
             // End the season by updating the status.

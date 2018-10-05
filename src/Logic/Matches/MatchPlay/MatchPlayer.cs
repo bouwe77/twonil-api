@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using TwoNil.Shared.DomainObjects;
 
-namespace TwoNil.Logic.Matches
+namespace TwoNil.Logic.Matches.MatchPlay
 {
    public class MatchPlayer
    {

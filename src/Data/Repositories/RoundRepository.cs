@@ -55,7 +55,9 @@ namespace TwoNil.Data.Repositories
         {
             var nextRound = Find(round => round.SeasonCompetitionId.Equals(previousRound.SeasonCompetitionId)
                                                           && round.Order == previousRound.Order + 1).FirstOrDefault();
+
             GetReferencedData(nextRound);
+
             return nextRound;
         }
 

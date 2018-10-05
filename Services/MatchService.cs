@@ -6,6 +6,8 @@ using TwoNil.Logic.Exceptions;
 using TwoNil.Logic.Competitions;
 using TwoNil.Logic.Matches;
 using TwoNil.Shared.DomainObjects;
+using TwoNil.Logic.Matches.PostMatches;
+using TwoNil.Logic.Matches.MatchPlay;
 
 namespace TwoNil.Services
 {
@@ -105,8 +107,7 @@ namespace TwoNil.Services
             transactionManager.RegisterUpdate(matchesToPlay);
 
             // After matches have been played a lot of stuff must be determined and updated.
-            var postMatchManager = new PostMatchManager(transactionManager, RepositoryFactory);
-            postMatchManager.Handle(currentSeason.Id, matchesToPlay);
+            new PostMatchOrchestrator(transactionManager, RepositoryFactory).Handle(matchesToPlay);
         }
 
         public IEnumerable<TeamRoundMatch> GetTeamRoundMatches(string teamId, string seasonId, string leagueCompetitionId)

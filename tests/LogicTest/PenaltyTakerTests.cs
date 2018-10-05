@@ -5,6 +5,7 @@ using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TwoNil.Logic.Matches;
+using TwoNil.Logic.Matches.MatchPlay;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic

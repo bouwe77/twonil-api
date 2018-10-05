@@ -10,11 +10,11 @@ namespace TwoNil.Logic.Calendar
 {
     public class GameDateTimeMutationManager
     {
-        private readonly TransactionManager _transactionManager;
+        private readonly ITransactionManager _transactionManager;
         private readonly IRepositoryFactory _repositoryFactory;
         private readonly GameDateTimeReadManager _readManager;
 
-        public GameDateTimeMutationManager(TransactionManager transactionManager, IRepositoryFactory repositoryFactory)
+        public GameDateTimeMutationManager(ITransactionManager transactionManager, IRepositoryFactory repositoryFactory)
         {
             _transactionManager = transactionManager;
             _repositoryFactory = repositoryFactory;
