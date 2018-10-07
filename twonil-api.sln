@@ -21,9 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "src\Shared\Shared
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogicTest", "tests\LogicTest\LogicTest.csproj", "{02939F93-7390-46F0-86C9-109272B764C6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiTest", "ApiTest\ApiTest.csproj", "{081258D2-6AD0-461C-A548-24E5933CFE4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiTest", "tests\ApiTest\ApiTest.csproj", "{081258D2-6AD0-461C-A548-24E5933CFE4C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{66B31F3D-EDDB-4ACF-BB9E-84126A740662}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "src\Services\Services.csproj", "{66B31F3D-EDDB-4ACF-BB9E-84126A740662}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
