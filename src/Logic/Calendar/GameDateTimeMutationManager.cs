@@ -45,7 +45,6 @@ namespace TwoNil.Logic.Calendar
             _transactionManager.RegisterUpdate(now);
         }
 
-        //TODO Rename this method
         public void GoToNext()
         {
             var now = _readManager.GetNow();

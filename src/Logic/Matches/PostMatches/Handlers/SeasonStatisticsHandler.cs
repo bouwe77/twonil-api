@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace TwoNil.Logic.Matches.PostMatches
+namespace TwoNil.Logic.Matches.PostMatches.Handlers
 {
     public class SeasonStatisticsHandler : IPostMatchesHandler
     {

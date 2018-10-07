@@ -2,7 +2,7 @@
 using TwoNil.Data;
 using TwoNil.Logic.Competitions;
 
-namespace TwoNil.Logic.Matches.PostMatches
+namespace TwoNil.Logic.Matches.PostMatches.Handlers
 {
     public class DrawNextCupRoundHandler : IPostMatchesHandler
     {

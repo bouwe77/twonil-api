@@ -1,6 +1,6 @@
 ﻿using TwoNil.Logic.Teams;
 
-namespace TwoNil.Logic.Matches.PostMatches
+namespace TwoNil.Logic.Matches.PostMatches.Handlers
 {
     public class TeamStatisticsHandler : IPostMatchesHandler
     {

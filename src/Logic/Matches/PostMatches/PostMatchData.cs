@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Matches.PostMatches
@@ -23,6 +24,9 @@ namespace TwoNil.Logic.Matches.PostMatches
             CompetitionIdNationalCup = competitionIdNationalCup;
             CompetitionIdNationalSuperCup = competitionIdNationalSuperCup;
             CompetitionIdFriendlies = competitionIdFriendlies;
+
+            CupMatchesNextRound = new List<Match>();
+            DuringSeasonFriendlies = new List<Match>();
         }
 
         public Dictionary<string, IEnumerable<Match>> Matches { get; set; }
@@ -30,6 +34,7 @@ namespace TwoNil.Logic.Matches.PostMatches
         public Dictionary<string, Team> Teams { get; set; }
         public Dictionary<string, LeagueTable> LeagueTables { get; set; }
         public Dictionary<string, League> Leagues { get; set; }
+        public DateTime MatchDateTime { get; set; }
         public Team ManagersTeam { get; set; }
         public Season Season { get; set; }
         public SeasonStatistics SeasonStatistics { get; set; }
@@ -63,6 +68,24 @@ namespace TwoNil.Logic.Matches.PostMatches
 
         public bool League1Finished { get; set; }
         public bool NationalCupFinalHasBeenPlayed => RoundNationalCup?.Name == Round.Final;
+
+        public IEnumerable<DateTime> NewManagerMatchDates
+        {
+            get
+            {
+                var newManagerMatchDates = new List<DateTime>();
+
+                var newFriendlyMatchForManager = DuringSeasonFriendlies.SingleOrDefault(m => m.HomeTeam.Equals(ManagersTeam) || m.AwayTeam.Equals(ManagersTeam));
+                if (newFriendlyMatchForManager != null)
+                    newManagerMatchDates.Add(newFriendlyMatchForManager.Date);
+
+                var newCupMatchForManager = CupMatchesNextRound.SingleOrDefault(m => m.HomeTeam.Equals(ManagersTeam) || m.AwayTeam.Equals(ManagersTeam));
+                if (newCupMatchForManager != null)
+                    newManagerMatchDates.Add(newCupMatchForManager.Date);
+
+                return newManagerMatchDates;
+            }
+        }
 
         private IEnumerable<T> GetCollectionFromDictionary<T>(Dictionary<string, IEnumerable<T>> dictionary, string key)
         {

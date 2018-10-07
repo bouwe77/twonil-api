@@ -6,7 +6,7 @@ using TwoNil.Data;
 using TwoNil.Logic.Competitions.Friendlies;
 using TwoNil.Shared.DomainObjects;
 
-namespace TwoNil.Logic.Matches.PostMatches
+namespace TwoNil.Logic.Matches.PostMatches.Handlers
 {
     public class GenerateDuringSeasonFriendliesHandler : IPostMatchesHandler
     {
@@ -19,7 +19,7 @@ namespace TwoNil.Logic.Matches.PostMatches
 
         public void Handle(PostMatchData postMatchData)
         {
-            if (postMatchData.NationalCupFinalHasBeenPlayed)
+            if (postMatchData.NationalCupFinalHasBeenPlayed || !postMatchData.CupMatchesNextRound.Any())
                 return;
 
             // During the next cup round there also might be a friendly round. If so, generate friendly matches.

@@ -1,43 +1,42 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Text;
-//using TwoNil.Data;
-//using TwoNil.Logic.Calendar;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using TwoNil.Data;
+using TwoNil.Logic.Calendar;
 
-//namespace TwoNil.Logic.Matches.PostMatches
-//{
-//    public class GameDateTimeHandler : IPostMatchesHandler
-//    {
-//        private GameDateTimeMutationManager _gameDateTimeMutationManager;
+namespace TwoNil.Logic.Matches.PostMatches.Handlers
+{
+    public class GameDateTimeHandler : IPostMatchesHandler
+    {
+        private GameDateTimeMutationManager _gameDateTimeMutationManager;
 
-//        public GameDateTimeHandler(ITransactionManager transactionManager, IRepositoryFactory repositoryFactory)
-//        {
-//            _gameDateTimeMutationManager = new GameDateTimeMutationManager(transactionManager, repositoryFactory);
-//        }
+        public GameDateTimeHandler(ITransactionManager transactionManager, IRepositoryFactory repositoryFactory)
+        {
+            _gameDateTimeMutationManager = new GameDateTimeMutationManager(transactionManager, repositoryFactory);
+        }
 
-//        public void Handle(PostMatchData postMatchData)
-//        {
-//            UpdateManagerPlaysMatch();
-//            UpdateMatchStatus();
-//        }
+        public void Handle(PostMatchData postMatchData)
+        {
+            if (postMatchData.NewManagerMatchDates.Any())
+                UpdateManagerPlaysMatch(postMatchData);
 
-//        private void UpdateManagerPlaysMatch()
-//        {
-//            // regelen dat je uit de PostMatchData kunt halen dat er voor de manager nieuwe wedstrijd(en) bij zijn gekomen
-//            // en dat je dat bij de GameDateTimes moet aangeven.
-//            // op dit moment zijn dat alleen friendlies en cup wedstrijden.
-//            // Ik denk dat beide wel bij elkaar in deze class kunnen.
+            UpdateMatchStatus(postMatchData);
+        }
 
+        private void UpdateManagerPlaysMatch(PostMatchData postMatchData)
+        {
+            foreach (var matchDate in postMatchData.NewManagerMatchDates)
+            {
+                _gameDateTimeMutationManager.UpdateManagerPlaysMatch(matchDate);
 
-//            //if (matchesNextRound.Any(m => m.TeamPlaysMatch(managersTeam)))
-//            //    _gameDateTimeManager.UpdateManagerPlaysMatch(matchesNextRound.Select(m => m.Date).First());
-//        }
+            }
+        }
 
-//        private void UpdateMatchStatus()
-//        {
-//            // Update match status in the calendar.
-//            var matchDateTime = rounds.Select(x => x.MatchDate).First();
-//            _gameDateTimeMutationManager.UpdateMatchStatus(matchDateTime);
-//        }
-//    }
-//}
+        private void UpdateMatchStatus(PostMatchData postMatchData)
+        {
+            // Update match status in the calendar.
+            _gameDateTimeMutationManager.UpdateMatchStatus(postMatchData.MatchDateTime);
+        }
+    }
+}

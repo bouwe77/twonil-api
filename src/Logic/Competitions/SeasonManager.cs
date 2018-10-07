@@ -233,11 +233,15 @@ namespace TwoNil.Logic.Competitions
         {
             // Get all league tables and update the team statistics.
             using (var leagueTableRepository = _repositoryFactory.CreateLeagueTableRepository())
+            using (var competitionRepository = _repositoryFactory.CreateCompetitionRepository())
+            using (var teamStatisticsRepository = _repositoryFactory.CreateTeamStatisticsRepository())
             {
+                var teamStatistics = teamStatisticsRepository.GetAll().ToDictionary(k => k.TeamId, v => v);
+                var teamStatisticsManager = new TeamStatisticsManager(teamStatistics);
+
                 var leagueTables = leagueTableRepository.GetBySeason(season.Id);
-                //TODO POSTMATCH fix this
-                //var teamStatisticsManager = new TeamStatisticsManager(transactionManager, _repositoryFactory);
-                //teamStatisticsManager.Update(leagueTables);
+                var leagues = competitionRepository.GetLeagues().ToDictionary(k => k.Id, v => v);
+                teamStatisticsManager.Update(leagueTables, leagues);
             }
 
             // End the season by updating the status.

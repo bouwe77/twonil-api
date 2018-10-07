@@ -61,9 +61,8 @@ namespace TwoNil.Shared.DomainObjects
       }
 
       /// <summary>
-      /// If a round does not have matches when it is created, typically for knockout rounds, the date of the matches is stored here.
+      /// If a round does not have matches when it is created, typically for knockout rounds, the date of the matches yet to be determined is stored here.
       /// Also, it is used to determine which rounds are played on the same moment.
-      /// NOTE: This field is not intended to be displayed i.e. returned by the REST API.
       /// </summary>
       public DateTime MatchDate { get; set; }
 

@@ -14,14 +14,17 @@ namespace TwoNil.Logic.Teams
             _seasonTeamStatistics = seasonTeamStatistics;
         }
 
-        public void Update(string seasonId, IEnumerable<Match> matches, LeagueTable leagueTable)
+        public void Update(string seasonId, IEnumerable<Match> matches, IEnumerable<LeagueTable> leagueTables)
         {
             foreach (var match in matches)
             {
                 UpdateTeamStatistics(seasonId, match);
             }
 
-            UpdateLeagueTablePositions(seasonId, leagueTable);
+            foreach (var leagueTable in leagueTables)
+            {
+                UpdateLeagueTablePositions(seasonId, leagueTable);
+            }
         }
 
         private void UpdateTeamStatistics(string seasonId, Match match)

@@ -1,4 +1,4 @@
-﻿namespace TwoNil.Logic.Matches.PostMatches
+﻿namespace TwoNil.Logic.Matches.PostMatches.Handlers
 {
     public interface IPostMatchesHandler
     {

@@ -35,7 +35,12 @@ namespace TwoNil.Logic.Matches.PostMatches
                     competitionRepository.GetFriendly().Id);
             }
 
-            postMatchData.Season = _matches.First().Season;
+            postMatchData.MatchDateTime = _matches.First().Date;
+
+            using (var seasonRepository = _repositoryFactory.CreateSeasonRepository())
+            {
+                postMatchData.Season = seasonRepository.GetOne(_matches.First().SeasonId);
+            }
 
             // Add all rounds as Dictionary of CompetitionId and Round.
             postMatchData.Rounds = _matches.Select(m => m.Round).GroupBy(r => r.CompetitionId).ToDictionary(g => g.Key, g => g.First());

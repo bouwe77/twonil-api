@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using TwoNil.Data;
+using TwoNil.Logic.Matches.PostMatches.Handlers;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Matches.PostMatches
@@ -29,11 +30,11 @@ namespace TwoNil.Logic.Matches.PostMatches
                 new LeagueTableHandler(_repositoryFactory),
                 new DrawNextCupRoundHandler(_repositoryFactory),
                 new GenerateDuringSeasonFriendliesHandler(_repositoryFactory),
-                //new SeasonStatisticsHandler(_transactionManager, _repositoryFactory),
-                //new SeasonTeamStatisticsHandler(_repositoryFactory),
-                //new TeamStatisticsHandler(_repositoryFactory),
-                //new GameDateTimeHandler(_repositoryFactory),
-                //new TeamHandler(),
+                new SeasonStatisticsHandler(),
+                new SeasonTeamStatisticsHandler(),
+                new TeamStatisticsHandler(),
+                new TeamHandler(),
+                new GameDateTimeHandler(_transactionManager, _repositoryFactory),
             };
 
             foreach (var postMatchHandler in handlers)
@@ -41,8 +42,8 @@ namespace TwoNil.Logic.Matches.PostMatches
                 postMatchHandler.Handle(postMatchData);
             }
 
-            //TODO POSTMATCH Hier dus PostMatchData in de TransactionManager stoppen
-            //TODO POSTMATCH Let trouwens op dat je naast de LeagueTable ook de LeagueTablePositions erin stopt, beide RegisterUpdate.
+            var postMatchDataPersister = new PostMatchDataPersister(_transactionManager, postMatchData);
+            postMatchDataPersister.Persist();
         }
     }
 }
