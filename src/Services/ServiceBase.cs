@@ -1,18 +1,14 @@
-﻿using Randomization;
+﻿using TwoNil.Data;
 
 namespace TwoNil.Services
 {
-   public abstract class ServiceBase
-   {
-      protected INumberRandomizer NumberRandomizer;
-      protected IListRandomizer ListRandomizer;
-      protected ServiceFactory ServiceFactory;
+    public abstract class ServiceBase
+    {
+        protected IUnitOfWorkFactory UowFactory;
 
-      protected ServiceBase()
-      {
-         NumberRandomizer = new NumberRandomizer();
-         ListRandomizer = new ListRandomizer();
-         ServiceFactory = new ServiceFactory();
-      }
-   }
+        protected ServiceBase(IUnitOfWorkFactory uowFactory)
+        {
+            UowFactory = uowFactory;
+        }
+    }
 }

@@ -1,78 +1,128 @@
 ﻿using System;
+using TwoNil.Data;
+using TwoNil.Logic.Calendar;
+using TwoNil.Logic.Competitions;
+using TwoNil.Logic.Matches.PostMatches;
+using TwoNil.Logic.Players;
+using TwoNil.Logic.Teams;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Services
 {
+    public interface IServiceFactory
+    {
+        CompetitionService CreateCompetitionService();
+        GameDateTimeService CreateGameDateTimeService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo);
+        GameService CreateGameService();
+        LeagueTableService CreateLeagueTableService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo);
+        MatchService CreateMatchService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo);
+        PlayerService CreatePlayerService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo);
+        RoundService CreateRoundService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo);
+        SeasonService CreateSeasonService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo);
+        StatisticsService CreateStatisticsService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo);
+        TeamService CreateTeamService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo);
+        UserService CreateUserService();
+    }
+
     /// <summary>
     /// Factory class for creating services.
     /// </summary>
-    public class ServiceFactory
+    public class ServiceFactory : IServiceFactory
     {
+        private readonly IUnitOfWorkFactory _uowFactory;
+        private readonly IGameDateTimeReadManager _gameDateTimeReadManager;
+        private readonly IGameDateTimeMutationManager _gameDateTimeMutationManager;
+        private readonly IPlayerGenerator _playerGenerator;
+        private readonly ITeamManager _teamManager;
+        private readonly IPostMatchOrchestrator _postMatchOrchestrator;
+        private readonly ISeasonManager _seasonManager;
+
+        public ServiceFactory(
+            IUnitOfWorkFactory uowFactory,
+            IGameDateTimeReadManager gameDateTimeReadManager,
+            IGameDateTimeMutationManager gameDateTimeMutationManager,
+            IPlayerGenerator playerGenerator,
+            ITeamManager teamManager,
+            IPostMatchOrchestrator postMatchOrchestrator,
+            ISeasonManager seasonManager)
+        {
+            _uowFactory = uowFactory;
+            _gameDateTimeReadManager = gameDateTimeReadManager;
+            _gameDateTimeMutationManager = gameDateTimeMutationManager;
+            _playerGenerator = playerGenerator;
+            _teamManager = teamManager;
+            _postMatchOrchestrator = postMatchOrchestrator;
+            _seasonManager = seasonManager;
+        }
+
         public GameService CreateGameService()
         {
-            return new GameService();
+            return new GameService(_uowFactory);
         }
 
         public CompetitionService CreateCompetitionService()
         {
-            return new CompetitionService();
+            return new CompetitionService(_uowFactory);
         }
 
-        public GameDateTimeService CreateGameDateTimeService(GameInfo gameInfo)
+        public GameDateTimeService CreateGameDateTimeService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
         {
             Assert(gameInfo);
-            return new GameDateTimeService(gameInfo);
+            var matchService = CreateMatchService(uowFactory, gameInfo);
+            return new GameDateTimeService(_uowFactory, gameInfo, matchService, _gameDateTimeReadManager, _gameDateTimeMutationManager);
         }
 
-        public TeamService CreateTeamService(GameInfo gameInfo)
+        public TeamService CreateTeamService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
         {
             Assert(gameInfo);
-            return new TeamService(gameInfo);
+            return new TeamService(_uowFactory, gameInfo);
         }
 
-        public PlayerService CreatePlayerService(GameInfo gameInfo)
+        public PlayerService CreatePlayerService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
         {
             Assert(gameInfo);
-            return new PlayerService(gameInfo);
+            var teamService = CreateTeamService(uowFactory, gameInfo);
+            return new PlayerService(_uowFactory, gameInfo, teamService, _playerGenerator, _teamManager);
         }
 
         public UserService CreateUserService()
         {
-            return new UserService();
+            return new UserService(_uowFactory);
         }
 
-        public MatchService CreateMatchService(GameInfo gameInfo)
+        public MatchService CreateMatchService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
         {
             Assert(gameInfo);
-            return new MatchService(gameInfo);
+            var seasonService = CreateSeasonService(uowFactory, gameInfo);
+            return new MatchService(_uowFactory, gameInfo, seasonService, _postMatchOrchestrator);
         }
 
-        public SeasonService CreateSeasonService(GameInfo gameInfo)
+        public SeasonService CreateSeasonService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
         {
             Assert(gameInfo);
-            return new SeasonService(gameInfo);
+            return new SeasonService(_uowFactory, gameInfo, _seasonManager);
         }
 
-        public RoundService CreateRoundService(GameInfo gameInfo)
+        public RoundService CreateRoundService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
         {
             Assert(gameInfo);
-            return new RoundService(gameInfo);
+            return new RoundService(_uowFactory, gameInfo);
+        }
+
+        public LeagueTableService CreateLeagueTableService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
+        {
+            Assert(gameInfo);
+            return new LeagueTableService(_uowFactory, gameInfo);
+        }
+
+        public StatisticsService CreateStatisticsService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
+        {
+            return new StatisticsService(_uowFactory, gameInfo);
         }
 
         private void Assert(GameInfo gameInfo)
         {
-            if (gameInfo == null || string.IsNullOrWhiteSpace(gameInfo.GameId)) throw new ArgumentException("gameInfo");
-        }
-
-        public LeagueTableService CreateLeagueTableService(GameInfo gameInfo)
-        {
-            Assert(gameInfo);
-            return new LeagueTableService(gameInfo);
-        }
-
-        public StatisticsService CreateStatisticsService(GameInfo gameInfo)
-        {
-            return new StatisticsService(gameInfo);
+            if (gameInfo == null || string.IsNullOrWhiteSpace(gameInfo.GameId)) throw new ArgumentException(nameof(gameInfo));
         }
     }
 }

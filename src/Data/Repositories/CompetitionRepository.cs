@@ -4,7 +4,20 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Data.Repositories
 {
-    public class CompetitionRepository : MemoryRepository<Competition>
+    public interface ICompetitionRepository
+    {
+        IEnumerable<Competition> GetByCompetitionType(CompetitionType competitionType);
+        Competition GetFriendly();
+        League GetLeague1();
+        League GetLeague2();
+        League GetLeague3();
+        League GetLeague4();
+        IEnumerable<League> GetLeagues();
+        Competition GetNationalCup();
+        Competition GetNationalSuperCup();
+    }
+
+    public class CompetitionRepository : MemoryRepository<Competition>, ICompetitionRepository
     {
         internal CompetitionRepository()
         {

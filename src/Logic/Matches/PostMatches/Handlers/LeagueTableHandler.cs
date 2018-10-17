@@ -1,16 +1,15 @@
 ﻿using System.Linq;
-using TwoNil.Data;
 using TwoNil.Logic.Competitions;
 
 namespace TwoNil.Logic.Matches.PostMatches.Handlers
 {
     public class LeagueTableHandler : IPostMatchesHandler
     {
-        private readonly LeagueTableManager _leagueTableManager;
+        private readonly ILeagueTableManager _leagueTableManager;
 
-        public LeagueTableHandler(IRepositoryFactory repositoryFactory)
+        public LeagueTableHandler(ILeagueTableManager leagueTableManager)
         {
-            _leagueTableManager = new LeagueTableManager(repositoryFactory);
+            _leagueTableManager = leagueTableManager;
         }
 
         public void Handle(PostMatchData postMatchData)

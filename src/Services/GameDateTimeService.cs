@@ -1,4 +1,4 @@
-﻿using TwoNil.Data;
+﻿using TwoNil.Data; //======= KLAAR =======
 using TwoNil.Logic.Calendar;
 using TwoNil.Shared.DomainObjects;
 
@@ -6,52 +6,53 @@ namespace TwoNil.Services
 {
     public class GameDateTimeService : ServiceWithGameBase
     {
-        public GameDateTimeService(GameInfo gameInfo)
-            : base(gameInfo)
+        private readonly IMatchService _matchService;
+        private readonly IGameDateTimeReadManager _gameDateTimeReadManager;
+        private readonly IGameDateTimeMutationManager _gameDateTimeMutationManager;
+
+        public GameDateTimeService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo, IMatchService matchService, IGameDateTimeReadManager gameDateTimeReadManager, IGameDateTimeMutationManager gameDateTimeMutationManager)
+            : base(uowFactory, gameInfo)
         {
+            _gameDateTimeReadManager = gameDateTimeReadManager;
+            _gameDateTimeMutationManager = gameDateTimeMutationManager;
+            _matchService = matchService;
         }
 
         public GameDateTime GetNow()
         {
-            var manager = new GameDateTimeReadManager(RepositoryFactory);
-            return manager.GetNow();
+            return _gameDateTimeReadManager.GetNow();
         }
 
         public void NavigateToNext()
         {
-            var readManager = new GameDateTimeReadManager(RepositoryFactory);
-
-            var now = readManager.GetNow();
+            var now = _gameDateTimeReadManager.GetNow();
             if (now.ManagerPlaysMatch || now.Matches != GameDateTimeEventStatus.ToDo)
             {
                 GoToNext();
             }
             else
             {
-                var matchService = new ServiceFactory().CreateMatchService(GameInfo);
-
                 // Keep on playing matches until a current GameDateTime indicates the manager plays a match. 
                 while (!now.ManagerPlaysMatch && now.Matches == GameDateTimeEventStatus.ToDo)
                 {
-                    using (var transactionManager = RepositoryFactory.CreateTransactionManager())
+                    using (var uow = UowFactory.Create())
                     {
-                        matchService.PlayMatchDay(now.DateTime, transactionManager);
-                        transactionManager.Save();
+                        _matchService.PlayMatchDay(now.DateTime);
+                        //TODO Hier moet een transactie omheen
                     }
 
                     GoToNext();
-                    now = readManager.GetNow();
+                    now = _gameDateTimeReadManager.GetNow();
                 }
             }
         }
 
         private void GoToNext()
         {
-            using (var transactionManager = RepositoryFactory.CreateTransactionManager())
+            using (var uow = UowFactory.Create())
             {
-                var mutationManager = new GameDateTimeMutationManager(transactionManager, RepositoryFactory);
-                mutationManager.GoToNext();
-                transactionManager.Save();
+                _gameDateTimeMutationManager.GoToNext(uow);
+                //TODO Hier moet een transactie omheen
             }
         }
     }

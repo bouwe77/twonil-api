@@ -1,27 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using TwoNil.Data;
 using TwoNil.Logic.Exceptions;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Calendar
 {
-    public class GameDateTimeMutationManager
+    public interface IGameDateTimeMutationManager
     {
-        private readonly ITransactionManager _transactionManager;
-        private readonly IRepositoryFactory _repositoryFactory;
-        private readonly GameDateTimeReadManager _readManager;
+        void CreateNewForSeason(IUnitOfWork uow, IEnumerable<DateTime> matchDatesManagersTeam, IEnumerable<DateTime> matchDatesOtherTeams, DateTime endOfSeasonDate);
+        void GoToNext(IUnitOfWork uow);
+        void UpdateManagerPlaysMatch(IUnitOfWork uow, DateTime dateTime);
+        void UpdateMatchStatus(IUnitOfWork uow, DateTime matchDateTime);
+        void UpdateEndOfSeasonStatus(IUnitOfWork uow, DateTime endOfSeasonDateTime);
+    }
 
-        public GameDateTimeMutationManager(ITransactionManager transactionManager, IRepositoryFactory repositoryFactory)
+    public class GameDateTimeMutationManager : IGameDateTimeMutationManager
+    {
+        private readonly IGameDateTimeReadManager _readManager;
+
+        public GameDateTimeMutationManager(IGameDateTimeReadManager gameDateTimeReadManager)
         {
-            _transactionManager = transactionManager;
-            _repositoryFactory = repositoryFactory;
-            _readManager = new GameDateTimeReadManager(_repositoryFactory);
+            _readManager = gameDateTimeReadManager;
         }
 
-        public void UpdateMatchStatus(DateTime matchDateTime)
+        public void UpdateMatchStatus(IUnitOfWork uow, DateTime matchDateTime)
         {
             var now = _readManager.GetNow();
 
@@ -30,10 +34,10 @@ namespace TwoNil.Logic.Calendar
 
             now.Matches = GameDateTimeEventStatus.Done;
 
-            _transactionManager.RegisterUpdate(now);
+            uow.GameDateTimes.Update(now);
         }
 
-        internal void UpdateEndOfSeasonStatus(DateTime endOfSeasonDateTime)
+        public void UpdateEndOfSeasonStatus(IUnitOfWork uow, DateTime endOfSeasonDateTime)
         {
             var now = _readManager.GetNow();
 
@@ -42,24 +46,24 @@ namespace TwoNil.Logic.Calendar
 
             now.EndOfSeason = GameDateTimeEventStatus.Done;
 
-            _transactionManager.RegisterUpdate(now);
+            uow.GameDateTimes.Update(now);
         }
 
-        public void GoToNext()
+        public void GoToNext(IUnitOfWork uow)
         {
             var now = _readManager.GetNow();
 
             if (!now.CanNavigateToNext())
                 throw new ConflictException($"Now {now.DateTime} is not finished yet");
 
-            _transactionManager.RegisterDelete(now);
+            uow.GameDateTimes.Remove(now);
 
             var next = _readManager.GetNext();
             next.Status = GameDateTimeStatus.Now;
-            _transactionManager.RegisterUpdate(next);
+            uow.GameDateTimes.Update(next);
         }
 
-        public void CreateNewForSeason(IEnumerable<DateTime> matchDatesManagersTeam, IEnumerable<DateTime> matchDatesOtherTeams, DateTime endOfSeasonDate)
+        public void CreateNewForSeason(IUnitOfWork uow, IEnumerable<DateTime> matchDatesManagersTeam, IEnumerable<DateTime> matchDatesOtherTeams, DateTime endOfSeasonDate)
         {
             var gameDateTimes = new List<GameDateTime>();
 
@@ -79,17 +83,16 @@ namespace TwoNil.Logic.Calendar
 
             SetFirstDateToNowIfNecessary(gameDateTimes);
 
-            _transactionManager.RegisterInsert(gameDateTimes);
-
+            uow.GameDateTimes.Add(gameDateTimes);
         }
 
-        public void UpdateManagerPlaysMatch(DateTime dateTime)
+        public void UpdateManagerPlaysMatch(IUnitOfWork uow, DateTime dateTime)
         {
             var gameDateTime = _readManager.GetByDateTime(dateTime);
 
             gameDateTime.ManagerPlaysMatch = true;
 
-            _transactionManager.RegisterUpdate(gameDateTime);
+           uow.GameDateTimes.Update(gameDateTime);
         }
 
         private void SetFirstDateToNowIfNecessary(List<GameDateTime> gameDateTimes)

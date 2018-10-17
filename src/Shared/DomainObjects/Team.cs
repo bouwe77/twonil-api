@@ -1,8 +1,5 @@
-﻿using SQLite;
-
-namespace TwoNil.Shared.DomainObjects
+﻿namespace TwoNil.Shared.DomainObjects
 {
-   [Table("Teams")]
    public class Team : DomainObjectBase
    {
       public string Name { get; set; }
@@ -21,7 +18,6 @@ namespace TwoNil.Shared.DomainObjects
       public decimal RatingMidfield { get; set; }
       public decimal RatingAttack { get; set; }
 
-      [Ignore]
       public Competition CurrentLeagueCompetition
       {
          get
@@ -35,7 +31,6 @@ namespace TwoNil.Shared.DomainObjects
          }
       }
 
-      [Ignore]
       public Formation Formation
       {
          get

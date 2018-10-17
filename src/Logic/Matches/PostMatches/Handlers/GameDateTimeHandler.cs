@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using TwoNil.Data;
+﻿using System.Linq;
 using TwoNil.Logic.Calendar;
 
 namespace TwoNil.Logic.Matches.PostMatches.Handlers
 {
     public class GameDateTimeHandler : IPostMatchesHandler
     {
-        private GameDateTimeMutationManager _gameDateTimeMutationManager;
+        private IGameDateTimeMutationManager _gameDateTimeMutationManager;
 
-        public GameDateTimeHandler(ITransactionManager transactionManager, IRepositoryFactory repositoryFactory)
+        public GameDateTimeHandler(IGameDateTimeMutationManager gameDateTimeMutationManager)
         {
-            _gameDateTimeMutationManager = new GameDateTimeMutationManager(transactionManager, repositoryFactory);
+            _gameDateTimeMutationManager = gameDateTimeMutationManager;
         }
 
         public void Handle(PostMatchData postMatchData)

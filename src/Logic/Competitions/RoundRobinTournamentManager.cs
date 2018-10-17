@@ -96,7 +96,7 @@ namespace TwoNil.Logic.Competitions
                     matches.Add(match);
 
                     // Remember the dummy match (if applicable) for future reference.
-                    if (match.HomeTeam.Equals(dummyTeam) || match.AwayTeam.Equals(dummyTeam))
+                    if (match.HomeTeamId == dummyTeam.Id || match.AwayTeamId == dummyTeam.Id)
                     {
                         dummyMatch = match;
                     }

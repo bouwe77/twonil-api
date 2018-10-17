@@ -1,8 +1,5 @@
-﻿using SQLite;
-
-namespace TwoNil.Shared.DomainObjects
+﻿namespace TwoNil.Shared.DomainObjects
 {
-   [Table("Games")]
    public class Game : DomainObjectBase
    {
       public string UserId { get; set; }

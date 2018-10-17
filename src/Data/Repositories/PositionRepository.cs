@@ -3,7 +3,7 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Data.Repositories
 {
-   public interface IPositionRepository : IRepository<Position>
+   public interface IPositionRepository
    {
       Position GetGoalkeeper();
       Position GetSweeper();

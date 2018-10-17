@@ -1,48 +1,60 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using TwoNil.Logic.Exceptions;
 using TwoNil.Logic.Competitions;
 using TwoNil.Shared.DomainObjects;
+using TwoNil.Data;
 
 namespace TwoNil.Services
 {
-    public class SeasonService : ServiceWithGameBase
+    public interface ISeasonService
     {
-        internal SeasonService(GameInfo gameInfo)
-           : base(gameInfo)
+        bool DetermineSeasonEnded(string seasonId);
+        void EndSeasonAndCreateNext(string seasonId);
+        Season Get(string seasonId);
+        IEnumerable<Season> GetAll();
+        Season GetCurrentSeason();
+    }
+
+    public class SeasonService : ServiceWithGameBase, ISeasonService
+    {
+        private readonly ISeasonManager _seasonManager;
+
+        internal SeasonService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo, ISeasonManager seasonManager)
+           : base(uowFactory, gameInfo)
         {
+            _seasonManager = seasonManager;
         }
 
         public Season GetCurrentSeason()
         {
-            using (var seasonRepository = RepositoryFactory.CreateSeasonRepository())
+            using (var uow = UowFactory.Create())
             {
-                return seasonRepository.GetCurrentSeason();
+                return uow.Seasons.GetCurrentSeason();
             }
         }
 
         public Season Get(string seasonId)
         {
-            using (var seasonRepository = RepositoryFactory.CreateSeasonRepository())
+            using (var uow = UowFactory.Create())
             {
-                return seasonRepository.GetOne(seasonId);
+                return uow.Seasons.GetOne(seasonId);
             }
         }
 
         public IEnumerable<Season> GetAll()
         {
-            using (var seasonRepository = RepositoryFactory.CreateSeasonRepository())
+            using (var uow = UowFactory.Create())
             {
-                return seasonRepository.GetAll();
+                return uow.Seasons.GetAll();
             }
         }
 
         public bool DetermineSeasonEnded(string seasonId)
         {
             bool seasonEnded;
-            using (var matchRepository = RepositoryFactory.CreateMatchRepository())
+            using (var uow = UowFactory.Create())
             {
-                seasonEnded = matchRepository.GetBySeason(seasonId).All(m => m.MatchStatus == MatchStatus.Ended);
+                seasonEnded = uow.Matches.GetBySeason(seasonId).All(m => m.MatchStatus == MatchStatus.Ended);
             }
 
             return seasonEnded;
@@ -51,24 +63,18 @@ namespace TwoNil.Services
         public void EndSeasonAndCreateNext(string seasonId)
         {
             Team managersTeam;
-            using (var repo = RepositoryFactory.CreateGameInfoRepository())
+            using (var uow = UowFactory.Create())
             {
-                managersTeam = repo.GetGameInfo().CurrentTeam;
+                managersTeam = uow.GameInfos.GetGameInfo().CurrentTeam;
+                Season season = uow.Seasons.GetOne(seasonId);
+
+                // Create a transaction which ends the current season and creates a new one.
+                //TODO create transaction on the UOW
+                _seasonManager.EndSeason(season, uow);
+                _seasonManager.CreateNextSeason(season, uow);
+
+                //TODO commit
             }
-
-            var seasonManager = new SeasonManager(RepositoryFactory, managersTeam);
-
-            Season season;
-            using (var seasonRepository = RepositoryFactory.CreateSeasonRepository())
-            {
-                season = seasonRepository.GetOne(seasonId);
-            }
-
-            // Create a transaction which ends the current season and creates a new one.
-            var transactionManager = RepositoryFactory.CreateTransactionManager();
-            seasonManager.EndSeason(season, transactionManager);
-            seasonManager.CreateNextSeason(season, transactionManager);
-            transactionManager.Save();
         }
     }
 }

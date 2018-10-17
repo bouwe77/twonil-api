@@ -45,8 +45,8 @@ namespace TwoNil.API.Resources
                   matchesForOneCompetitionResource.AddProperty("round-name", match.Round.Name);
                }
 
-               if (match.HomeTeamId.Equals(teamIdOnTop, StringComparison.OrdinalIgnoreCase)
-                   || match.AwayTeamId.Equals(teamIdOnTop, StringComparison.OrdinalIgnoreCase))
+               if (match.HomeTeamId == teamIdOnTop
+                   || match.AwayTeamId == teamIdOnTop)
                {
                   teamIdFound = true;
                }

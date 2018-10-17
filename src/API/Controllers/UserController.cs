@@ -61,7 +61,7 @@ namespace TwoNil.API.Controllers
 
          // The logged in user is only allowed to request its own profile.
          //TODO Let MODDERVOKKIN op
-         bool allowed = "17eqhq".Equals(userId, StringComparison.OrdinalIgnoreCase);
+         bool allowed = "17eqhq" == userId;
          if (!allowed)
          {
             throw ResponseHelper.Get404NotFound("");

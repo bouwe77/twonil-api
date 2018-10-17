@@ -2,20 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using Randomization;
+using TwoNil.Data;
 using TwoNil.Logic.Matches;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Competitions.Friendlies
 {
-    public class PreSeasonFriendlyManager : FriendlyManagerBase
+    public interface IPreSeasonFriendlyManager
     {
-        public PreSeasonFriendlyManager()
-            : this(new Randomizer(), new NumberRandomizer())
-        {
-        }
+        CompetitionSchedule CreatePreSeasonSchedule(List<Team> teams, Season season, MatchDateManager matchDateManager);
+    }
 
-        public PreSeasonFriendlyManager(IRandomizer randomizer, INumberRandomizer numberRandomizer)
-            : base(randomizer, numberRandomizer)
+    public class PreSeasonFriendlyManager : FriendlyManagerBase, IPreSeasonFriendlyManager
+    {
+        public PreSeasonFriendlyManager(IUnitOfWorkFactory uowFactory, IRandomizer randomizer, INumberRandomizer numberRandomizer)
+            : base(uowFactory, randomizer, numberRandomizer)
         {
         }
 

@@ -1,16 +1,15 @@
 ﻿using System.Linq;
-using TwoNil.Data;
 using TwoNil.Logic.Competitions;
 
 namespace TwoNil.Logic.Matches.PostMatches.Handlers
 {
     public class DrawNextCupRoundHandler : IPostMatchesHandler
     {
-        private readonly NationalCupManager _nationalCupManager;
+        private readonly INationalCupManager _nationalCupManager;
 
-        public DrawNextCupRoundHandler(IRepositoryFactory repositoryFactory)
+        public DrawNextCupRoundHandler(INationalCupManager nationalCupManager)
         {
-            _nationalCupManager = new NationalCupManager(repositoryFactory);
+            _nationalCupManager = nationalCupManager;
         }
 
         public void Handle(PostMatchData postMatchData)

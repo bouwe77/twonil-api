@@ -3,33 +3,39 @@ using System.Collections.Generic;
 
 namespace TwoNil.Data.Repositories
 {
-   public class NameRepository
-   {
-      private static readonly Dictionary<int, string> LastNames;
+    public interface INameRepository
+    {
+        string GetLastName(int index);
+        int GetNumberOfNames();
+    }
 
-      static NameRepository()
-      {
-         LastNames = GetLastNames();
-      }
+    public class NameRepository : INameRepository
+    {
+        private static readonly Dictionary<int, string> _lastNames;
 
-      public int GetNumberOfNames()
-      {
-         return LastNames.Count;
-      }
+        static NameRepository()
+        {
+            _lastNames = GetLastNames();
+        }
 
-      public string GetLastName(int index)
-      {
-         if (!LastNames.ContainsKey(index))
-         {
-            throw new Exception($"Lastname with index [{index}] not found");
-         }
+        public int GetNumberOfNames()
+        {
+            return _lastNames.Count;
+        }
 
-         return LastNames[index];
-      }
+        public string GetLastName(int index)
+        {
+            if (!_lastNames.ContainsKey(index))
+            {
+                throw new Exception($"Lastname with index [{index}] not found");
+            }
 
-      private static Dictionary<int, string> GetLastNames()
-      {
-         var lastnames = new Dictionary<int, string>
+            return _lastNames[index];
+        }
+
+        private static Dictionary<int, string> GetLastNames()
+        {
+            var lastnames = new Dictionary<int, string>
          {
             { 0, "Walton" },
             { 1, "Patel" },
@@ -3033,7 +3039,7 @@ namespace TwoNil.Data.Repositories
             { 2999, "Mistry" }
          };
 
-         return lastnames;
-      }
-   }
+            return lastnames;
+        }
+    }
 }

@@ -830,90 +830,90 @@ namespace TwoNil.Data.Repositories
       {
          playerProfile.PlayerProfileSkills = new List<PlayerProfileSkill>();
 
-         using (var playerSkillRepository = new RepositoryFactory().CreatePlayerSkillRepository())
+         using (var uow = new UnitOfWorkFactory().Create())
          {
             // Add Goalkeeping skill.
-            var playerSkill = playerSkillRepository.GetGoalkeeping();
+            var playerSkill = uow.PlayerSkills.GetGoalkeeping();
             var profileSkill = new PlayerProfileSkill(playerSkill, goalkeeping);
             playerProfile.PlayerProfileSkills.Add(profileSkill);
 
             // Add Defending skill.
-            playerSkill = playerSkillRepository.GetDefending();
+            playerSkill = uow.PlayerSkills.GetDefending();
             profileSkill = new PlayerProfileSkill(playerSkill, defending);
             playerProfile.PlayerProfileSkills.Add(profileSkill);
 
             // Add Passing skill.
-            playerSkill = playerSkillRepository.GetPassing();
+            playerSkill = uow.PlayerSkills.GetPassing();
             profileSkill = new PlayerProfileSkill(playerSkill, passing);
             playerProfile.PlayerProfileSkills.Add(profileSkill);
 
             // Add Speed skill.
-            playerSkill = playerSkillRepository.GetSpeed();
+            playerSkill = uow.PlayerSkills.GetSpeed();
             profileSkill = new PlayerProfileSkill(playerSkill, speed);
             playerProfile.PlayerProfileSkills.Add(profileSkill);
 
             // Add Technique skill.
-            playerSkill = playerSkillRepository.GetTechnique();
+            playerSkill = uow.PlayerSkills.GetTechnique();
             profileSkill = new PlayerProfileSkill(playerSkill, technique);
             playerProfile.PlayerProfileSkills.Add(profileSkill);
 
             // Add Shooting skill.
-            playerSkill = playerSkillRepository.GetShooting();
+            playerSkill = uow.PlayerSkills.GetShooting();
             profileSkill = new PlayerProfileSkill(playerSkill, shooting);
             playerProfile.PlayerProfileSkills.Add(profileSkill);
 
             // Add Heading skill.
-            playerSkill = playerSkillRepository.GetHeading();
+            playerSkill = uow.PlayerSkills.GetHeading();
             profileSkill = new PlayerProfileSkill(playerSkill, heading);
             playerProfile.PlayerProfileSkills.Add(profileSkill);
 
             // Add Tactics skill.
-            playerSkill = playerSkillRepository.GetTactics();
+            playerSkill = uow.PlayerSkills.GetTactics();
             profileSkill = new PlayerProfileSkill(playerSkill, tactics);
             playerProfile.PlayerProfileSkills.Add(profileSkill);
 
             // Add Talent skill.
-            playerSkill = playerSkillRepository.GetTalent();
+            playerSkill = uow.PlayerSkills.GetTalent();
             profileSkill = new PlayerProfileSkill(playerSkill, talent);
             playerProfile.PlayerProfileSkills.Add(profileSkill);
 
             // Add Fitness skill.
-            playerSkill = playerSkillRepository.GetFitness();
+            playerSkill = uow.PlayerSkills.GetFitness();
             profileSkill = new PlayerProfileSkill(playerSkill, fitness);
             playerProfile.PlayerProfileSkills.Add(profileSkill);
 
             // Add Form skill.
-            playerSkill = playerSkillRepository.GetForm();
+            playerSkill = uow.PlayerSkills.GetForm();
             profileSkill = new PlayerProfileSkill(playerSkill, form);
             playerProfile.PlayerProfileSkills.Add(profileSkill);
 
             // Add Confidence skill.
-            playerSkill = playerSkillRepository.GetConfidence();
+            playerSkill = uow.PlayerSkills.GetConfidence();
             profileSkill = new PlayerProfileSkill(playerSkill, confidence);
             playerProfile.PlayerProfileSkills.Add(profileSkill);
 
             // Add Pace skill.
-            playerSkill = playerSkillRepository.GetPace();
+            playerSkill = uow.PlayerSkills.GetPace();
             profileSkill = new PlayerProfileSkill(playerSkill, pace);
             playerProfile.PlayerProfileSkills.Add(profileSkill);
 
             // Add Stamina skill.
-            playerSkill = playerSkillRepository.GetStamina();
+            playerSkill = uow.PlayerSkills.GetStamina();
             profileSkill = new PlayerProfileSkill(playerSkill, stamina);
             playerProfile.PlayerProfileSkills.Add(profileSkill);
 
             // Add Strength skill.
-            playerSkill = playerSkillRepository.GetStrength();
+            playerSkill = uow.PlayerSkills.GetStrength();
             profileSkill = new PlayerProfileSkill(playerSkill, strength);
             playerProfile.PlayerProfileSkills.Add(profileSkill);
 
             // Add Mentality skill.
-            playerSkill = playerSkillRepository.GetMentality();
+            playerSkill = uow.PlayerSkills.GetMentality();
             profileSkill = new PlayerProfileSkill(playerSkill, mentality);
             playerProfile.PlayerProfileSkills.Add(profileSkill);
 
             // Add Intelligence skill.
-            playerSkill = playerSkillRepository.GetIntelligence();
+            playerSkill = uow.PlayerSkills.GetIntelligence();
             profileSkill = new PlayerProfileSkill(playerSkill, intelligence);
             playerProfile.PlayerProfileSkills.Add(profileSkill);
          }
@@ -1332,10 +1332,9 @@ namespace TwoNil.Data.Repositories
 
       #endregion Positions
 
-      private string GetLastModified()
+      private DateTime GetLastModified()
       {
-         var lastModified = new DateTime(2016, 5, 20);
-         return SqliteRepository.Format(lastModified);
+         return new DateTime(2016, 5, 20);
       }
    }
 }

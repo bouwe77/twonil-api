@@ -25,7 +25,7 @@ namespace TwoNil.API.Controllers
             }
 
             var currentSeason = seasonService.GetCurrentSeason();
-            if (!currentSeason.Equals(season))
+            if (currentSeason.Id != season.Id)
             {
                 throw ResponseHelper.Get409Conflict("This is not the current season");
             }

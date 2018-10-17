@@ -1,64 +1,35 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using TwoNil.Shared.DomainObjects;
+﻿
+//TODO EF/SQL migratie: Hier is een CUSTOM QUERY!!!
 
-namespace TwoNil.Data.Repositories
-{
-    public class TeamRepository : ReadRepository<Team>
-    {
-        internal TeamRepository(string databaseFilePath, string gameId)
-           : base(databaseFilePath, gameId)
-        {
-        }
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using TwoNil.Shared.DomainObjects;
 
-        public IEnumerable<Team> GetTeams()
-        {
-            var teams = GetAll();
+//namespace TwoNil.Data.Repositories
+//{
+//    public class MatchRepository : ReadRepository<Match>, IMatchRepository
+//    {
+//        public IEnumerable<TeamRoundMatch> GetTeamRoundMatches(string gameId, string teamId, string seasonId)
+//        {
+//            const string sql = @"
+//            SELECT r.MatchDate, r.CompetitionId, r.CompetitionName, r.Name AS RoundName, m.Id AS MatchId, m.HomeTeamId, m.AwayTeamId, 
+//            m.HomeScore, m.AwayScore, m.PenaltiesTaken, m.HomePenaltyScore, m.AwayPenaltyScore, m.MatchStatus
+//            FROM rounds r 
+//            LEFT OUTER JOIN matches m 
+//            ON (m.RoundId = r.Id AND (m.HomeTeamId = ? OR m.AwayTeamId = ?))
+//            WHERE r.SeasonId = ?
+//            ORDER BY r.MatchDate ASC";
 
-            foreach (var team in teams)
-            {
-                GetReferencedData(team);
-            }
+//            var matches = Connection.Query<TeamRoundMatch>(sql, teamId, teamId, seasonId);
 
-            return teams;
-        }
+//            foreach (var match in matches)
+//            {
+//                match.GameId = gameId;
+//                GetReferencedData(match);
+//            }
 
-        public IEnumerable<Team> GetTeamsBySeasonCompetition(string seasonCompetitionId)
-        {
-            using (var seasonCompetitionTeamRepository = new RepositoryFactory(_gameId).CreateRepository<SeasonCompetitionTeam>())
-            {
-                var seasonCompetitionTeams = seasonCompetitionTeamRepository.Find(x => x.SeasonCompetitionId.Equals(seasonCompetitionId));
-
-                var teams = seasonCompetitionTeams.Select(seasonCompetitionTeam => seasonCompetitionTeam.Team).ToList();
-                return teams;
-            }
-        }
-
-        public Team GetTeam(string teamId)
-        {
-            var team = GetOne(teamId);
-            if (team != null)
-            {
-                GetReferencedData(team);
-            }
-
-            return team;
-        }
-
-        private void GetReferencedData(Team team)
-        {
-            var repositoryFactory = new RepositoryFactory();
-            using (var competitionRepository = repositoryFactory.CreateCompetitionRepository())
-            {
-                var currentLeagueCompetition = competitionRepository.GetOne(team.CurrentLeagueCompetitionId);
-                team.CurrentLeagueCompetition = currentLeagueCompetition;
-            }
-
-            using (var formationRepository = repositoryFactory.CreateFormationRepository())
-            {
-                var formation = formationRepository.GetOne(team.FormationId);
-                team.Formation = formation;
-            }
-        }
-    }
-}
+//            return matches;
+//        }
+//    }
+//}

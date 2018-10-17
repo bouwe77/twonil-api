@@ -2,15 +2,21 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TwoNil.Data;
 using TwoNil.Logic.Matches;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Competitions.Friendlies
 {
-    public class DuringSeasonFriendlyRoundsManager : FriendlyManagerBase
+    public interface IDuringSeasonFriendlyRoundsManager
     {
-        public DuringSeasonFriendlyRoundsManager()
-            : base(new Randomizer(), new NumberRandomizer())
+        CompetitionSchedule CreateDuringSeasonFriendlyRounds(SeasonCompetition seasonCompetition, List<DateTime> matchDates, int startIndex);
+    }
+
+    public class DuringSeasonFriendlyRoundsManager : FriendlyManagerBase, IDuringSeasonFriendlyRoundsManager
+    {
+        public DuringSeasonFriendlyRoundsManager(IUnitOfWorkFactory unitOfWorkFactory, IRandomizer randomizer, INumberRandomizer numberRandomizer)
+            : base(unitOfWorkFactory, randomizer, numberRandomizer)
         {
         }
 

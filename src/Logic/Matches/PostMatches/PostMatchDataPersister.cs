@@ -3,40 +3,41 @@ using TwoNil.Data;
 
 namespace TwoNil.Logic.Matches.PostMatches
 {
+    public interface IPostMatchDataPersister
+    {
+        void Persist(PostMatchData postMatchData);
+    }
+
     public class PostMatchDataPersister
     {
-        private readonly ITransactionManager _transactionManager;
-        private readonly PostMatchData _postMatchData;
+        private readonly IUnitOfWork _uow;
 
-        public PostMatchDataPersister(ITransactionManager transactionManager, PostMatchData postMatchData)
+        public PostMatchDataPersister(IUnitOfWork uow)
         {
-            _transactionManager = transactionManager;
-            _postMatchData = postMatchData;
+            _uow = uow;
         }
 
-        public void Persist()
+        public void Persist(PostMatchData postMatchData)
         {
             // Update teams
-            _transactionManager.RegisterUpdate(_postMatchData.Teams.Values);
+            _uow.Teams.Update(postMatchData.Teams.Values);
 
             // Update LeagueTables en positions.
-            _transactionManager.RegisterUpdate(_postMatchData.LeagueTables.Values);
-            _transactionManager.RegisterUpdate(_postMatchData.LeagueTables.Values.SelectMany(x => x.LeagueTablePositions));
+            _uow.LeagueTables.Update(postMatchData.LeagueTables.Values);
+            _uow.LeagueTablePositions.Update(postMatchData.LeagueTables.Values.SelectMany(x => x.LeagueTablePositions));
 
             // Update statistics
-            _transactionManager.RegisterUpdate(_postMatchData.SeasonStatistics);
-            _transactionManager.RegisterUpdate(_postMatchData.SeasonTeamStatistics.Values);
-            _transactionManager.RegisterUpdate(_postMatchData.TeamStatistics.Values);
+            _uow.SeasonStatics.Update(postMatchData.SeasonStatistics);
+            _uow.SeasonTeamStatistics.Update(postMatchData.SeasonTeamStatistics.Values);
+            _uow.TeamStatistics.Update(postMatchData.TeamStatistics.Values);
 
             // Insert new cup matches
-            if (_postMatchData.CupMatchesNextRound.Any())
-                _transactionManager.RegisterInsert(_postMatchData.CupMatchesNextRound);
+            if (postMatchData.CupMatchesNextRound.Any())
+                _uow.Matches.Add(postMatchData.CupMatchesNextRound);
 
             // Insert new friendly matches
-            if (_postMatchData.DuringSeasonFriendlies.Any())
-                _transactionManager.RegisterInsert(_postMatchData.DuringSeasonFriendlies);
-
-
+            if (postMatchData.DuringSeasonFriendlies.Any())
+                _uow.Matches.Add(postMatchData.DuringSeasonFriendlies);
         }
     }
 }

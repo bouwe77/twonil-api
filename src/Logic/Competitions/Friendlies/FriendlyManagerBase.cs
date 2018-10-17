@@ -1,8 +1,6 @@
 ﻿using Randomization;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using TwoNil.Data;
 using TwoNil.Shared.DomainObjects;
 
@@ -14,14 +12,14 @@ namespace TwoNil.Logic.Competitions.Friendlies
         protected IRandomizer _randomizer;
         protected INumberRandomizer _numberRandomizer;
 
-        public FriendlyManagerBase(IRandomizer randomizer, INumberRandomizer numberRandomizer)
+        public FriendlyManagerBase(IUnitOfWorkFactory uowFactory, IRandomizer randomizer, INumberRandomizer numberRandomizer)
         {
             _randomizer = randomizer;
             _numberRandomizer = numberRandomizer;
 
-            using (var competitionRepository = new RepositoryFactory().CreateCompetitionRepository())
+            using (var uow = uowFactory.Create())
             {
-                _competition = competitionRepository.GetFriendly();
+                _competition = uow.Competitions.GetFriendly();
             }
         }
 

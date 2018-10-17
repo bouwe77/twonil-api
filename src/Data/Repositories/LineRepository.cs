@@ -3,8 +3,16 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Data.Repositories
 {
-   public class LineRepository : MemoryRepository<Line>
-   {
+    public interface ILineRepository
+    {
+        Line GetAttack();
+        Line GetDefence();
+        Line GetGoalkeeper();
+        Line GetMidfield();
+    }
+
+    public class LineRepository : MemoryRepository<Line>, ILineRepository
+    {
       public LineRepository()
       {
          Entities = new List<Line>

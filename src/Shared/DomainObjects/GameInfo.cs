@@ -1,6 +1,4 @@
-﻿using SQLite;
-
-namespace TwoNil.Shared.DomainObjects
+﻿namespace TwoNil.Shared.DomainObjects
 {
     public class GameInfo : DomainObjectBase
     {
@@ -14,7 +12,6 @@ namespace TwoNil.Shared.DomainObjects
 
         public string CurrentTeamId { get; set; }
 
-        [Ignore]
         public Team CurrentTeam
         {
             get

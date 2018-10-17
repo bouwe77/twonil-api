@@ -68,7 +68,7 @@ namespace TwoNil.API.Controllers
         //         throw ResponseHelper.Get404NotFound($"Game ID '{gameId}' not found");
         //      }
 
-        //      bool userIdIsLoggedInUser = User.Identity.Id.Equals(userId);
+        //      bool userIdIsLoggedInUser = User.Identity.Id == userId;
         //      if (!userIdIsLoggedInUser)
         //      {
         //         throw ResponseHelper.Get404NotFound($"User ID '{userId}' not found");

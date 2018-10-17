@@ -1,94 +1,98 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using TwoNil.Data;
 using TwoNil.Logic.Players;
 using TwoNil.Logic.Teams;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Services
 {
-   public class PlayerService : ServiceWithGameBase
-   {
-      private readonly PlayerGenerator _playerGenerator;
-      private TeamService _teamService;
+    public class PlayerService : ServiceWithGameBase
+    {
+        private readonly IPlayerGenerator _playerGenerator;
+        private readonly ITeamManager _teamManager;
+        private readonly ITeamService _teamService;
 
-      internal PlayerService(GameInfo gameInfo)
-         : base(gameInfo)
-      {
-         _playerGenerator = new PlayerGenerator();
-         _teamService = new ServiceFactory().CreateTeamService(gameInfo);
-      }
+        internal PlayerService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo, ITeamService teamService, IPlayerGenerator playerGenerator, ITeamManager teamManager)
+           : base(uowFactory, gameInfo)
+        {
+            _playerGenerator = playerGenerator;
+            _teamManager = teamManager;
+            _teamService = teamService;
+        }
 
-      public IEnumerable<Player> GetAll()
-      {
-         using (var playerRepository = RepositoryFactory.CreatePlayerRepository())
-         {
-            var players = playerRepository.GetPlayers();
-            return players;
-         }
-      }
+        public IEnumerable<Player> GetAll()
+        {
+            using (var uow = UowFactory.Create())
+            {
+                var players = uow.Players.GetPlayers();
+                return players;
+            }
+        }
 
-      public IEnumerable<Player> GetByTeam(Team team)
-      {
-         using (var playerRepository = RepositoryFactory.CreatePlayerRepository())
-         {
-            var players = playerRepository.GetPlayersByTeam(team);
-            return players;
-         }
-      }
+        public IEnumerable<Player> GetByTeam(Team team)
+        {
+            using (var uow = UowFactory.Create())
+            {
+                var players = uow.Players.GetPlayersByTeam(team);
+                return players;
+            }
+        }
 
-      public Player GetPlayer(string playerId)
-      {
-         using (var playerRepository = RepositoryFactory.CreatePlayerRepository())
-         {
-            return playerRepository.GetOne(playerId);
-         }
-      }
+        public Player GetPlayer(string playerId)
+        {
+            using (var uow = UowFactory.Create())
+            {
+                return uow.Players.GetOne(playerId);
+            }
+        }
 
-      //public void Update(Player player)
-      //{
-      //   using (var playerRepository = _repositoryFactory.GetPlayerRepository())
-      //   {
-      //      playerRepository.Update(player);
-      //   }
-      //}
+        //public void Update(Player player)
+        //{
+        //   using (var uow = UowFactory.Create())
+        //   {
+        //      uow.Players.Update(player);
+        //   }
+        //}
 
-      //public void Delete(Player player)
-      //{
-      //   using (var playerRepository = _repositoryFactory.GetPlayerRepository())
-      //   {
-      //      playerRepository.Delete(player);
-      //   }
-      //}
+        //public void Delete(Player player)
+        //{
+        //   using (var uow = UowFactory.Create())
+        //   {
+        //      uow.Players.Delete(player);
+        //   }
+        //}
 
-      public void SubstitutePlayers(Player player1, Player player2)
-      {
-         // Update the team order of both players.
-         int oldPlayer1TeamOrder = player1.TeamOrder;
-         int oldPlayer2TeamOrder = player2.TeamOrder;
-         player1.TeamOrder = oldPlayer2TeamOrder;
-         player2.TeamOrder = oldPlayer1TeamOrder;
+        public void SubstitutePlayers(Player player1, Player player2)
+        {
+            // Update the team order of both players.
+            int oldPlayer1TeamOrder = player1.TeamOrder;
+            int oldPlayer2TeamOrder = player2.TeamOrder;
+            player1.TeamOrder = oldPlayer2TeamOrder;
+            player2.TeamOrder = oldPlayer1TeamOrder;
 
-         using (var transactionManager = RepositoryFactory.CreateTransactionManager())
-         {
-            transactionManager.RegisterUpdate(player1);
-            transactionManager.RegisterUpdate(player2);
+            using (var uow = UowFactory.Create())
+            {
+                //TODO Create transaction on UOW
 
-            var team = player1.Team;
+                uow.Players.Update(player1);
+                uow.Players.Update(player2);
 
-            var teamManager = new TeamManager(RepositoryFactory);
-            teamManager.UpdateRating(team);
-            transactionManager.RegisterUpdate(team);
+                var team = player1.Team;
 
-            transactionManager.Save();
-         }
-      }
+                _teamManager.UpdateRating(team);
+                uow.Teams.Update(team);
 
-      public Player GetPlayer(string playerId, string teamId)
-      {
-         using (var playerRepository = RepositoryFactory.CreatePlayerRepository())
-         {
-            return playerRepository.Find(p => p.Id == playerId && p.TeamId == teamId).FirstOrDefault();
-         }
-      }
-   }
+                //TODO commit here
+            }
+        }
+
+        public Player GetPlayer(string playerId, string teamId)
+        {
+            using (var uow = UowFactory.Create())
+            {
+                return uow.Players.Find(p => p.Id == playerId && p.TeamId == teamId).FirstOrDefault();
+            }
+        }
+    }
 }

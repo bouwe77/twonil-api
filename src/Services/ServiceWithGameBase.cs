@@ -6,10 +6,10 @@ namespace TwoNil.Services
 {
    public abstract class ServiceWithGameBase : ServiceBase
    {
-      protected RepositoryFactory RepositoryFactory;
       protected GameInfo GameInfo;
 
-      public ServiceWithGameBase(GameInfo gameInfo)
+      public ServiceWithGameBase(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
+            : base(uowFactory)
       {
          if (gameInfo == null || string.IsNullOrEmpty(gameInfo.Id))
          {
@@ -17,7 +17,6 @@ namespace TwoNil.Services
          }
 
          GameInfo = gameInfo;
-         RepositoryFactory = new RepositoryFactory(gameInfo.Id);
       }
    }
 }

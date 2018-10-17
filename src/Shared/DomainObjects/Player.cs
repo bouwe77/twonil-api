@@ -1,8 +1,5 @@
-﻿using SQLite;
-
-namespace TwoNil.Shared.DomainObjects
+﻿namespace TwoNil.Shared.DomainObjects
 {
-   [Table("Players")]
    public class Player : DomainObjectBase
    {
       public string Name { get; set; }
@@ -46,7 +43,6 @@ namespace TwoNil.Shared.DomainObjects
       private Team _team;
       public string TeamId { get; set; }
 
-      [Ignore]
       public Team Team
       {
          get => _team;
@@ -60,7 +56,6 @@ namespace TwoNil.Shared.DomainObjects
       private Position _preferredPosition;
       public string PreferredPositionId { get; set; }
 
-      [Ignore]
       public Position PreferredPosition
       {
          get => _preferredPosition;
@@ -74,7 +69,6 @@ namespace TwoNil.Shared.DomainObjects
       private Position _currentPosition;
       public string CurrentPositionId { get; set; }
 
-      [Ignore]
       public Position CurrentPosition
       {
          get => _currentPosition;

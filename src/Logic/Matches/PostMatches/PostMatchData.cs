@@ -75,11 +75,11 @@ namespace TwoNil.Logic.Matches.PostMatches
             {
                 var newManagerMatchDates = new List<DateTime>();
 
-                var newFriendlyMatchForManager = DuringSeasonFriendlies.SingleOrDefault(m => m.HomeTeam.Equals(ManagersTeam) || m.AwayTeam.Equals(ManagersTeam));
+                var newFriendlyMatchForManager = DuringSeasonFriendlies.SingleOrDefault(m => m.HomeTeamId == ManagersTeam.Id || m.AwayTeamId == ManagersTeam.Id);
                 if (newFriendlyMatchForManager != null)
                     newManagerMatchDates.Add(newFriendlyMatchForManager.Date);
 
-                var newCupMatchForManager = CupMatchesNextRound.SingleOrDefault(m => m.HomeTeam.Equals(ManagersTeam) || m.AwayTeam.Equals(ManagersTeam));
+                var newCupMatchForManager = CupMatchesNextRound.SingleOrDefault(m => m.HomeTeamId == ManagersTeam.Id || m.AwayTeamId == ManagersTeam.Id);
                 if (newCupMatchForManager != null)
                     newManagerMatchDates.Add(newCupMatchForManager.Date);
 

@@ -1,8 +1,5 @@
-﻿using SQLite;
-
-namespace TwoNil.Shared.DomainObjects
+﻿namespace TwoNil.Shared.DomainObjects
 {
-   [Table("SeasonCompetition")]
    public class SeasonCompetition : DomainObjectBase
    {
       private Competition _competition;
@@ -11,7 +8,6 @@ namespace TwoNil.Shared.DomainObjects
       public string CompetitionId { get; set; }
       public string SeasonId { get; set; }
 
-      [Ignore]
       public Competition Competition
       {
          get
@@ -25,7 +21,6 @@ namespace TwoNil.Shared.DomainObjects
          }
       }
 
-      [Ignore]
       public Season Season
       {
          get

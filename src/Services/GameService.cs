@@ -1,28 +1,31 @@
-﻿using System;
+﻿using System; //======= KLAAR =======
 using System.Collections.Generic;
 using System.Linq;
 using TwoNil.Data;
+using TwoNil.Logic.Exceptions;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Services
 {
     public class GameService : ServiceBase
     {
+        public GameService(IUnitOfWorkFactory uowFactory)
+            : base(uowFactory)
+        {
+        }
+
         public IEnumerable<GameInfo> GetGames(string userId)
         {
             var gameInfos = new List<GameInfo>();
 
-            using (var gameRepository = new RepositoryFactory().CreateGameRepository())
+            using (var uow = UowFactory.Create())
             {
-                var games = gameRepository.GetByUserId(userId);
+                var games = uow.Games.GetByUserId(userId);
 
                 foreach (var game in games)
                 {
-                    using (var gameInfoRepository = new RepositoryFactory(game.Id).CreateGameInfoRepository())
-                    {
-                        var gameInfo = gameInfoRepository.GetGameInfo();
-                        gameInfos.Add(gameInfo);
-                    }
+                    var gameInfo = uow.GameInfos.GetGameInfo();
+                    gameInfos.Add(gameInfo);
                 }
             }
 
@@ -33,18 +36,15 @@ namespace TwoNil.Services
         {
             GameInfo gameInfo = null;
 
-            using (var gameRepository = new RepositoryFactory().CreateGameRepository())
+            using (var uow = UowFactory.Create())
             {
                 // First check the game belongs to the user.
-                var game = gameRepository.GetByUserId(userId).FirstOrDefault(x => x.Id == gameId);
+                var game = uow.Games.GetByUserId(userId).FirstOrDefault(x => x.Id == gameId);
 
                 // If so, retrieve the game info.
                 if (game != null)
                 {
-                    using (var gameInfoRepository = new RepositoryFactory(gameId).CreateGameInfoRepository())
-                    {
-                        gameInfo = gameInfoRepository.GetGameInfo();
-                    }
+                    gameInfo = uow.GameInfos.GetGameInfo();
                 }
             }
 
@@ -54,39 +54,40 @@ namespace TwoNil.Services
         public void AddChosenTeam(string gameId, string userId, Team chosenTeam)
         {
             throw new NotImplementedException();
-            //var game = GetGame(gameId, userId);
-            //if (game == null)
-            //{
-            //   throw new NotFoundException($"Game with ID '{gameId}' not found");
-            //}
-
-            //game.CurrentTeam = chosenTeam;
-            //using (var transactionManager = new RepositoryFactory().CreateTransactionManager())
-            //{
-            //   transactionManager.RegisterUpdate(game);
-            //   transactionManager.Save();
-            //}
         }
 
         public void DeleteGame(string gameId)
         {
             // Delete the game from the database.
-            using (var gameRepository = new RepositoryFactory().CreateGameRepository())
+            using (var uow = UowFactory.Create())
             {
-                gameRepository.DeleteGame(gameId);
+                var game = uow.Games.GetOne(gameId);
+                DeleteGame(game);
             }
         }
 
         public void DeleteAllGames()
         {
             // Delete all games from the database.
-            using (var gameRepository = new RepositoryFactory().CreateGameRepository())
+            using (var uow = UowFactory.Create())
             {
-                var games = gameRepository.GetAll();
+                var games = uow.Games.GetAll();
                 foreach (var game in games)
                 {
-                    gameRepository.DeleteGame(game.Id);
+                    DeleteGame(game);
                 }
+            }
+        }
+
+        private void DeleteGame(Game game)
+        {
+            // Delete the game from the database.
+            using (var uow = UowFactory.Create())
+            {
+                if (game == null)
+                    throw new NotFoundException("Game not found");
+
+                uow.Games.Remove(game);
             }
         }
     }

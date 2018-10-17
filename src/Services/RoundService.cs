@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
+using TwoNil.Data;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Services
 {
    public class RoundService : ServiceWithGameBase
    {
-      internal RoundService(GameInfo gameInfo)
-         : base(gameInfo)
+      internal RoundService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
+         : base(uowFactory, gameInfo)
       {
       }
 

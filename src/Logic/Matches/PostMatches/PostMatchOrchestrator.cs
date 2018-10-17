@@ -5,36 +5,44 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Matches.PostMatches
 {
+    public interface IPostMatchOrchestrator
+    {
+        void Handle(IEnumerable<Match> matches);
+    }
+
     /// <summary>
     /// Orchestrates which data in which order must be saved after matches have been played.
     /// </summary>
-    public class PostMatchOrchestrator
+    public class PostMatchOrchestrator : IPostMatchOrchestrator
     {
-        private readonly TransactionManager _transactionManager;
-        private readonly IRepositoryFactory _repositoryFactory;
         private readonly IEnumerable<Match> _matches;
         private readonly string _seasonId;
+        private readonly IUnitOfWork _uow;
+        private readonly IPostMatchDataFactory _postMatchDataFactory;
+        private readonly IPostMatchDataPersister _postMatchDataPersister;
 
-        public PostMatchOrchestrator(TransactionManager transactionManager, IRepositoryFactory repositoryFactory)
+        public PostMatchOrchestrator(IUnitOfWork uow, IPostMatchDataFactory postMatchDataFactory, IPostMatchDataPersister postMatchDataPersister)
         {
-            _transactionManager = transactionManager;
-            _repositoryFactory = repositoryFactory;
+            _uow = uow;
+            _postMatchDataFactory = postMatchDataFactory;
+            _postMatchDataPersister = postMatchDataPersister;
         }
 
         public void Handle(IEnumerable<Match> matches)
         {
-            var postMatchData = new PostMatchDataFactory(_repositoryFactory, matches).InitializePostMatchData();
+            var postMatchData = _postMatchDataFactory.InitializePostMatchData(matches);
 
+            //TODO deze news kunnen niet meer, dus welk pattern moet ik toepassen? Waarschijnlijk kan ik via Unity vragen om mij alle geregistreerde IPostMatchHandlers terug te geven?
             var handlers = new List<IPostMatchesHandler>
             {
-                new LeagueTableHandler(_repositoryFactory),
-                new DrawNextCupRoundHandler(_repositoryFactory),
-                new GenerateDuringSeasonFriendliesHandler(_repositoryFactory),
-                new SeasonStatisticsHandler(),
-                new SeasonTeamStatisticsHandler(),
-                new TeamStatisticsHandler(),
-                new TeamHandler(),
-                new GameDateTimeHandler(_transactionManager, _repositoryFactory),
+                //new LeagueTableHandler(),
+                //new DrawNextCupRoundHandler(),
+                //new GenerateDuringSeasonFriendliesHandler(),
+                //new SeasonStatisticsHandler(),
+                //new SeasonTeamStatisticsHandler(),
+                //new TeamStatisticsHandler(),
+                //new TeamHandler(),
+                //new GameDateTimeHandler(),
             };
 
             foreach (var postMatchHandler in handlers)
@@ -42,8 +50,7 @@ namespace TwoNil.Logic.Matches.PostMatches
                 postMatchHandler.Handle(postMatchData);
             }
 
-            var postMatchDataPersister = new PostMatchDataPersister(_transactionManager, postMatchData);
-            postMatchDataPersister.Persist();
+            _postMatchDataPersister.Persist(postMatchData);
         }
     }
 }

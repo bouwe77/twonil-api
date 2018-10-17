@@ -5,73 +5,80 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Players
 {
-   public class PlayerManager
-   {
-      private NumberRandomizer _numberRandomizer;
-      private PlayerGenerator _playerGenerator;
+    public interface IPlayerManager
+    {
+        IEnumerable<Player> GenerateSquad(Team team, int averageRating);
+    }
 
-      public PlayerManager()
-      {
-         _numberRandomizer = new NumberRandomizer();
-         _playerGenerator = new PlayerGenerator();
-      }
+    public class PlayerManager : IPlayerManager
+    {
+        private INumberRandomizer _numberRandomizer;
+        private readonly IUnitOfWorkFactory _uowFactory;
+        private IPlayerGenerator _playerGenerator;
 
-      public IEnumerable<Player> GenerateSquad(Team team, int averageRating)
-      {
-         var squad = new List<Player>();
+        public PlayerManager(IUnitOfWorkFactory uowFactory, IPlayerGenerator playerGenerator, INumberRandomizer numberRandomizer)
+        {
+            _uowFactory = uowFactory;
+            _playerGenerator = playerGenerator;
+            _numberRandomizer = numberRandomizer;
+        }
 
-         using (var lineRepository = new RepositoryFactory().CreateLineRepository())
-         {
-            // Generate 2 or 3 goalkeepers.
-            int howMany = _numberRandomizer.GetNumber(2, 3);
-            var line = lineRepository.GetGoalkeeper();
-            squad.AddRange(GeneratePlayersForLine(line, howMany, averageRating));
+        public IEnumerable<Player> GenerateSquad(Team team, int averageRating)
+        {
+            var squad = new List<Player>();
 
-            // Generate between 5 and 7 defenders.
-            howMany = _numberRandomizer.GetNumber(5, 7);
-            line = lineRepository.GetDefence();
-            squad.AddRange(GeneratePlayersForLine(line, howMany, averageRating));
-
-            // Generate between 5 and 7 midfielders.
-            howMany = _numberRandomizer.GetNumber(5, 7);
-            line = lineRepository.GetMidfield();
-            squad.AddRange(GeneratePlayersForLine(line, howMany, averageRating));
-
-            // Generate between 4 and 6 attackers.
-            howMany = _numberRandomizer.GetNumber(4, 6);
-            line = lineRepository.GetAttack();
-            squad.AddRange(GeneratePlayersForLine(line, howMany, averageRating));
-         }
-
-         int teamOrder = 0;
-         foreach (var player in squad)
-         {
-            player.Team = team;
-            player.TeamOrder = teamOrder++;
-         }
-
-         return squad;
-      }
-
-      private IEnumerable<Player> GeneratePlayersForLine(Line line, int howMany, int averageRating)
-      {
-         var players = new List<Player>();
-
-         int generated = 0;
-         while (generated < howMany)
-         {
-            var player = _playerGenerator.Generate(line, averageRating);
-
-            // Only add the player if his line is the expected one.
-            if (player.PreferredPosition.Line.Equals(line))
+            using (var uow = _uowFactory.Create())
             {
-               players.Add(player);
-               generated++;
+                // Generate 2 or 3 goalkeepers.
+                int howMany = _numberRandomizer.GetNumber(2, 3);
+                var line = uow.Lines.GetGoalkeeper();
+                squad.AddRange(GeneratePlayersForLine(line, howMany, averageRating));
+
+                // Generate between 5 and 7 defenders.
+                howMany = _numberRandomizer.GetNumber(5, 7);
+                line = uow.Lines.GetDefence();
+                squad.AddRange(GeneratePlayersForLine(line, howMany, averageRating));
+
+                // Generate between 5 and 7 midfielders.
+                howMany = _numberRandomizer.GetNumber(5, 7);
+                line = uow.Lines.GetMidfield();
+                squad.AddRange(GeneratePlayersForLine(line, howMany, averageRating));
+
+                // Generate between 4 and 6 attackers.
+                howMany = _numberRandomizer.GetNumber(4, 6);
+                line = uow.Lines.GetAttack();
+                squad.AddRange(GeneratePlayersForLine(line, howMany, averageRating));
             }
-         }
 
-         return players;
-      }
+            int teamOrder = 0;
+            foreach (var player in squad)
+            {
+                player.Team = team;
+                player.TeamOrder = teamOrder++;
+            }
 
-   }
+            return squad;
+        }
+
+        private IEnumerable<Player> GeneratePlayersForLine(Line line, int howMany, int averageRating)
+        {
+            var players = new List<Player>();
+
+            int generated = 0;
+            while (generated < howMany)
+            {
+                var player = _playerGenerator.Generate(line, averageRating);
+
+                // Only add the player if his line is the expected one.
+                if (player.PreferredPosition.Line.Id == line.Id)
+                {
+                    players.Add(player);
+                    generated++;
+                }
+            }
+
+            return players;
+        }
+
+    }
 }

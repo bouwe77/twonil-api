@@ -2,43 +2,45 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Data.Repositories
 {
-   public class MemoryRepository<TEntity> : IRepository<TEntity> where TEntity : DomainObjectBase
-   {
-      protected IEnumerable<TEntity> Entities { get; set; }
-      protected InMemoryData InMemoryData;
+    public class MemoryRepository<TEntity> : IGenericRepository<TEntity> where TEntity : DomainObjectBase
+    {
+        protected IEnumerable<TEntity> Entities { get; set; }
+        protected InMemoryData InMemoryData;
 
-      public MemoryRepository()
-      {
-         InMemoryData = new InMemoryData();
-      }
+        public MemoryRepository()
+        {
+            InMemoryData = new InMemoryData();
+        }
 
-      public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
-      {
-         return Entities.AsQueryable().Where(predicate.Compile()).ToList();
-      }
+        public void Add(TEntity entity)
+        {
+            throw new NotSupportedException("Adding is not supported for in-memory repositories");
+        }
 
-      public IEnumerable<TEntity> GetAll()
-      {
-         return Entities;
-      }
+        public void Update(TEntity entity)
+        {
+            throw new NotSupportedException("Updating is not supported for in-memory repositories");
+        }
 
-      public TEntity GetOne(string id)
-      {
-         return Entities.SingleOrDefault(entity => entity.Id == id);
-      }
-      
-      public void Dispose()
-      {
-         // Nothing to dispose.
-      }
+        public void Remove(TEntity entity)
+        {
+            throw new NotSupportedException("Removing is not supported for in-memory repositories");
+        }
 
-      public List<TEntity> ExecuteQuery(string query)
-      {
-         throw new NotImplementedException("Querying is not supported on in-memory collections");
-      }
-   }
+        public Task<TEntity> Find(params object[] keyParams)
+        {
+            //TODO Deze nog implemeteren?
+            throw new NotImplementedException();
+        }
+
+        public IQueryable<TEntity> GetAll(params Expression<Func<TEntity, object>>[] includes)
+        {
+            return Entities.AsQueryable();
+        }
+    }
 }

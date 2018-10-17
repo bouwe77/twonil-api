@@ -12,7 +12,7 @@ namespace TwoNil.Logic.Matches
             throw new Exception("Home and away team can not be null");
          }
 
-         if (homeTeam.Equals(awayTeam))
+         if (homeTeam.Id == awayTeam.Id)
          {
             throw new Exception("Home and away team can not be the same");
          }

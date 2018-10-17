@@ -133,7 +133,7 @@ namespace TwoNil.API.Controllers
                     var awayTeamResource = teamMapper.Map(matchForCurrentTeam.AwayTeam, TeamMapper.TeamName, TeamMapper.LeagueName, TeamMapper.CurrentLeaguePosition);
                     matchResource.AddResource("away-team", awayTeamResource);
 
-                    matchResource.AddResource("your-opponent", gameInfo.CurrentTeam.Equals(matchForCurrentTeam.HomeTeam) ? awayTeamResource : homeTeamResource);
+                    matchResource.AddResource("your-opponent", gameInfo.CurrentTeamId == matchForCurrentTeam.HomeTeamId ? awayTeamResource : homeTeamResource);
 
                     matchDayResource.AddResource("next-match", matchResource);
                 }

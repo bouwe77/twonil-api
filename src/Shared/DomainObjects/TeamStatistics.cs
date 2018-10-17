@@ -1,8 +1,5 @@
-﻿using SQLite;
-
-namespace TwoNil.Shared.DomainObjects
+﻿namespace TwoNil.Shared.DomainObjects
 {
-    [Table("TeamStatistics")]
     public class TeamStatistics : DomainObjectBase
     {
         public TeamStatistics()
@@ -19,7 +16,6 @@ namespace TwoNil.Shared.DomainObjects
         private Team _team;
         public string TeamId { get; set; }
 
-        [Ignore]
         public Team Team
         {
             get

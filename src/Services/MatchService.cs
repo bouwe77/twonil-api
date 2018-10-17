@@ -3,87 +3,100 @@ using System.Collections.Generic;
 using System.Linq;
 using TwoNil.Data;
 using TwoNil.Logic.Exceptions;
-using TwoNil.Logic.Competitions;
-using TwoNil.Logic.Matches;
 using TwoNil.Shared.DomainObjects;
 using TwoNil.Logic.Matches.PostMatches;
 using TwoNil.Logic.Matches.MatchPlay;
 
 namespace TwoNil.Services
 {
-    public class MatchService : ServiceWithGameBase
+    public interface IMatchService
     {
-        private SeasonService _seasonService;
+        IEnumerable<Match> GetByMatchDay(DateTime matchDay);
+        Match GetByMatchDayAndTeam(DateTime matchDay, string teamId);
+        IEnumerable<Match> GetByRound(Round round);
+        IEnumerable<Match> GetBySeasonAndTeam(string seasonId, string teamId);
+        Match GetMatch(string matchId);
+        DateTime? GetNextMatchDate(string seasonId);
+        IEnumerable<TeamRoundMatch> GetTeamRoundMatches(string teamId, string seasonId, string leagueCompetitionId);
+        void PlayMatchDay(DateTime matchDate);
+        void PlayMatchDay(DateTime matchDate, IUnitOfWork uow);
+    }
 
-        internal MatchService(GameInfo gameInfo)
-           : base(gameInfo)
+    public class MatchService : ServiceWithGameBase, IMatchService
+    {
+        private ISeasonService _seasonService;
+        private readonly IPostMatchOrchestrator _postMatchOrchestrator;
+
+        internal MatchService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo, ISeasonService seasonService, IPostMatchOrchestrator postMatchOrchestrator)
+           : base(uowFactory, gameInfo)
         {
-            _seasonService = new ServiceFactory().CreateSeasonService(gameInfo);
+            _seasonService = seasonService;
+            _postMatchOrchestrator = postMatchOrchestrator;
         }
 
         public Match GetMatch(string matchId)
         {
-            using (var matchRepository = RepositoryFactory.CreateMatchRepository())
+            using (var uow = UowFactory.Create())
             {
                 // Get the match from the database.
-                var match = matchRepository.GetMatch(matchId);
+                var match = uow.Matches.GetMatch(matchId);
                 return match;
             }
         }
 
         public IEnumerable<Match> GetBySeasonAndTeam(string seasonId, string teamId)
         {
-            using (var matchRepository = RepositoryFactory.CreateMatchRepository())
+            using (var uow = UowFactory.Create())
             {
-                var matches = matchRepository.GetBySeasonAndTeam(seasonId, teamId).OrderBy(match => match.Date);
+                var matches = uow.Matches.GetBySeasonAndTeam(seasonId, teamId).OrderBy(match => match.Date);
                 return matches;
             }
         }
 
         public IEnumerable<Match> GetByRound(Round round)
         {
-            using (var matchRepository = RepositoryFactory.CreateMatchRepository())
+            using (var uow = UowFactory.Create())
             {
-                return matchRepository.GetByRound(round.Id);
+                return uow.Matches.GetByRound(round.Id);
             }
         }
 
         public DateTime? GetNextMatchDate(string seasonId)
         {
-            using (var matchRepository = RepositoryFactory.CreateMatchRepository())
+            using (var uow = UowFactory.Create())
             {
-                return matchRepository.GetNextMatchDate(seasonId);
+                return uow.Matches.GetNextMatchDate(seasonId);
             }
         }
 
         public IEnumerable<Match> GetByMatchDay(DateTime matchDay)
         {
-            using (var matchRepository = RepositoryFactory.CreateMatchRepository())
+            using (var uow = UowFactory.Create())
             {
-                var matches = matchRepository.GetByMatchDay(matchDay);
+                var matches = uow.Matches.GetByMatchDay(matchDay);
                 return matches;
             }
         }
 
         public Match GetByMatchDayAndTeam(DateTime matchDay, string teamId)
         {
-            using (var matchRepository = RepositoryFactory.CreateMatchRepository())
+            using (var uow = UowFactory.Create())
             {
-                var match = matchRepository.GetByMatchDayAndTeam(matchDay, teamId);
+                var match = uow.Matches.GetByMatchDayAndTeam(matchDay, teamId);
                 return match;
             }
         }
 
         public void PlayMatchDay(DateTime matchDate)
         {
-            using (var transactionManager = RepositoryFactory.CreateTransactionManager())
+            using (var uow = UowFactory.Create())
             {
-                PlayMatchDay(matchDate, transactionManager);
-                transactionManager.Save();
+                //TODO Deze UOW moet een transactie krijgen
+                PlayMatchDay(matchDate, uow);
             }
         }
 
-        public void PlayMatchDay(DateTime matchDate, TransactionManager transactionManager)
+        public void PlayMatchDay(DateTime matchDate, IUnitOfWork uow)
         {
             // First check if the given matchDay is the "next" match day in this season.
             var currentSeason = _seasonService.GetCurrentSeason();
@@ -104,21 +117,20 @@ namespace TwoNil.Services
                 new MatchPlayer().Play(match);
             }
 
-            transactionManager.RegisterUpdate(matchesToPlay);
+            uow.Matches.Update(matchesToPlay);
 
             // After matches have been played a lot of stuff must be determined and updated.
-            new PostMatchOrchestrator(transactionManager, RepositoryFactory).Handle(matchesToPlay);
+            _postMatchOrchestrator.Handle(matchesToPlay);
         }
 
         public IEnumerable<TeamRoundMatch> GetTeamRoundMatches(string teamId, string seasonId, string leagueCompetitionId)
         {
-            using (var matchRepository = RepositoryFactory.CreateMatchRepository())
-            using (var competitionRepository = new RepositoryFactory().CreateCompetitionRepository())
+            using (var uow = UowFactory.Create())
             {
-                var matches = matchRepository.GetTeamRoundMatches(GameInfo.Id, teamId, seasonId);
+                var matches = uow.Matches.GetTeamRoundMatches(GameInfo.Id, teamId, seasonId);
 
                 // For league competitions only the team's current league must be included.
-                var leagueCompetitionsToSkip = competitionRepository.GetLeagues().Where(c => c.Id != leagueCompetitionId).Select(c => c.Id);
+                var leagueCompetitionsToSkip = uow.Competitions.GetLeagues().Where(c => c.Id != leagueCompetitionId).Select(c => c.Id);
                 return matches.Where(m => !leagueCompetitionsToSkip.Contains(m.CompetitionId));
             }
         }

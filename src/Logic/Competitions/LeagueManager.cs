@@ -7,19 +7,32 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Competitions
 {
-    public class LeagueManager
+    public interface ILeagueManager
     {
+        CompetitionSchedule CreateSchedules(List<Team> teamsLeague1, List<Team> teamsLeague2, List<Team> teamsLeague3, List<Team> teamsLeague4, Season season, MatchDateManager matchDateManager);
+        List<List<Team>> PromoteAndRelegateTeams(List<List<Team>> leagues, int howManyTeamsPromoteAndRelegate);
+    }
+
+    public class LeagueManager : ILeagueManager
+    {
+        private readonly IUnitOfWorkFactory _uowFactory;
+
+        public LeagueManager(IUnitOfWorkFactory uowFactory)
+        {
+            _uowFactory = uowFactory;
+        }
+
         public CompetitionSchedule CreateSchedules(List<Team> teamsLeague1, List<Team> teamsLeague2, List<Team> teamsLeague3, List<Team> teamsLeague4, Season season, MatchDateManager matchDateManager)
         {
             var competitionSchedule = new CompetitionSchedule();
 
-            using (var competitionRepository = new RepositoryFactory().CreateCompetitionRepository())
+            using (var uow = _uowFactory.Create())
             {
                 // Create the leagues with the teams.
-                CreateLeague(competitionSchedule, competitionRepository.GetLeague1(), teamsLeague1, season, matchDateManager);
-                CreateLeague(competitionSchedule, competitionRepository.GetLeague2(), teamsLeague2, season, matchDateManager);
-                CreateLeague(competitionSchedule, competitionRepository.GetLeague3(), teamsLeague3, season, matchDateManager);
-                CreateLeague(competitionSchedule, competitionRepository.GetLeague4(), teamsLeague4, season, matchDateManager);
+                CreateLeague(competitionSchedule, uow.Competitions.GetLeague1(), teamsLeague1, season, matchDateManager);
+                CreateLeague(competitionSchedule, uow.Competitions.GetLeague2(), teamsLeague2, season, matchDateManager);
+                CreateLeague(competitionSchedule, uow.Competitions.GetLeague3(), teamsLeague3, season, matchDateManager);
+                CreateLeague(competitionSchedule, uow.Competitions.GetLeague4(), teamsLeague4, season, matchDateManager);
             }
 
             return competitionSchedule;

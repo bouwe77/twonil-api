@@ -5,39 +5,46 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Calendar
 {
-    public class GameDateTimeReadManager
+    public interface IGameDateTimeReadManager
     {
-        private readonly IRepositoryFactory _repositoryFactory;
+        GameDateTime GetByDateTime(DateTime dateTime);
+        GameDateTime GetNow(bool allowNonExisting = false);
+        GameDateTime GetNext();
+    }
 
-        public GameDateTimeReadManager(IRepositoryFactory repositoryFactory)
+    public class GameDateTimeReadManager : IGameDateTimeReadManager
+    {
+        private readonly IUnitOfWorkFactory _uowFactory;
+
+        public GameDateTimeReadManager(IUnitOfWorkFactory uowFactory)
         {
-            _repositoryFactory = repositoryFactory;
+            _uowFactory = uowFactory;
         }
 
         public GameDateTime GetNow(bool allowNonExisting = false)
         {
-            using (var repo = _repositoryFactory.CreateGameDateTimeRepository())
+            using (var uow = _uowFactory.Create())
             {
                 if (allowNonExisting)
-                    return repo.GetByStatus(GameDateTimeStatus.Now).FirstOrDefault();
+                    return uow.GameDateTimes.GetByStatus(GameDateTimeStatus.Now).FirstOrDefault();
                 else
-                    return repo.GetByStatus(GameDateTimeStatus.Now).First();
+                    return uow.GameDateTimes.GetByStatus(GameDateTimeStatus.Now).First();
             }
         }
 
         public GameDateTime GetByDateTime(DateTime dateTime)
         {
-            using (var repo = _repositoryFactory.CreateGameDateTimeRepository())
+            using (var uow = _uowFactory.Create())
             {
-                return repo.Find(g => g.DateTime == dateTime).First();
+                return uow.GameDateTimes.Find(g => g.DateTime == dateTime).First();
             }
         }
 
-        internal GameDateTime GetNext()
+        public GameDateTime GetNext()
         {
-            using (var repo = _repositoryFactory.CreateGameDateTimeRepository())
+            using (var uow = _uowFactory.Create())
             {
-                return repo.GetByStatus(GameDateTimeStatus.Future).First();
+                return uow.GameDateTimes.GetByStatus(GameDateTimeStatus.Future).First();
             }
         }
     }

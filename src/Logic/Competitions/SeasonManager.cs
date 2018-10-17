@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using TwoNil.Data;
-using TwoNil.Data.Repositories;
 using TwoNil.Logic.Exceptions;
 using TwoNil.Logic.Calendar;
 using TwoNil.Logic.Competitions.Friendlies;
@@ -12,20 +11,42 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Competitions
 {
-    public class SeasonManager
+    public interface ISeasonManager
     {
-        private readonly LeagueManager _leagueManager;
-        private readonly RepositoryFactory _repositoryFactory;
-        private readonly Team _managersTeam;
+        void CreateFirstSeason(List<Team> teams, IUnitOfWork uow);
+        void CreateNextSeason(Season previousSeason, IUnitOfWork uow);
+        void EndSeason(Season season, IUnitOfWork uow);
+    }
 
-        public SeasonManager(RepositoryFactory repositoryFactory, Team managersTeam)
+    public class SeasonManager : ISeasonManager
+    {
+        private readonly ILeagueManager _leagueManager;
+        private readonly IPreSeasonFriendlyManager _preSeasonFriendlyManager;
+        private readonly IUnitOfWorkFactory _uowFactory;
+        private readonly INationalCupManager _nationalCupManager;
+        private readonly INationalSuperCupManager _nationalSuperCupManager;
+        private readonly IDuringSeasonFriendlyRoundsManager _duringSeasonFriendlyRoundsManager;
+        private readonly IGameDateTimeMutationManager _gameDateTimeMutationManager;
+
+        public SeasonManager(
+            IUnitOfWorkFactory uowFactory,
+            ILeagueManager leagueManager,
+            IPreSeasonFriendlyManager preSeasonFriendlyManager,
+            INationalCupManager nationalCupManager,
+            INationalSuperCupManager nationalSuperCupManager,
+            IDuringSeasonFriendlyRoundsManager duringSeasonFriendlyRoundsManager,
+            IGameDateTimeMutationManager gameDateTimeMutationManager)
         {
-            _repositoryFactory = repositoryFactory;
-            _managersTeam = managersTeam;
-            _leagueManager = new LeagueManager();
+            _uowFactory = uowFactory;
+            _leagueManager = leagueManager;
+            _preSeasonFriendlyManager = preSeasonFriendlyManager;
+            _nationalCupManager = nationalCupManager;
+            _nationalSuperCupManager = nationalSuperCupManager;
+            _duringSeasonFriendlyRoundsManager = duringSeasonFriendlyRoundsManager;
+            _gameDateTimeMutationManager = gameDateTimeMutationManager;
         }
 
-        public void CreateFirstSeason(List<Team> teams, TransactionManager transactionManager)
+        public void CreateFirstSeason(List<Team> teams, IUnitOfWork uow)
         {
             // First check the number of teams can be evenly divided into the number of leagues.
             bool teamsOk = teams.Count % Constants.HowManyLeagues == 0;
@@ -56,16 +77,16 @@ namespace TwoNil.Logic.Competitions
             var seasonAndCompetitionSchedules = CreateSeasonAndCompetitionSchedules(newSeasonInfo);
 
             // Insert the season and all competition schedules.
-            InsertSeasonAndCompetitionSchedule(transactionManager, seasonAndCompetitionSchedules);
+            InsertSeasonAndCompetitionSchedule(seasonAndCompetitionSchedules, uow);
 
-            InsertGameDateTimes(transactionManager, seasonAndCompetitionSchedules);
+            InsertGameDateTimes(seasonAndCompetitionSchedules, uow);
 
             // Insert statistics.
-            InsertSeasonRelatedStatistics(transactionManager, teams, seasonAndCompetitionSchedules);
-            InsertTeamStatistics(transactionManager, teams);
+            InsertSeasonRelatedStatistics(teams, seasonAndCompetitionSchedules, uow);
+            InsertTeamStatistics(teams, uow);
         }
 
-        public void CreateNextSeason(Season previousSeason, TransactionManager transactionManager)
+        public void CreateNextSeason(Season previousSeason, IUnitOfWork uow)
         {
             if (previousSeason.SeasonStatus != SeasonStatus.Ended)
             {
@@ -79,10 +100,7 @@ namespace TwoNil.Logic.Competitions
 
             // Determine which teams promote and relegate.
             List<Team> allTeamsSortedOnLeagueAndPosition;
-            using (var teamRepository = _repositoryFactory.CreateTeamRepository())
-            {
-                allTeamsSortedOnLeagueAndPosition = teamRepository.GetTeams().OrderBy(x => x.CurrentLeagueCompetition.Order).ThenBy(x => x.CurrentLeaguePosition).ToList();
-            }
+            allTeamsSortedOnLeagueAndPosition = uow.Teams.GetTeams().OrderBy(x => x.CurrentLeagueCompetition.Order).ThenBy(x => x.CurrentLeaguePosition).ToList();
 
             var teamsGroupedPerLeague = allTeamsSortedOnLeagueAndPosition.GroupBy(t => t.CurrentLeagueCompetitionId).Select(grp => grp.ToList()).ToList();
             var newLeagues = _leagueManager.PromoteAndRelegateTeams(teamsGroupedPerLeague, Constants.HowManyTeamsPromoteOrRelegate);
@@ -93,25 +111,22 @@ namespace TwoNil.Logic.Competitions
             newSeasonInfo.TeamsLeague4 = newLeagues[3];
 
             // Determine the previous season's statistics.
-            using (var seasonStatisticsRepository = _repositoryFactory.CreateSeasonStatisticsRepository())
-            {
-                var seasonStatistics = seasonStatisticsRepository.GetBySeason(previousSeason.Id);
-                newSeasonInfo.PreviousSeasonStatistics = seasonStatistics;
-            }
+            var seasonStatistics = uow.SeasonStatics.GetBySeason(previousSeason.Id);
+            newSeasonInfo.PreviousSeasonStatistics = seasonStatistics;
 
             // Now all teams have been placed in the right leagues, so create match schedules for all competitions.
             var seasonAndCompetitionSchedules = CreateSeasonAndCompetitionSchedules(newSeasonInfo);
 
             // Insert the season and all competition schedules.
-            InsertSeasonAndCompetitionSchedule(transactionManager, seasonAndCompetitionSchedules);
+            InsertSeasonAndCompetitionSchedule(seasonAndCompetitionSchedules, uow);
 
-            InsertGameDateTimes(transactionManager, seasonAndCompetitionSchedules);
+            InsertGameDateTimes(seasonAndCompetitionSchedules, uow);
 
             // Insert statistics.
-            InsertSeasonRelatedStatistics(transactionManager, allTeamsSortedOnLeagueAndPosition, seasonAndCompetitionSchedules);
+            InsertSeasonRelatedStatistics(allTeamsSortedOnLeagueAndPosition, seasonAndCompetitionSchedules, uow);
         }
 
-        private void InsertSeasonRelatedStatistics(TransactionManager transactionManager, IEnumerable<Team> teams, SeasonAndCompetitionSchedules seasonAndCompetitionSchedules)
+        private void InsertSeasonRelatedStatistics(IEnumerable<Team> teams, SeasonAndCompetitionSchedules seasonAndCompetitionSchedules, IUnitOfWork uow)
         {
             string league1LeagueTableId = seasonAndCompetitionSchedules.LeaguesSchedule.LeagueTables[0].Id;
             string league2LeagueTableId = seasonAndCompetitionSchedules.LeaguesSchedule.LeagueTables[1].Id;
@@ -120,22 +135,22 @@ namespace TwoNil.Logic.Competitions
 
             // SeasonStatistics.
             var seasonStatistics = new SeasonStatistics(seasonAndCompetitionSchedules.Season, league1LeagueTableId, league2LeagueTableId, league3LeagueTableId, league4LeagueTableId);
-            transactionManager.RegisterInsert(seasonStatistics);
+            uow.SeasonStatics.Add(seasonStatistics);
 
             // SeasonTeamStatistics.
             foreach (var team in teams)
             {
                 var seasonTeamStatistic = new SeasonTeamStatistics(seasonAndCompetitionSchedules.Season, team, team.CurrentLeagueCompetition.Name);
-                transactionManager.RegisterInsert(seasonTeamStatistic);
+                uow.SeasonTeamStatistics.Add(seasonTeamStatistic);
             }
         }
 
-        private void InsertTeamStatistics(TransactionManager transactionManager, List<Team> teams)
+        private void InsertTeamStatistics(List<Team> teams, IUnitOfWork uow)
         {
             foreach (var team in teams)
             {
                 var teamStatistics = new TeamStatistics(team);
-                transactionManager.RegisterInsert(teamStatistics);
+                uow.TeamStatistics.Add(teamStatistics);
             }
         }
 
@@ -157,28 +172,28 @@ namespace TwoNil.Logic.Competitions
             }
         }
 
-        private void InsertSeasonAndCompetitionSchedule(TransactionManager transactionManager, SeasonAndCompetitionSchedules seasonAndCompetitionSchedules)
+        private void InsertSeasonAndCompetitionSchedule(SeasonAndCompetitionSchedules seasonAndCompetitionSchedules, IUnitOfWork uow)
         {
             // Insert the season.
-            transactionManager.RegisterInsert(seasonAndCompetitionSchedules.Season);
+            uow.Seasons.Add(seasonAndCompetitionSchedules.Season);
 
             // Insert league schedules.
-            SaveCompetitionSchedule(seasonAndCompetitionSchedules.LeaguesSchedule, transactionManager);
+            SaveCompetitionSchedule(seasonAndCompetitionSchedules.LeaguesSchedule, uow);
 
             // Insert cup schedule.
-            SaveCompetitionSchedule(seasonAndCompetitionSchedules.NationalCupSchedule, transactionManager);
+            SaveCompetitionSchedule(seasonAndCompetitionSchedules.NationalCupSchedule, uow);
 
             // Insert super cup schedule.
-            SaveCompetitionSchedule(seasonAndCompetitionSchedules.NationalSuperCupSchedule, transactionManager);
+            SaveCompetitionSchedule(seasonAndCompetitionSchedules.NationalSuperCupSchedule, uow);
 
             // Insert pre-season friendly schedule.
-            SaveCompetitionSchedule(seasonAndCompetitionSchedules.PreSeasonFriendliesSchedule, transactionManager);
+            SaveCompetitionSchedule(seasonAndCompetitionSchedules.PreSeasonFriendliesSchedule, uow);
 
             // Insert during season friendlies.
-            SaveCompetitionSchedule(seasonAndCompetitionSchedules.DuringSeasonFriendliesSchedule, transactionManager);
+            SaveCompetitionSchedule(seasonAndCompetitionSchedules.DuringSeasonFriendliesSchedule, uow);
 
             // Update the teams.
-            transactionManager.RegisterUpdate(seasonAndCompetitionSchedules.Teams);
+            uow.Teams.Update(seasonAndCompetitionSchedules.Teams);
         }
 
         private SeasonAndCompetitionSchedules CreateSeasonAndCompetitionSchedules(NewSeasonInfo newSeasonInfo)
@@ -199,29 +214,24 @@ namespace TwoNil.Logic.Competitions
             var seasonAndCompetitionSchedules = new SeasonAndCompetitionSchedules { Season = season };
 
             // Create leagues and schedule.
-            var leagueManager = new LeagueManager();
-            seasonAndCompetitionSchedules.LeaguesSchedule = leagueManager.CreateSchedules(newSeasonInfo.TeamsLeague1, newSeasonInfo.TeamsLeague2, newSeasonInfo.TeamsLeague3, newSeasonInfo.TeamsLeague4, season, matchDateManager);
+            seasonAndCompetitionSchedules.LeaguesSchedule = _leagueManager.CreateSchedules(newSeasonInfo.TeamsLeague1, newSeasonInfo.TeamsLeague2, newSeasonInfo.TeamsLeague3, newSeasonInfo.TeamsLeague4, season, matchDateManager);
 
             // Create a national cup tournament.
-            var nationalCupManager = new NationalCupManager(_repositoryFactory);
-            seasonAndCompetitionSchedules.NationalCupSchedule = nationalCupManager.CreateSchedule(newSeasonInfo.AllTeams.ToList(), season, matchDateManager);
+            seasonAndCompetitionSchedules.NationalCupSchedule = _nationalCupManager.CreateSchedule(newSeasonInfo.AllTeams.ToList(), season, matchDateManager);
 
             // Create pre-season friendlies.
-            var preSeasonFriendlyManager = new PreSeasonFriendlyManager();
-            seasonAndCompetitionSchedules.PreSeasonFriendliesSchedule = preSeasonFriendlyManager.CreatePreSeasonSchedule(newSeasonInfo.AllTeams.ToList(), season, matchDateManager);
+            seasonAndCompetitionSchedules.PreSeasonFriendliesSchedule = _preSeasonFriendlyManager.CreatePreSeasonSchedule(newSeasonInfo.AllTeams.ToList(), season, matchDateManager);
 
             // Create friendlies during the season.
             // Determine on which dates these friendlies can be played. For now, this is only during the national cup tournament, except the first round and the final.
             var cupDates = seasonAndCompetitionSchedules.NationalCupSchedule.Rounds.Select(r => r.MatchDate).Skip(1).Take(seasonAndCompetitionSchedules.NationalCupSchedule.Rounds.Count - 2).ToList();
-            var friendlyRoundsManager = new DuringSeasonFriendlyRoundsManager();
-            seasonAndCompetitionSchedules.DuringSeasonFriendliesSchedule = friendlyRoundsManager.CreateDuringSeasonFriendlyRounds(seasonAndCompetitionSchedules.PreSeasonFriendliesSchedule.SeasonCompetitions.First(), cupDates, Constants.HowManyPreSeasonFriendlies + 1);
+            seasonAndCompetitionSchedules.DuringSeasonFriendliesSchedule = _duringSeasonFriendlyRoundsManager.CreateDuringSeasonFriendlyRounds(seasonAndCompetitionSchedules.PreSeasonFriendliesSchedule.SeasonCompetitions.First(), cupDates, Constants.HowManyPreSeasonFriendlies + 1);
 
             // Create Super Cup.
-            var nationalSuperCupManager = new NationalSuperCupManager();
             // The home team is always the national champion and the away team is either the cup winner or the league 1 runner up if the champion also won the cup.
             var homeTeam = newSeasonInfo.PreviousSeasonStatistics.NationalChampion;
-            var awayTeam = newSeasonInfo.PreviousSeasonStatistics.NationalChampion.Equals(newSeasonInfo.PreviousSeasonStatistics.CupWinner) ? newSeasonInfo.PreviousSeasonStatistics.NationalChampionRunnerUp : newSeasonInfo.PreviousSeasonStatistics.CupWinner;
-            seasonAndCompetitionSchedules.NationalSuperCupSchedule = nationalSuperCupManager.CreateSchedule(homeTeam, awayTeam, season, matchDateManager);
+            var awayTeam = newSeasonInfo.PreviousSeasonStatistics.NationalChampionTeamId == newSeasonInfo.PreviousSeasonStatistics.CupWinnerTeamId ? newSeasonInfo.PreviousSeasonStatistics.NationalChampionRunnerUp : newSeasonInfo.PreviousSeasonStatistics.CupWinner;
+            seasonAndCompetitionSchedules.NationalSuperCupSchedule = _nationalSuperCupManager.CreateSchedule(homeTeam, awayTeam, season, matchDateManager);
 
             // In the meantime data of the teams has changed, so add them to the SeasonAndCompetitionSchedules object so they can be updated in the database.
             seasonAndCompetitionSchedules.Teams = newSeasonInfo.AllTeams;
@@ -229,57 +239,48 @@ namespace TwoNil.Logic.Competitions
             return seasonAndCompetitionSchedules;
         }
 
-        public void EndSeason(Season season, TransactionManager transactionManager)
+        public void EndSeason(Season season, IUnitOfWork uow)
         {
             // Get all league tables and update the team statistics.
-            using (var leagueTableRepository = _repositoryFactory.CreateLeagueTableRepository())
-            using (var competitionRepository = _repositoryFactory.CreateCompetitionRepository())
-            using (var teamStatisticsRepository = _repositoryFactory.CreateTeamStatisticsRepository())
-            {
-                var teamStatistics = teamStatisticsRepository.GetAll().ToDictionary(k => k.TeamId, v => v);
-                var teamStatisticsManager = new TeamStatisticsManager(teamStatistics);
+            var teamStatistics = uow.TeamStatistics.GetAll().ToDictionary(k => k.TeamId, v => v);
+            var teamStatisticsManager = new TeamStatisticsManager(teamStatistics);
 
-                var leagueTables = leagueTableRepository.GetBySeason(season.Id);
-                var leagues = competitionRepository.GetLeagues().ToDictionary(k => k.Id, v => v);
-                teamStatisticsManager.Update(leagueTables, leagues);
-            }
+            var leagueTables = uow.LeagueTables.GetBySeason(season.Id);
+            var leagues = uow.Competitions.GetLeagues().ToDictionary(k => k.Id, v => v);
+            teamStatisticsManager.Update(leagueTables, leagues);
 
             // End the season by updating the status.
             season.SeasonStatus = SeasonStatus.Ended;
-            transactionManager.RegisterUpdate(season);
+            uow.Seasons.Update(season);
 
             // Mark the end of season date as completed.
-            var gameDateTimeManager = new GameDateTimeMutationManager(transactionManager, _repositoryFactory);
-            gameDateTimeManager.UpdateEndOfSeasonStatus(season.EndDateTime);
+            _gameDateTimeMutationManager.UpdateEndOfSeasonStatus(season.EndDateTime);
         }
 
-        private void SaveCompetitionSchedule(CompetitionSchedule competitionSchedule, TransactionManager transactionManager)
+        private void SaveCompetitionSchedule(CompetitionSchedule competitionSchedule, IUnitOfWork uow)
         {
-            transactionManager.RegisterInsert(competitionSchedule.LeagueTables);
+            uow.LeagueTables.Add(competitionSchedule.LeagueTables);
             foreach (var leagueTable in competitionSchedule.LeagueTables)
             {
-                transactionManager.RegisterInsert(leagueTable.LeagueTablePositions);
+                uow.LeagueTablePositions.Add(leagueTable.LeagueTablePositions);
             }
 
-            transactionManager.RegisterInsert(competitionSchedule.SeasonCompetitions);
-
-            transactionManager.RegisterInsert(competitionSchedule.SeasonCompetitionTeams);
-
-            transactionManager.RegisterInsert(competitionSchedule.Rounds);
-
-            transactionManager.RegisterInsert(competitionSchedule.Matches);
+            uow.SeasonCompetitions.Add(competitionSchedule.SeasonCompetitions);
+            uow.SeasonCompetitionTeams.Add(competitionSchedule.SeasonCompetitionTeams);
+            uow.Rounds.Add(competitionSchedule.Rounds);
+            uow.Matches.Add(competitionSchedule.Matches);
         }
 
-        private void InsertGameDateTimes(TransactionManager transactionManager, SeasonAndCompetitionSchedules schedules)
+        private void InsertGameDateTimes(SeasonAndCompetitionSchedules schedules, IUnitOfWork uow)
         {
             // Determine the match dates the manager's team plays.
-            var managersMatchDates = schedules.AllMatches.Where(m => m.TeamPlaysMatch(_managersTeam)).Select(m => m.Date);
+            var managersTeam = new Team(); //TODO hier via de repo managers team ophalen
+            var managersMatchDates = schedules.AllMatches.Where(m => m.TeamPlaysMatch(managersTeam)).Select(m => m.Date);
 
             // Determine when the manager's team does not play: all dates in the season except the ones that were just determined.
             var otherTeamsMatchDates = schedules.AllMatchDates.Except(managersMatchDates);
 
-            var gameDateTimeNanager = new GameDateTimeMutationManager(transactionManager, _repositoryFactory);
-            gameDateTimeNanager.CreateNewForSeason(managersMatchDates, otherTeamsMatchDates, schedules.Season.EndDateTime);
+            _gameDateTimeMutationManager.CreateNewForSeason(managersMatchDates, otherTeamsMatchDates, schedules.Season.EndDateTime);
         }
     }
 }

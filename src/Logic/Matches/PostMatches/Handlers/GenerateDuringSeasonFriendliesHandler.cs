@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using TwoNil.Data;
+﻿using System.Linq;
 using TwoNil.Logic.Competitions.Friendlies;
-using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Matches.PostMatches.Handlers
 {
     public class GenerateDuringSeasonFriendliesHandler : IPostMatchesHandler
     {
-        private readonly DuringSeasonFriendlyManager _duringSeasonFriendlyManager;
+        private readonly IDuringSeasonFriendlyManager _duringSeasonFriendlyManager;
 
-        public GenerateDuringSeasonFriendliesHandler(IRepositoryFactory repositoryFactory)
+        public GenerateDuringSeasonFriendliesHandler(IDuringSeasonFriendlyManager duringSeasonFriendlyManager)
         {
-            _duringSeasonFriendlyManager = new DuringSeasonFriendlyManager(repositoryFactory);
+            _duringSeasonFriendlyManager = duringSeasonFriendlyManager;
         }
 
         public void Handle(PostMatchData postMatchData)

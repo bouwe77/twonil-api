@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Randomization;
 using TwoNil.Data;
 using TwoNil.Data.Repositories;
@@ -12,17 +13,32 @@ namespace TwoNil.Logic
 {
     public class GameCreationManager
     {
-        public Game CreateGame()
+        private readonly IUnitOfWorkFactory _uowFactory;
+        private readonly INumberRandomizer _numberRandomizer;
+        private readonly ISeasonManager _seasonManager;
+        private readonly ITeamManager _teamManager;
+        private readonly IPlayerManager _playerManager;
+        private readonly IStartingLineupGenerator _startingLineupGenerator;
+
+        public GameCreationManager(IUnitOfWorkFactory uowFactory, INumberRandomizer numberRandomizer, ISeasonManager seasonManager, 
+            ITeamManager teamManager, IPlayerManager playerManager, IStartingLineupGenerator startingLineupGenerator)
+        {
+            _uowFactory = uowFactory;
+            _numberRandomizer = numberRandomizer;
+            _seasonManager = seasonManager;
+            _teamManager = teamManager;
+            _playerManager = playerManager;
+            _startingLineupGenerator = startingLineupGenerator;
+        }
+
+        public async Task<Game> CreateGame()
         {
             var game = new Game();
 
-            var repositoryFactory = new RepositoryFactory(game.Id);
-            var gameRepository = repositoryFactory.CreateGameRepository();
-            try
+            using (var uow = _uowFactory.Create())
             {
                 // Create the Game, generate game data and save it to the database.
-                gameRepository.CreateGame(game.Id);
-                CreateGameData(repositoryFactory, game.Id);
+                await CreateGameData(game.Id);
 
                 // ===================================================================
                 //TODO, OK let MODDERVOKKIN op
@@ -30,28 +46,15 @@ namespace TwoNil.Logic
                 // ===================================================================
 
                 // Insert the game in the database.
-                InsertGame(game);
-            }
-            catch (Exception exception)
-            {
-                gameRepository.DeleteGame(game.Id);
-                throw;
+                uow.Games.Add(game);
             }
 
             return game;
         }
 
-        private void InsertGame(Game game)
+        private async Task CreateGameData(string gameId)
         {
-            using (var gameRepository = new RepositoryFactory().CreateGameRepository())
-            {
-                gameRepository.InsertGame(game);
-            }
-        }
-
-        private void CreateGameData(RepositoryFactory repositoryFactory, string gameId)
-        {
-            using (var transactionManager = repositoryFactory.CreateTransactionManager())
+            using (var uow = _uowFactory.Create())
             {
                 // Create GameInfo.
                 // Overrule the GameInfo Id with the Game Id.
@@ -62,55 +65,51 @@ namespace TwoNil.Logic
                 };
 
                 // Create teams and players.
-                var teamsAndPlayers = CreateTeamsAndPlayers(repositoryFactory);
+                var teamsAndPlayers = CreateTeamsAndPlayers();
 
                 // ===================================================================
                 //TODO OK, let MODDERVOKKIN op
-                var numberRandomizer = new NumberRandomizer();
-                int randomIndex = numberRandomizer.GetNumber(0, Constants.HowManyTeamsPerLeague * Constants.HowManyLeagues - 1);
+                int randomIndex = _numberRandomizer.GetNumber(0, Constants.HowManyTeamsPerLeague * Constants.HowManyLeagues - 1);
                 gameInfo.CurrentTeam = teamsAndPlayers.Teams[randomIndex];
                 // ===================================================================
 
-                transactionManager.RegisterInsert(gameInfo);
+                uow.GameInfos.Add(gameInfo);
 
                 // Insert teams.
-                transactionManager.RegisterInsert(teamsAndPlayers.Teams);
+                uow.Teams.Add(teamsAndPlayers.Teams);
 
                 // Insert players.
-                transactionManager.RegisterInsert(teamsAndPlayers.Players);
+                uow.Players.Add(teamsAndPlayers.Players);
 
                 // Create a season with match schedules.
-                var seasonManager = new SeasonManager(repositoryFactory, gameInfo.CurrentTeam);
-                seasonManager.CreateFirstSeason(teamsAndPlayers.Teams, transactionManager);
+                _seasonManager.CreateFirstSeason(teamsAndPlayers.Teams, uow);
 
-                transactionManager.Save();
+                await uow.CommitAsync();
             }
         }
 
-        private TeamsAndPlayers CreateTeamsAndPlayers(RepositoryFactory repositoryFactory)
+        private TeamsAndPlayers CreateTeamsAndPlayers()
         {
-            var teamManager = new TeamManager(repositoryFactory);
-            var playerManager = new PlayerManager();
-
             var teamsAndPlayers = new TeamsAndPlayers();
 
             // Generate all teams for this game.
             const int howManyTeams = Constants.HowManyTeamsPerLeague * Constants.HowManyLeagues;
-            var teams = teamManager.Create(howManyTeams).ToList();
+            var teams = _teamManager.Create(howManyTeams).ToList();
 
             // Assign team names.
-            var teamNames = new TeamNameRepository().GetAll();
-            for (int i = 0; i < teams.Count; i++)
+            using (var uow = _uowFactory.Create())
             {
-                teams[i].Name = teamNames[i];
+                var teamNames = new TeamNameRepository().GetAll();
+                for (int i = 0; i < teams.Count; i++)
+                {
+                    teams[i].Name = teamNames[i];
+                }
             }
 
             teamsAndPlayers.Teams = teams;
 
             var averageRatingsPerLeague = new[] { 10, 40, 70, 100 };
             int averageRatingIndex = 0;
-
-            var startingLineupGenerator = new StartingLineupGenerator();
 
             foreach (var team in teams)
             {
@@ -121,13 +120,13 @@ namespace TwoNil.Logic
                 }
 
                 int currentAverageRating = averageRatingsPerLeague[averageRatingIndex];
-                var players = playerManager.GenerateSquad(team, currentAverageRating).ToList();
+                var players = _playerManager.GenerateSquad(team, currentAverageRating).ToList();
 
-                var players2 = startingLineupGenerator.GenerateStartingLineup(players, team.Formation);
+                var players2 = _startingLineupGenerator.GenerateStartingLineup(players, team.Formation);
 
                 teamsAndPlayers.Players.AddRange(players2);
 
-                teamManager.UpdateRating(team, players.Where(p => p.InStartingEleven).ToList());
+                _teamManager.UpdateRating(team, players.Where(p => p.InStartingEleven).ToList());
             }
 
             return teamsAndPlayers;

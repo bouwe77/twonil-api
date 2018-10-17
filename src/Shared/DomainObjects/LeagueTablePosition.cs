@@ -1,14 +1,10 @@
-﻿using SQLite;
-
-namespace TwoNil.Shared.DomainObjects
+﻿namespace TwoNil.Shared.DomainObjects
 {
-   [Table("LeagueTablePositions")]
    public class LeagueTablePosition : DomainObjectBase
    {
       private Team _team;
       public string TeamId { get; set; }
 
-      [Ignore]
       public Team Team
       {
          get => _team;
@@ -22,7 +18,6 @@ namespace TwoNil.Shared.DomainObjects
       private LeagueTable _leagueTable;
       public string LeagueTableId { get; set; }
 
-      [Ignore]
       public LeagueTable LeagueTable
       {
          get => _leagueTable;

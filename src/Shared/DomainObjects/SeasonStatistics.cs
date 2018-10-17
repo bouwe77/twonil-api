@@ -1,8 +1,5 @@
-﻿using SQLite;
-
-namespace TwoNil.Shared.DomainObjects
+﻿namespace TwoNil.Shared.DomainObjects
 {
-   [Table("SeasonStatistics")]
    public class SeasonStatistics : DomainObjectBase
    {
       public SeasonStatistics()
@@ -31,7 +28,6 @@ namespace TwoNil.Shared.DomainObjects
       private Season _season;
       public string SeasonId { get; set; }
 
-      [Ignore]
       public Season Season
       {
          get
@@ -48,7 +44,6 @@ namespace TwoNil.Shared.DomainObjects
       private Team _cupWinner;
       public string CupWinnerTeamId { get; set; }
 
-      [Ignore]
       public Team CupWinner
       {
          get
@@ -65,7 +60,6 @@ namespace TwoNil.Shared.DomainObjects
       private Team _cupRunnerUp;
       public string CupRunnerUpTeamId { get; set; }
 
-      [Ignore]
       public Team CupRunnerUp
       {
          get
@@ -82,7 +76,6 @@ namespace TwoNil.Shared.DomainObjects
       private Team _nationalChampion;
       public string NationalChampionTeamId { get; set; }
 
-      [Ignore]
       public Team NationalChampion
       {
          get
@@ -99,7 +92,6 @@ namespace TwoNil.Shared.DomainObjects
       private Team _nationalChampionRunnerUp;
       public string NationalChampionRunnerUpTeamId { get; set; }
 
-      [Ignore]
       public Team NationalChampionRunnerUp
       {
          get
@@ -116,7 +108,6 @@ namespace TwoNil.Shared.DomainObjects
       private Team _nationalSuperCupWinner;
       public string NationalSuperCupWinnerTeamId { get; set; }
 
-      [Ignore]
       public Team NationalSuperCupWinner
       {
          get

@@ -6,55 +6,64 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Teams
 {
-   public class TeamManager
-   {
-      private readonly ListRandomizer _listRandomizer;
-      private readonly RepositoryFactory _repositoryFactory;
+    public interface ITeamManager
+    {
+        IEnumerable<Team> Create(int howMany);
+        void UpdateRating(Team team);
+        void UpdateRating(Team team, List<Player> squad);
+    }
 
-      public TeamManager(RepositoryFactory repositoryFactory)
-      {
-         _repositoryFactory = repositoryFactory;
-         _listRandomizer = new ListRandomizer();
-      }
+    public class TeamManager : ITeamManager
+    {
+        private readonly ListRandomizer _listRandomizer;
+        private readonly IUnitOfWorkFactory _uowFactory;
+        private readonly ITeamRater _teamRater;
 
-      public IEnumerable<Team> Create(int howMany)
-      {
-         var teams = new List<Team>();
+        public TeamManager(IUnitOfWorkFactory uowFactory, ITeamRater teamRater)
+        {
+            _uowFactory = uowFactory;
+            _teamRater = teamRater;
+            _listRandomizer = new ListRandomizer();
+        }
 
-         using (var formationRepository = new RepositoryFactory().CreateFormationRepository())
-         {
-            var formations = formationRepository.GetAll().ToList();
+        public IEnumerable<Team> Create(int howMany)
+        {
+            var teams = new List<Team>();
 
-            for (int i = 0; i < howMany; i++)
+            using (var uow = _uowFactory.Create())
             {
-               var team = new Team { Formation = _listRandomizer.GetItem(formations) };
-               teams.Add(team);
+                var formations = uow.Formations.GetAll().ToList();
+
+                for (int i = 0; i < howMany; i++)
+                {
+                    var team = new Team { Formation = _listRandomizer.GetItem(formations) };
+                    teams.Add(team);
+                }
             }
-         }
 
-         return teams;
-      }
+            return teams;
+        }
 
-      public void UpdateRating(Team team, List<Player> squad)
-      {
-         var teamRating = TeamRater.GetRating(squad);
+        public void UpdateRating(Team team, List<Player> squad)
+        {
+            var teamRating = _teamRater.GetRating(squad);
 
-         team.Rating = teamRating.ratingTeam;
-         team.RatingGoalkeeper = teamRating.ratingGoalkeeper;
-         team.RatingDefence = teamRating.ratingDefence;
-         team.RatingMidfield = teamRating.ratingMidfield;
-         team.RatingAttack = teamRating.ratingAttack;
-      }
+            team.Rating = teamRating.ratingTeam;
+            team.RatingGoalkeeper = teamRating.ratingGoalkeeper;
+            team.RatingDefence = teamRating.ratingDefence;
+            team.RatingMidfield = teamRating.ratingMidfield;
+            team.RatingAttack = teamRating.ratingAttack;
+        }
 
-      public void UpdateRating(Team team)
-      {
-         IEnumerable<Player> players;
-         using (var playerRepository = _repositoryFactory.CreatePlayerRepository())
-         {
-            players = playerRepository.GetPlayersByTeam(team, false).Where(p => p.InStartingEleven);
-         }
+        public void UpdateRating(Team team)
+        {
+            IEnumerable<Player> players;
+            using (var uow = _uowFactory.Create())
+            {
+                players = uow.Players.GetPlayersByTeam(team, false).Where(p => p.InStartingEleven);
+            }
 
-         UpdateRating(team, players.ToList());
-      }
-   }
+            UpdateRating(team, players.ToList());
+        }
+    }
 }

@@ -1,9 +1,7 @@
 ﻿using System;
-using SQLite;
 
 namespace TwoNil.Shared.DomainObjects
 {
-    [Table("Matches")]
     public class Match : DomainObjectBase
     {
         public int HomeScore { get; set; }
@@ -26,7 +24,6 @@ namespace TwoNil.Shared.DomainObjects
         public int AwayPenaltyScore { get; set; }
         public MatchStatus MatchStatus { get; set; }
 
-        [Ignore]
         public bool Played
         {
             get
@@ -36,7 +33,6 @@ namespace TwoNil.Shared.DomainObjects
         }
 
         private Team _homeTeam;
-        [Ignore]
         public Team HomeTeam
         {
             get
@@ -51,7 +47,6 @@ namespace TwoNil.Shared.DomainObjects
         }
 
         private Team _awayTeam;
-        [Ignore]
         public Team AwayTeam
         {
             get
@@ -66,7 +61,6 @@ namespace TwoNil.Shared.DomainObjects
         }
 
         private Round _round;
-        [Ignore]
         public Round Round
         {
             get
@@ -81,7 +75,6 @@ namespace TwoNil.Shared.DomainObjects
         }
 
         private Season _season;
-        [Ignore]
         public Season Season
         {
             get

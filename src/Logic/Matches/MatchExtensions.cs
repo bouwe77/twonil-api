@@ -63,7 +63,7 @@ namespace TwoNil.Logic.Matches
             if (winner == null)
                 return null;
 
-            return match.HomeTeam.Equals(winner) ? match.AwayTeam : match.HomeTeam;
+            return match.HomeTeamId == winner.Id ? match.AwayTeam : match.HomeTeam;
         }
 
         public static void SwapHomeAndAway(this Match match)
@@ -81,7 +81,7 @@ namespace TwoNil.Logic.Matches
         /// <returns>True or false.</returns>
         public static bool TeamPlaysMatch(this List<Match> matches, Team team)
         {
-            return matches.Any(match => match.HomeTeam.Equals(team) || match.AwayTeam.Equals(team));
+            return matches.Any(match => match.HomeTeamId == team.Id || match.AwayTeamId == team.Id);
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace TwoNil.Logic.Matches
         /// <returns>True or false.</returns>
         public static bool TeamPlaysMatch(this Match match, Team team)
         {
-            return match.HomeTeam.Equals(team) || match.AwayTeam.Equals(team);
+            return match.HomeTeamId == team.Id || match.AwayTeamId == team.Id;
         }
 
         /// <summary>
@@ -103,8 +103,8 @@ namespace TwoNil.Logic.Matches
         /// <returns>True or false.</returns>
         public static bool MatchExists(this List<Match> matches, Match match)
         {
-            return matches.Any(m => (m.HomeTeam.Equals(match.HomeTeam) && m.AwayTeam.Equals(match.AwayTeam))
-                                         || (m.HomeTeam.Equals(match.AwayTeam) && m.AwayTeam.Equals(match.HomeTeam)));
+            return matches.Any(m => (m.HomeTeamId == match.HomeTeamId && m.AwayTeamId == match.AwayTeamId)
+                                    || (m.HomeTeamId == match.AwayTeamId && m.AwayTeamId == match.HomeTeamId));
         }
     }
 }

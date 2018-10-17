@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using SQLite;
 
 namespace TwoNil.Shared.DomainObjects
 {
-   [Table("Rounds")]
    public class Round : DomainObjectBase
    {
       public Round()
@@ -32,7 +30,6 @@ namespace TwoNil.Shared.DomainObjects
 
       public CompetitionType CompetitionType { get; set; }
 
-      [Ignore]
       public SeasonCompetition SeasonCompetition
       {
          get
@@ -46,7 +43,6 @@ namespace TwoNil.Shared.DomainObjects
          }
       }
 
-      [Ignore]
       public Season Season
       {
          get
@@ -69,7 +65,6 @@ namespace TwoNil.Shared.DomainObjects
       /// <summary>
       /// This is a helper property that is not stored in the database.
       /// </summary>
-      [Ignore]
       public List<Match> Matches { get; set; }
    }
 }

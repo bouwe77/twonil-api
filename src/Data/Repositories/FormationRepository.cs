@@ -3,8 +3,17 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Data.Repositories
 {
-   public class FormationRepository : MemoryRepository<Formation>
-   {
+    public interface IFormationRepository
+    {
+        Formation Get343();
+        Formation Get433();
+        Formation Get442();
+        Formation Get451();
+        Formation Get541();
+    }
+
+    public class FormationRepository : MemoryRepository<Formation>, IFormationRepository
+    {
       public FormationRepository()
       {
          Entities = new List<Formation>

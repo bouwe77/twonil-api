@@ -1,35 +1,43 @@
 ﻿using System.Collections.Generic;
 using Randomization;
 using TwoNil.Data;
-using TwoNil.Data.Repositories;
 
 namespace TwoNil.Logic
 {
-   public class PersonNameGenerator
-   {
-      private readonly NameRepository _nameRepository;
-      private readonly INumberRandomizer _numberRandomizer;
+    public interface IPersonNameGenerator
+    {
+        string GetLastName();
+        string GetFirstName();
+    }
 
-      public PersonNameGenerator()
-      {
-         _nameRepository = new RepositoryFactory().CreateNameRepository();
-         _numberRandomizer = new NumberRandomizer();
-      }
+    public class PersonNameGenerator : IPersonNameGenerator
+    {
+        private readonly INumberRandomizer _numberRandomizer;
+        private readonly IUnitOfWorkFactory _uowFactory;
 
-      public string GetLastName()
-      {
-         int maxValue = _nameRepository.GetNumberOfNames() - 1;
-         int randomNumber = _numberRandomizer.GetNumber(0, maxValue);
-         return _nameRepository.GetLastName(randomNumber);
-      }
+        public PersonNameGenerator(IUnitOfWorkFactory uowFactory, INumberRandomizer numberRandomizer)
+        {
+            _uowFactory = uowFactory;
+            _numberRandomizer = numberRandomizer;
+        }
 
-      public string GetFirstName()
-      {
-         var firstnames = new List<string> { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
+        public string GetLastName()
+        {
+            using (var uow = _uowFactory.Create())
+            {
+                int maxValue = uow.Names.GetNumberOfNames() - 1;
+                int randomNumber = _numberRandomizer.GetNumber(0, maxValue);
+                return uow.Names.GetLastName(randomNumber);
+            }
+        }
 
-         int randomNumber = _numberRandomizer.GetNumber(0, 25);
-         string firstname = firstnames[randomNumber];
-         return firstname;
-      }
-   }
+        public string GetFirstName()
+        {
+            var firstnames = new List<string> { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
+
+            int randomNumber = _numberRandomizer.GetNumber(0, 25);
+            string firstname = firstnames[randomNumber];
+            return firstname;
+        }
+    }
 }
