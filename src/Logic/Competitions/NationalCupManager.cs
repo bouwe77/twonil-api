@@ -7,13 +7,7 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Competitions
 {
-    public interface INationalCupManager
-    {
-        CompetitionSchedule CreateSchedule(List<Team> teams, Season season, MatchDateManager matchDateManager);
-        List<Match> DrawNextRound(Round previousRound, IEnumerable<Match> matchesPreviousRound, Season season);
-    }
-
-    public class NationalCupManager : INationalCupManager
+    public class NationalCupManager
     {
         private readonly IUnitOfWorkFactory _uowFactory;
         private Competition _competition;

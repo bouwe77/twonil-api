@@ -3,11 +3,6 @@ using TwoNil.Data;
 
 namespace TwoNil.Logic.Matches.PostMatches
 {
-    public interface IPostMatchDataPersister
-    {
-        void Persist(PostMatchData postMatchData);
-    }
-
     public class PostMatchDataPersister
     {
         private readonly IUnitOfWork _uow;

@@ -9,25 +9,12 @@ using TwoNil.Logic.Matches.MatchPlay;
 
 namespace TwoNil.Services
 {
-    public interface IMatchService
+    public class MatchService : ServiceWithGameBase
     {
-        IEnumerable<Match> GetByMatchDay(DateTime matchDay);
-        Match GetByMatchDayAndTeam(DateTime matchDay, string teamId);
-        IEnumerable<Match> GetByRound(Round round);
-        IEnumerable<Match> GetBySeasonAndTeam(string seasonId, string teamId);
-        Match GetMatch(string matchId);
-        DateTime? GetNextMatchDate(string seasonId);
-        IEnumerable<TeamRoundMatch> GetTeamRoundMatches(string teamId, string seasonId, string leagueCompetitionId);
-        void PlayMatchDay(DateTime matchDate);
-        void PlayMatchDay(DateTime matchDate, IUnitOfWork uow);
-    }
+        private SeasonService _seasonService;
+        private readonly PostMatchOrchestrator _postMatchOrchestrator;
 
-    public class MatchService : ServiceWithGameBase, IMatchService
-    {
-        private ISeasonService _seasonService;
-        private readonly IPostMatchOrchestrator _postMatchOrchestrator;
-
-        internal MatchService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo, ISeasonService seasonService, IPostMatchOrchestrator postMatchOrchestrator)
+        internal MatchService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo, SeasonService seasonService, PostMatchOrchestrator postMatchOrchestrator)
            : base(uowFactory, gameInfo)
         {
             _seasonService = seasonService;

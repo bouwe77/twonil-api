@@ -30,21 +30,21 @@ namespace TwoNil.Services
     public class ServiceFactory : IServiceFactory
     {
         private readonly IUnitOfWorkFactory _uowFactory;
-        private readonly IGameDateTimeReadManager _gameDateTimeReadManager;
-        private readonly IGameDateTimeMutationManager _gameDateTimeMutationManager;
-        private readonly IPlayerGenerator _playerGenerator;
-        private readonly ITeamManager _teamManager;
-        private readonly IPostMatchOrchestrator _postMatchOrchestrator;
-        private readonly ISeasonManager _seasonManager;
+        private readonly GameDateTimeReadManager _gameDateTimeReadManager;
+        private readonly GameDateTimeMutationManager _gameDateTimeMutationManager;
+        private readonly PlayerGenerator _playerGenerator;
+        private readonly TeamManager _teamManager;
+        private readonly PostMatchOrchestrator _postMatchOrchestrator;
+        private readonly SeasonManager _seasonManager;
 
         public ServiceFactory(
             IUnitOfWorkFactory uowFactory,
-            IGameDateTimeReadManager gameDateTimeReadManager,
-            IGameDateTimeMutationManager gameDateTimeMutationManager,
-            IPlayerGenerator playerGenerator,
-            ITeamManager teamManager,
-            IPostMatchOrchestrator postMatchOrchestrator,
-            ISeasonManager seasonManager)
+            GameDateTimeReadManager gameDateTimeReadManager,
+            GameDateTimeMutationManager gameDateTimeMutationManager,
+            PlayerGenerator playerGenerator,
+            TeamManager teamManager,
+            PostMatchOrchestrator postMatchOrchestrator,
+            SeasonManager seasonManager)
         {
             _uowFactory = uowFactory;
             _gameDateTimeReadManager = gameDateTimeReadManager;

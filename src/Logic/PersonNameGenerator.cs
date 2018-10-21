@@ -4,13 +4,7 @@ using TwoNil.Data;
 
 namespace TwoNil.Logic
 {
-    public interface IPersonNameGenerator
-    {
-        string GetLastName();
-        string GetFirstName();
-    }
-
-    public class PersonNameGenerator : IPersonNameGenerator
+    public class PersonNameGenerator
     {
         private readonly INumberRandomizer _numberRandomizer;
         private readonly IUnitOfWorkFactory _uowFactory;

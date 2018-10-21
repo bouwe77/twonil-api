@@ -7,12 +7,7 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Matches.PostMatches
 {
-    public interface IPostMatchDataFactory
-    {
-        PostMatchData InitializePostMatchData(IEnumerable<Match> matches);
-    }
-
-    public class PostMatchDataFactory : IPostMatchDataFactory
+    public class PostMatchDataFactory
     {
         private readonly IUnitOfWorkFactory _uowFactory;
         private readonly string _seasonId;

@@ -7,11 +7,6 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Competitions
 {
-    public interface ILeagueTableManager
-    {
-        void UpdateLeagueTable(LeagueTable leagueTable, IEnumerable<Match> matches);
-    }
-
     public class LeagueTableManager
     {
         private readonly IUnitOfWorkFactory _uowFactory;

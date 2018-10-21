@@ -7,13 +7,7 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Competitions
 {
-    public interface ILeagueManager
-    {
-        CompetitionSchedule CreateSchedules(List<Team> teamsLeague1, List<Team> teamsLeague2, List<Team> teamsLeague3, List<Team> teamsLeague4, Season season, MatchDateManager matchDateManager);
-        List<List<Team>> PromoteAndRelegateTeams(List<List<Team>> leagues, int howManyTeamsPromoteAndRelegate);
-    }
-
-    public class LeagueManager : ILeagueManager
+    public class LeagueManager
     {
         private readonly IUnitOfWorkFactory _uowFactory;
 

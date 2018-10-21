@@ -5,13 +5,7 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Players
 {
-    public interface IProfileScoreCalculator
-    {
-        List<PlayerSkillScore> Calculate(int startNumberR1, PlayerProfile profile, int age);
-        List<PlayerSkillScore> Calculate(PlayerProfile playerProfile, int age);
-    }
-
-    public class ProfileScoreCalculator : IProfileScoreCalculator
+    public class ProfileScoreCalculator
     {
         private static readonly Randomizer Randomizer = new Randomizer();
 

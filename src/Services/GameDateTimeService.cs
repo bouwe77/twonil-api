@@ -6,11 +6,11 @@ namespace TwoNil.Services
 {
     public class GameDateTimeService : ServiceWithGameBase
     {
-        private readonly IMatchService _matchService;
-        private readonly IGameDateTimeReadManager _gameDateTimeReadManager;
-        private readonly IGameDateTimeMutationManager _gameDateTimeMutationManager;
+        private readonly MatchService _matchService;
+        private readonly GameDateTimeReadManager _gameDateTimeReadManager;
+        private readonly GameDateTimeMutationManager _gameDateTimeMutationManager;
 
-        public GameDateTimeService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo, IMatchService matchService, IGameDateTimeReadManager gameDateTimeReadManager, IGameDateTimeMutationManager gameDateTimeMutationManager)
+        public GameDateTimeService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo, MatchService matchService, GameDateTimeReadManager gameDateTimeReadManager, GameDateTimeMutationManager gameDateTimeMutationManager)
             : base(uowFactory, gameInfo)
         {
             _gameDateTimeReadManager = gameDateTimeReadManager;

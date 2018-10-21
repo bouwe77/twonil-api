@@ -5,15 +5,10 @@ namespace TwoNil.Logic.Matches.MatchPlay
 {
    public class MatchPlayer
    {
-      private readonly IMatchPlayerRandomizer _randomizer;
-      private readonly IPenaltyTaker _penaltyTaker;
+      private readonly MatchPlayerRandomizer _randomizer;
+      private readonly PenaltyTaker _penaltyTaker;
 
-      public MatchPlayer()
-         : this(new MatchPlayerRandomizer(), new PenaltyTaker())
-      {
-      }
-
-      internal MatchPlayer(IMatchPlayerRandomizer randomizer, IPenaltyTaker penaltyTaker)
+      public MatchPlayer(MatchPlayerRandomizer randomizer, PenaltyTaker penaltyTaker)
       {
          _randomizer = randomizer;
          _penaltyTaker = penaltyTaker;

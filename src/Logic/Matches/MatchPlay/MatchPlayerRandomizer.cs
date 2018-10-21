@@ -3,17 +3,7 @@ using Randomization;
 
 namespace TwoNil.Logic.Matches.MatchPlay
 {
-   public interface IMatchPlayerRandomizer
-   {
-      bool HomeTeamWins(Dictionary<bool, float> stuff);
-      int HomeScore(Dictionary<int, float> stuff);
-      int HomePenaltyScore(Dictionary<int, float> stuff);
-      int AwayScore(Dictionary<int, float> stuff);
-      int AwayPenaltyScore(Dictionary<int, float> stuff);
-      bool HomeTeamWinsPenalties();
-   }
-
-   internal class MatchPlayerRandomizer : IMatchPlayerRandomizer
+   public class MatchPlayerRandomizer
    {
       private IRandomizer _randomizer;
 

@@ -11,31 +11,26 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Competitions
 {
-    public interface ISeasonManager
+    public class SeasonManager
     {
-        void CreateFirstSeason(List<Team> teams, IUnitOfWork uow);
-        void CreateNextSeason(Season previousSeason, IUnitOfWork uow);
-        void EndSeason(Season season, IUnitOfWork uow);
-    }
-
-    public class SeasonManager : ISeasonManager
-    {
-        private readonly ILeagueManager _leagueManager;
-        private readonly IPreSeasonFriendlyManager _preSeasonFriendlyManager;
+        private readonly LeagueManager _leagueManager;
+        private readonly PreSeasonFriendlyManager _preSeasonFriendlyManager;
         private readonly IUnitOfWorkFactory _uowFactory;
-        private readonly INationalCupManager _nationalCupManager;
-        private readonly INationalSuperCupManager _nationalSuperCupManager;
-        private readonly IDuringSeasonFriendlyRoundsManager _duringSeasonFriendlyRoundsManager;
-        private readonly IGameDateTimeMutationManager _gameDateTimeMutationManager;
+        private readonly NationalCupManager _nationalCupManager;
+        private readonly NationalSuperCupManager _nationalSuperCupManager;
+        private readonly DuringSeasonFriendlyRoundsManager _duringSeasonFriendlyRoundsManager;
+        private readonly GameDateTimeMutationManager _gameDateTimeMutationManager;
+        private readonly MatchDateManager _matchDateManager;
 
         public SeasonManager(
             IUnitOfWorkFactory uowFactory,
-            ILeagueManager leagueManager,
-            IPreSeasonFriendlyManager preSeasonFriendlyManager,
-            INationalCupManager nationalCupManager,
-            INationalSuperCupManager nationalSuperCupManager,
-            IDuringSeasonFriendlyRoundsManager duringSeasonFriendlyRoundsManager,
-            IGameDateTimeMutationManager gameDateTimeMutationManager)
+            LeagueManager leagueManager,
+            PreSeasonFriendlyManager preSeasonFriendlyManager,
+            NationalCupManager nationalCupManager,
+            NationalSuperCupManager nationalSuperCupManager,
+            DuringSeasonFriendlyRoundsManager duringSeasonFriendlyRoundsManager,
+            GameDateTimeMutationManager gameDateTimeMutationManager,
+            MatchDateManager matchDateManager)
         {
             _uowFactory = uowFactory;
             _leagueManager = leagueManager;
@@ -44,6 +39,7 @@ namespace TwoNil.Logic.Competitions
             _nationalSuperCupManager = nationalSuperCupManager;
             _duringSeasonFriendlyRoundsManager = duringSeasonFriendlyRoundsManager;
             _gameDateTimeMutationManager = gameDateTimeMutationManager;
+            _matchDateManager = matchDateManager;
         }
 
         public void CreateFirstSeason(List<Team> teams, IUnitOfWork uow)
@@ -198,11 +194,10 @@ namespace TwoNil.Logic.Competitions
 
         private SeasonAndCompetitionSchedules CreateSeasonAndCompetitionSchedules(NewSeasonInfo newSeasonInfo)
         {
-            var matchDateManager = new MatchDateManager(newSeasonInfo.StartYear);
-            matchDateManager.Initialize();
+            _matchDateManager.Initialize(newSeasonInfo.StartYear);
 
             // The season officially ends a day after the last match so there is a possibility to add events between the last match and the end of the season.
-            var endSeasonDateTime = matchDateManager.GetAllMatchDates().OrderBy(d => d).Last().AddDays(1);
+            var endSeasonDateTime = _matchDateManager.GetAllMatchDates().OrderBy(d => d).Last().AddDays(1);
 
             var season = new Season
             {
@@ -214,13 +209,13 @@ namespace TwoNil.Logic.Competitions
             var seasonAndCompetitionSchedules = new SeasonAndCompetitionSchedules { Season = season };
 
             // Create leagues and schedule.
-            seasonAndCompetitionSchedules.LeaguesSchedule = _leagueManager.CreateSchedules(newSeasonInfo.TeamsLeague1, newSeasonInfo.TeamsLeague2, newSeasonInfo.TeamsLeague3, newSeasonInfo.TeamsLeague4, season, matchDateManager);
+            seasonAndCompetitionSchedules.LeaguesSchedule = _leagueManager.CreateSchedules(newSeasonInfo.TeamsLeague1, newSeasonInfo.TeamsLeague2, newSeasonInfo.TeamsLeague3, newSeasonInfo.TeamsLeague4, season, _matchDateManager);
 
             // Create a national cup tournament.
-            seasonAndCompetitionSchedules.NationalCupSchedule = _nationalCupManager.CreateSchedule(newSeasonInfo.AllTeams.ToList(), season, matchDateManager);
+            seasonAndCompetitionSchedules.NationalCupSchedule = _nationalCupManager.CreateSchedule(newSeasonInfo.AllTeams.ToList(), season, _matchDateManager);
 
             // Create pre-season friendlies.
-            seasonAndCompetitionSchedules.PreSeasonFriendliesSchedule = _preSeasonFriendlyManager.CreatePreSeasonSchedule(newSeasonInfo.AllTeams.ToList(), season, matchDateManager);
+            seasonAndCompetitionSchedules.PreSeasonFriendliesSchedule = _preSeasonFriendlyManager.CreatePreSeasonSchedule(newSeasonInfo.AllTeams.ToList(), season, _matchDateManager);
 
             // Create friendlies during the season.
             // Determine on which dates these friendlies can be played. For now, this is only during the national cup tournament, except the first round and the final.
@@ -231,7 +226,7 @@ namespace TwoNil.Logic.Competitions
             // The home team is always the national champion and the away team is either the cup winner or the league 1 runner up if the champion also won the cup.
             var homeTeam = newSeasonInfo.PreviousSeasonStatistics.NationalChampion;
             var awayTeam = newSeasonInfo.PreviousSeasonStatistics.NationalChampionTeamId == newSeasonInfo.PreviousSeasonStatistics.CupWinnerTeamId ? newSeasonInfo.PreviousSeasonStatistics.NationalChampionRunnerUp : newSeasonInfo.PreviousSeasonStatistics.CupWinner;
-            seasonAndCompetitionSchedules.NationalSuperCupSchedule = _nationalSuperCupManager.CreateSchedule(homeTeam, awayTeam, season, matchDateManager);
+            seasonAndCompetitionSchedules.NationalSuperCupSchedule = _nationalSuperCupManager.CreateSchedule(homeTeam, awayTeam, season, _matchDateManager);
 
             // In the meantime data of the teams has changed, so add them to the SeasonAndCompetitionSchedules object so they can be updated in the database.
             seasonAndCompetitionSchedules.Teams = newSeasonInfo.AllTeams;

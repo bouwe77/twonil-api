@@ -5,14 +5,7 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Calendar
 {
-    public interface IGameDateTimeReadManager
-    {
-        GameDateTime GetByDateTime(DateTime dateTime);
-        GameDateTime GetNow(bool allowNonExisting = false);
-        GameDateTime GetNext();
-    }
-
-    public class GameDateTimeReadManager : IGameDateTimeReadManager
+    public class GameDateTimeReadManager
     {
         private readonly IUnitOfWorkFactory _uowFactory;
 

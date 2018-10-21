@@ -8,12 +8,7 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Players
 {
-    public interface IPositionDeterminator
-    {
-        Position Determine(List<PlayerSkillScore> skillScores);
-    }
-
-    public class PositionDeterminator : IPositionDeterminator
+    public class PositionDeterminator
     {
         private readonly IPositionRepository _positionRepository;
         private readonly IListRandomizer _listRandomizer;

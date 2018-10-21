@@ -5,23 +5,18 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Matches.PostMatches
 {
-    public interface IPostMatchOrchestrator
-    {
-        void Handle(IEnumerable<Match> matches);
-    }
-
     /// <summary>
     /// Orchestrates which data in which order must be saved after matches have been played.
     /// </summary>
-    public class PostMatchOrchestrator : IPostMatchOrchestrator
+    public class PostMatchOrchestrator
     {
         private readonly IEnumerable<Match> _matches;
         private readonly string _seasonId;
         private readonly IUnitOfWork _uow;
-        private readonly IPostMatchDataFactory _postMatchDataFactory;
-        private readonly IPostMatchDataPersister _postMatchDataPersister;
+        private readonly PostMatchDataFactory _postMatchDataFactory;
+        private readonly PostMatchDataPersister _postMatchDataPersister;
 
-        public PostMatchOrchestrator(IUnitOfWork uow, IPostMatchDataFactory postMatchDataFactory, IPostMatchDataPersister postMatchDataPersister)
+        public PostMatchOrchestrator(IUnitOfWork uow, PostMatchDataFactory postMatchDataFactory, PostMatchDataPersister postMatchDataPersister)
         {
             _uow = uow;
             _postMatchDataFactory = postMatchDataFactory;

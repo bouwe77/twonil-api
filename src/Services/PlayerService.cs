@@ -9,11 +9,11 @@ namespace TwoNil.Services
 {
     public class PlayerService : ServiceWithGameBase
     {
-        private readonly IPlayerGenerator _playerGenerator;
-        private readonly ITeamManager _teamManager;
-        private readonly ITeamService _teamService;
+        private readonly PlayerGenerator _playerGenerator;
+        private readonly TeamManager _teamManager;
+        private readonly TeamService _teamService;
 
-        internal PlayerService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo, ITeamService teamService, IPlayerGenerator playerGenerator, ITeamManager teamManager)
+        internal PlayerService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo, TeamService teamService, PlayerGenerator playerGenerator, TeamManager teamManager)
            : base(uowFactory, gameInfo)
         {
             _playerGenerator = playerGenerator;

@@ -15,13 +15,13 @@ namespace TwoNil.Logic
     {
         private readonly IUnitOfWorkFactory _uowFactory;
         private readonly INumberRandomizer _numberRandomizer;
-        private readonly ISeasonManager _seasonManager;
-        private readonly ITeamManager _teamManager;
-        private readonly IPlayerManager _playerManager;
-        private readonly IStartingLineupGenerator _startingLineupGenerator;
+        private readonly SeasonManager _seasonManager;
+        private readonly TeamManager _teamManager;
+        private readonly PlayerManager _playerManager;
+        private readonly StartingLineupGenerator _startingLineupGenerator;
 
-        public GameCreationManager(IUnitOfWorkFactory uowFactory, INumberRandomizer numberRandomizer, ISeasonManager seasonManager, 
-            ITeamManager teamManager, IPlayerManager playerManager, IStartingLineupGenerator startingLineupGenerator)
+        public GameCreationManager(IUnitOfWorkFactory uowFactory, INumberRandomizer numberRandomizer, SeasonManager seasonManager, 
+            TeamManager teamManager, PlayerManager playerManager, StartingLineupGenerator startingLineupGenerator)
         {
             _uowFactory = uowFactory;
             _numberRandomizer = numberRandomizer;

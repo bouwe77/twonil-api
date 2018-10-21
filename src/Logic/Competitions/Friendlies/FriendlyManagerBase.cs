@@ -11,12 +11,13 @@ namespace TwoNil.Logic.Competitions.Friendlies
         protected Competition _competition;
         protected IRandomizer _randomizer;
         protected INumberRandomizer _numberRandomizer;
+        private readonly SingleRoundTournamentManager _singleRoundTournamentManager;
 
-        public FriendlyManagerBase(IUnitOfWorkFactory uowFactory, IRandomizer randomizer, INumberRandomizer numberRandomizer)
+        public FriendlyManagerBase(IUnitOfWorkFactory uowFactory, IRandomizer randomizer, INumberRandomizer numberRandomizer, SingleRoundTournamentManager singleRoundTournamentManager)
         {
             _randomizer = randomizer;
             _numberRandomizer = numberRandomizer;
-
+            _singleRoundTournamentManager = singleRoundTournamentManager;
             using (var uow = uowFactory.Create())
             {
                 _competition = uow.Competitions.GetFriendly();
@@ -35,7 +36,7 @@ namespace TwoNil.Logic.Competitions.Friendlies
             if (teams.Any())
             {
                 // Create a so-called single round tournament between the teams.
-                matches = new SingleRoundTournamentManager().GetMatches(teams);
+                matches = _singleRoundTournamentManager.GetMatches(teams);
             }
 
             foreach (var match in matches)

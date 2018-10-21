@@ -8,11 +8,11 @@ namespace TwoNil.Logic.Competitions
 {
    public class SingleRoundTournamentManager
    {
-      private readonly Randomizer _randomizer;
+      private readonly IRandomizer _randomizer;
 
-      public SingleRoundTournamentManager()
+      public SingleRoundTournamentManager(IRandomizer randomizer)
       {
-         _randomizer = new Randomizer();
+         _randomizer = randomizer;
       }
 
       /// <summary>

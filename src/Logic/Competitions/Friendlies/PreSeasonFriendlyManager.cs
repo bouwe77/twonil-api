@@ -8,12 +8,7 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Competitions.Friendlies
 {
-    public interface IPreSeasonFriendlyManager
-    {
-        CompetitionSchedule CreatePreSeasonSchedule(List<Team> teams, Season season, MatchDateManager matchDateManager);
-    }
-
-    public class PreSeasonFriendlyManager : FriendlyManagerBase, IPreSeasonFriendlyManager
+    public class PreSeasonFriendlyManager : FriendlyManagerBase
     {
         public PreSeasonFriendlyManager(IUnitOfWorkFactory uowFactory, IRandomizer randomizer, INumberRandomizer numberRandomizer)
             : base(uowFactory, randomizer, numberRandomizer)

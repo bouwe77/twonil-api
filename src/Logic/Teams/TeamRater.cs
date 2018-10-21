@@ -5,15 +5,10 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Teams
 {
-    public interface ITeamRater
-    {
-        (decimal ratingGoalkeeper, decimal ratingDefence, decimal ratingMidfield, decimal ratingAttack, decimal ratingTeam) GetRating(List<Player> players);
-    }
-
     /// <summary>
     /// Calculates the team's rating per <see cref="Line"/> depending on which players are on which position in the field.
     /// </summary>
-    public class TeamRater : ITeamRater
+    public class TeamRater
     {
         private readonly IUnitOfWorkFactory _uowFactory;
 

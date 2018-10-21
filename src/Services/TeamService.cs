@@ -5,15 +5,7 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Services
 {
-    public interface ITeamService
-    {
-        IEnumerable<Team> GetAll();
-        IEnumerable<Team> GetBySeasonCompetition(string seasonCompetitionId);
-        IEnumerable<Team> GetGroupedByLeague();
-        Team GetTeam(string teamId);
-    }
-
-    public class TeamService : ServiceWithGameBase, ITeamService
+    public class TeamService : ServiceWithGameBase
     {
         internal TeamService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
            : base(uowFactory, gameInfo)

@@ -6,20 +6,11 @@ using TwoNil.Data;
 
 namespace TwoNil.Services
 {
-    public interface ISeasonService
+    public class SeasonService : ServiceWithGameBase
     {
-        bool DetermineSeasonEnded(string seasonId);
-        void EndSeasonAndCreateNext(string seasonId);
-        Season Get(string seasonId);
-        IEnumerable<Season> GetAll();
-        Season GetCurrentSeason();
-    }
+        private readonly SeasonManager _seasonManager;
 
-    public class SeasonService : ServiceWithGameBase, ISeasonService
-    {
-        private readonly ISeasonManager _seasonManager;
-
-        internal SeasonService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo, ISeasonManager seasonManager)
+        internal SeasonService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo, SeasonManager seasonManager)
            : base(uowFactory, gameInfo)
         {
             _seasonManager = seasonManager;

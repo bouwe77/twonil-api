@@ -6,12 +6,7 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Teams
 {
-    public interface IStartingLineupGenerator
-    {
-        List<Player> GenerateStartingLineup(List<Player> players, Formation formation);
-    }
-
-    public class StartingLineupGenerator : IStartingLineupGenerator
+    public class StartingLineupGenerator
     {
         private readonly IDictionary<string, List<Position>> _alternativePositions;
         private readonly IUnitOfWorkFactory _uowFactory;

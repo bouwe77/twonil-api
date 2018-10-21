@@ -6,32 +6,20 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Players
 {
-    public interface IPlayerGenerator
-    {
-        Player Generate();
-        Player Generate(int startNumber);
-        Player Generate(Line line);
-        Player Generate(Line line, int startNumber);
-        Player Generate(Line line, AgeRange ageRange);
-        Player Generate(Position position);
-        Player Generate(Position position, AgeRange ageRange);
-        Player Generate(AgeRange ageRange);
-    }
-
-    public class PlayerGenerator : IPlayerGenerator
+    public class PlayerGenerator
     {
         private readonly INumberRandomizer _numberRandomizer;
         private readonly IListRandomizer _listRandomizer;
-        private readonly IPersonNameGenerator _personNameGenerator;
-        private readonly IProfileScoreCalculator _profileScoreCalculator;
-        private readonly IPositionDeterminator _positionDeterminator;
+        private readonly PersonNameGenerator _personNameGenerator;
+        private readonly ProfileScoreCalculator _profileScoreCalculator;
+        private readonly PositionDeterminator _positionDeterminator;
         private readonly IEnumerable<Position> _positions;
         private readonly IEnumerable<Line> _lines;
         private readonly IEnumerable<PlayerProfile> _playerProfiles;
         private readonly IUnitOfWorkFactory _uowFactory;
 
-        public PlayerGenerator(IUnitOfWorkFactory uowFactory, IPersonNameGenerator personNameGenerator, IProfileScoreCalculator profileScoreCalculator,
-            INumberRandomizer numberRandomizer, IListRandomizer listRandomizer, IPositionDeterminator positionDeterminator)
+        public PlayerGenerator(IUnitOfWorkFactory uowFactory, PersonNameGenerator personNameGenerator, ProfileScoreCalculator profileScoreCalculator,
+            INumberRandomizer numberRandomizer, IListRandomizer listRandomizer, PositionDeterminator positionDeterminator)
         {
             _uowFactory = uowFactory;
 

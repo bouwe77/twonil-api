@@ -7,20 +7,11 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Calendar
 {
-    public interface IGameDateTimeMutationManager
+    public class GameDateTimeMutationManager
     {
-        void CreateNewForSeason(IUnitOfWork uow, IEnumerable<DateTime> matchDatesManagersTeam, IEnumerable<DateTime> matchDatesOtherTeams, DateTime endOfSeasonDate);
-        void GoToNext(IUnitOfWork uow);
-        void UpdateManagerPlaysMatch(IUnitOfWork uow, DateTime dateTime);
-        void UpdateMatchStatus(IUnitOfWork uow, DateTime matchDateTime);
-        void UpdateEndOfSeasonStatus(IUnitOfWork uow, DateTime endOfSeasonDateTime);
-    }
+        private readonly GameDateTimeReadManager _readManager;
 
-    public class GameDateTimeMutationManager : IGameDateTimeMutationManager
-    {
-        private readonly IGameDateTimeReadManager _readManager;
-
-        public GameDateTimeMutationManager(IGameDateTimeReadManager gameDateTimeReadManager)
+        public GameDateTimeMutationManager(GameDateTimeReadManager gameDateTimeReadManager)
         {
             _readManager = gameDateTimeReadManager;
         }

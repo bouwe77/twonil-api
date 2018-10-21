@@ -6,18 +6,15 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Competitions
 {
-    public interface INationalSuperCupManager
-    {
-        CompetitionSchedule CreateSchedule(Team team1, Team team2, Season season, MatchDateManager matchDateManager);
-    }
-
-    public class NationalSuperCupManager : INationalSuperCupManager
+    public class NationalSuperCupManager
     {
         private readonly IUnitOfWorkFactory _uowFactory;
+        private readonly SingleRoundTournamentManager _singleRoundTournamentManager;
 
-        public NationalSuperCupManager(IUnitOfWorkFactory uowFactory)
+        public NationalSuperCupManager(IUnitOfWorkFactory uowFactory, SingleRoundTournamentManager singleRoundTournamentManager)
         {
             _uowFactory = uowFactory;
+            _singleRoundTournamentManager = singleRoundTournamentManager;
         }
 
         public CompetitionSchedule CreateSchedule(Team team1, Team team2, Season season, MatchDateManager matchDateManager)
@@ -48,8 +45,7 @@ namespace TwoNil.Logic.Competitions
             // Create the super cup match and save it to the database.
             var teams1 = new List<Team> { team1 };
             var teams2 = new List<Team> { team2 };
-            var singleRoundTournamentManager = new SingleRoundTournamentManager();
-            var match = singleRoundTournamentManager.GetMatches(teams1, teams2).Single();
+            var match = _singleRoundTournamentManager.GetMatches(teams1, teams2).Single();
 
             match.Season = season;
             match.Round = superCupRound;

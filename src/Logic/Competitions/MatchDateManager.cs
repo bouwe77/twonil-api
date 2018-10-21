@@ -9,21 +9,22 @@ namespace TwoNil.Logic.Competitions
     public class MatchDateManager
     {
         private readonly INumberRandomizer _numberRandomizer;
-        private readonly int _startYear;
+        private int _startYear;
         private List<DateTime> _leagueDates;
         private List<DateTime> _cupDates;
         private List<DateTime> _friendlyDates;
         private DateTime _superCupDate;
         private bool _initialized = false;
 
-        public MatchDateManager(int startYear)
+        public MatchDateManager(NumberRandomizer numberRandomizer)
         {
-            _numberRandomizer = new NumberRandomizer();
-            _startYear = startYear;
+            _numberRandomizer = numberRandomizer;
         }
 
-        public void Initialize()
+        public void Initialize(int startYear)
         {
+            _startYear = startYear;
+
             // Determine the start date of the season.
             var startMatchDate = DetermineSeasonStartMatchDate();
 

@@ -6,19 +6,9 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Competitions.Friendlies
 {
-    public interface IDuringSeasonFriendlyManager
-    {
-        IEnumerable<Match> CreateDuringSeasonFriendlies(Round currentCupRound, IEnumerable<Team> teamsInNextCupRound);
-    }
-
-    public class DuringSeasonFriendlyManager : FriendlyManagerBase, IDuringSeasonFriendlyManager
+    public class DuringSeasonFriendlyManager : FriendlyManagerBase
     {
         private readonly IUnitOfWorkFactory _uowFactory;
-
-        public DuringSeasonFriendlyManager(IUnitOfWorkFactory uowFactory)
-            : this(uowFactory, new Randomizer(), new NumberRandomizer())
-        {
-        }
 
         public DuringSeasonFriendlyManager(IUnitOfWorkFactory uowFactory, IRandomizer randomizer, INumberRandomizer numberRandomizer)
             : base(uowFactory, randomizer, numberRandomizer)

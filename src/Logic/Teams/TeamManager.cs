@@ -6,24 +6,17 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Teams
 {
-    public interface ITeamManager
+    public class TeamManager
     {
-        IEnumerable<Team> Create(int howMany);
-        void UpdateRating(Team team);
-        void UpdateRating(Team team, List<Player> squad);
-    }
-
-    public class TeamManager : ITeamManager
-    {
-        private readonly ListRandomizer _listRandomizer;
+        private readonly IListRandomizer _listRandomizer;
         private readonly IUnitOfWorkFactory _uowFactory;
-        private readonly ITeamRater _teamRater;
+        private readonly TeamRater _teamRater;
 
-        public TeamManager(IUnitOfWorkFactory uowFactory, ITeamRater teamRater)
+        public TeamManager(IUnitOfWorkFactory uowFactory, TeamRater teamRater, IListRandomizer listRandomizer)
         {
             _uowFactory = uowFactory;
             _teamRater = teamRater;
-            _listRandomizer = new ListRandomizer();
+            _listRandomizer = listRandomizer;
         }
 
         public IEnumerable<Team> Create(int howMany)

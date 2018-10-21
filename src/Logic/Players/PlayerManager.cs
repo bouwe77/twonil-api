@@ -5,18 +5,13 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Logic.Players
 {
-    public interface IPlayerManager
-    {
-        IEnumerable<Player> GenerateSquad(Team team, int averageRating);
-    }
-
-    public class PlayerManager : IPlayerManager
+    public class PlayerManager
     {
         private INumberRandomizer _numberRandomizer;
         private readonly IUnitOfWorkFactory _uowFactory;
-        private IPlayerGenerator _playerGenerator;
+        private PlayerGenerator _playerGenerator;
 
-        public PlayerManager(IUnitOfWorkFactory uowFactory, IPlayerGenerator playerGenerator, INumberRandomizer numberRandomizer)
+        public PlayerManager(IUnitOfWorkFactory uowFactory, PlayerGenerator playerGenerator, INumberRandomizer numberRandomizer)
         {
             _uowFactory = uowFactory;
             _playerGenerator = playerGenerator;
