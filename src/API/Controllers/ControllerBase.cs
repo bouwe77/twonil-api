@@ -15,81 +15,81 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Controllers
 {
-   /// <summary>
-   /// Base class for all TwoNil ApiControllers to allow working with a current logged in user and its game.
-   /// </summary>
-   public abstract class ControllerBase : DoloresHandler
-   {
-      protected readonly ServiceFactory ServiceFactory;
-      protected HalDocumentFactory HalDocumentFactory;
-      //protected new virtual MyPrincipal User => HttpContext.Current == null ? null : HttpContext.Current.User as MyPrincipal;
+    /// <summary>
+    /// Base class for all TwoNil ApiControllers to allow working with a current logged in user and its game.
+    /// </summary>
+    public abstract class ControllerBase : DoloresHandler
+    {
+        protected readonly ServiceFactory ServiceFactory;
+        protected HalDocumentFactory HalDocumentFactory;
+        //protected new virtual MyPrincipal User => HttpContext.Current == null ? null : HttpContext.Current.User as MyPrincipal;
 
-      protected UriHelper UriHelper;
+        protected UriHelper UriHelper;
 
-      protected ControllerBase()
-      {
-         ServiceFactory = new ServiceFactory();
-         UriHelper = new UriHelper(RouteHelper);
-      }
+        protected ControllerBase(ServiceFactory serviceFactory, UriHelper uriHelper)
+        {
+            ServiceFactory = serviceFactory;
+            UriHelper = uriHelper;
+        }
 
-      internal GameInfo GetGameInfo(string gameId)
-      {
-         var gameService = ServiceFactory.CreateGameService();
+        internal GameInfo GetGameInfo(string gameId)
+        {
+            var gameService = ServiceFactory.CreateGameService();
 
-         //TODO Let MODDERVOKKIN op
-         string userId = "17eqhq";
+            //TODO Let MODDERVOKKIN op
+            string userId = "17eqhq";
 
-         var gameInfo = gameService.GetGame(gameId, userId);
+            var gameInfo = gameService.GetGame(gameId, userId);
 
-         if (gameInfo == null)
-         {
-            throw ResponseHelper.Get404NotFound($"Game '{gameId}' not found");
-         }
+            if (gameInfo == null)
+            {
+                throw ResponseHelper.Get404NotFound($"Game '{gameId}' not found");
+            }
 
-         return gameInfo;
-      }
+            return gameInfo;
+        }
 
-      protected HttpException Handle(BusinessLogicException businessLogicException)
-      {
-         if (businessLogicException is NotFoundException)
-         {
-            return ResponseHelper.Get404NotFound(businessLogicException.Message);
-         }
+        protected HttpException Handle(BusinessLogicException businessLogicException)
+        {
+            if (businessLogicException is NotFoundException)
+            {
+                return ResponseHelper.Get404NotFound(businessLogicException.Message);
+            }
 
-         if (businessLogicException is ConflictException)
-         {
-            return ResponseHelper.Get409Conflict(businessLogicException.Message);
-         }
+            if (businessLogicException is ConflictException)
+            {
+                return ResponseHelper.Get409Conflict(businessLogicException.Message);
+            }
 
-         return ResponseHelper.Get500InternalServerError("Unknown business logic exception");
-      }
+            return ResponseHelper.Get500InternalServerError("Unknown business logic exception");
+        }
 
-      protected Response GetResponse(Resource halDocument)
-      {
-         var response = new Response(Dolores.Http.HttpStatusCode.Ok)
-         {
-            MessageBody = new MemoryStream(Encoding.UTF8.GetBytes(halDocument.Json.ToString()))
-         };
+        protected Response GetResponse(Resource halDocument)
+        {
+            var response = new Response(Dolores.Http.HttpStatusCode.Ok)
+            {
+                MessageBody = new MemoryStream(Encoding.UTF8.GetBytes(halDocument.Json.ToString()))
+            };
 
-         response.SetContentTypeHeader("application/hal+json; charset=utf-8");
-         AddAccessControlAllowOriginHeader(response);
+            response.SetContentTypeHeader("application/hal+json; charset=utf-8");
+            AddAccessControlAllowOriginHeader(response);
 
-         return response;
-      }
+            return response;
+        }
 
-      protected static void AddAccessControlAllowOriginHeader(Response response)
-      {
-         response.SetHeader(HttpResponseHeaderFields.AccessControlAllowOrigin, "http://localhost:3000");
-      }
+        protected static void AddAccessControlAllowOriginHeader(Response response)
+        {
+            response.SetHeader(HttpResponseHeaderFields.AccessControlAllowOrigin, "http://localhost:3000");
+        }
 
-      protected Resource CreateHalDocument(string selfHref, GameInfo gameInfo = null)
-      {
-         //TODO Let MODDERVOKKIN op
-         //bool loggedIn = User != null;
-         bool loggedIn = true;
+        protected Resource CreateHalDocument(string selfHref, GameInfo gameInfo = null)
+        {
+            //TODO Let MODDERVOKKIN op
+            //bool loggedIn = User != null;
+            bool loggedIn = true;
 
-         var halDocumentFactory = new HalDocumentFactory(loggedIn, UriHelper);
-         return halDocumentFactory.Create(selfHref, gameInfo);
-      }
-   }
+            var halDocumentFactory = new HalDocumentFactory(loggedIn, UriHelper);
+            return halDocumentFactory.Create(selfHref, gameInfo);
+        }
+    }
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Dolores.Responses;
 using Shally.Hal;
 using TwoNil.API.Helpers;
+using TwoNil.API.Resources;
 using TwoNil.Services;
 using TwoNil.Shared.DomainObjects;
 
@@ -12,6 +13,11 @@ namespace TwoNil.API.Controllers
 {
     public class GameLinkController : ControllerBase
     {
+        public GameLinkController(ServiceFactory serviceFactory, UriHelper uriHelper)
+            : base(serviceFactory, uriHelper)
+        {
+
+        }
         public Response GetCollection(string gameId)
         {
             RequestHelper.ValidateId(gameId);
@@ -29,8 +35,6 @@ namespace TwoNil.API.Controllers
 
         private void CreateGameMenu(GameInfo gameInfo, Resource halDocument)
         {
-            var serviceFactory = new ServiceFactory();
-
             // Create the game menu.
             var gameLinks = new List<Link>();
 
@@ -39,15 +43,12 @@ namespace TwoNil.API.Controllers
             gameLinks.Add(gameLink);
 
             /*
-
-
-
              // The manager's squad.
              var teamPlayersLink = new Link(UriHelper.GetTeamPlayersUri(gameInfo.Id, gameInfo.CurrentTeamId)) { Title = "Players" };
              gameLinks.Add(teamPlayersLink);
 
              // League tables for the current season.
-             var seasonService = serviceFactory.CreateSeasonService(gameInfo);
+             var seasonService = ServiceFactory.CreateSeasonService(gameInfo);
              var currentSeason = seasonService.GetCurrentSeason();
              var leagueTableLink = new Link(UriHelper.GetSeasonLeagueTablesUri(gameInfo.Id, currentSeason.Id)) { Title = "League Tables" };
              gameLinks.Add(leagueTableLink);

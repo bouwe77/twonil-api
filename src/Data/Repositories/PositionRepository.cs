@@ -3,8 +3,8 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Data.Repositories
 {
-   public interface IPositionRepository
-   {
+   public interface IPositionRepository : IGenericRepository<Position>
+    {
       Position GetGoalkeeper();
       Position GetSweeper();
       Position GetCentreBack();

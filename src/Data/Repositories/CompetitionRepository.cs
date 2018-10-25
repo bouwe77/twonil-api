@@ -4,7 +4,7 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Data.Repositories
 {
-    public interface ICompetitionRepository
+    public interface ICompetitionRepository : IGenericRepository<Competition>
     {
         IEnumerable<Competition> GetByCompetitionType(CompetitionType competitionType);
         Competition GetFriendly();

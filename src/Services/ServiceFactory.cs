@@ -12,15 +12,15 @@ namespace TwoNil.Services
     public interface IServiceFactory
     {
         CompetitionService CreateCompetitionService();
-        GameDateTimeService CreateGameDateTimeService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo);
+        GameDateTimeService CreateGameDateTimeService(GameInfo gameInfo);
         GameService CreateGameService();
-        LeagueTableService CreateLeagueTableService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo);
-        MatchService CreateMatchService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo);
-        PlayerService CreatePlayerService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo);
-        RoundService CreateRoundService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo);
-        SeasonService CreateSeasonService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo);
-        StatisticsService CreateStatisticsService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo);
-        TeamService CreateTeamService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo);
+        LeagueTableService CreateLeagueTableService(GameInfo gameInfo);
+        MatchService CreateMatchService(GameInfo gameInfo);
+        PlayerService CreatePlayerService(GameInfo gameInfo);
+        RoundService CreateRoundService(GameInfo gameInfo);
+        SeasonService CreateSeasonService(GameInfo gameInfo);
+        StatisticsService CreateStatisticsService(GameInfo gameInfo);
+        TeamService CreateTeamService(GameInfo gameInfo);
         UserService CreateUserService();
     }
 
@@ -65,23 +65,23 @@ namespace TwoNil.Services
             return new CompetitionService(_uowFactory);
         }
 
-        public GameDateTimeService CreateGameDateTimeService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
+        public GameDateTimeService CreateGameDateTimeService(GameInfo gameInfo)
         {
             Assert(gameInfo);
-            var matchService = CreateMatchService(uowFactory, gameInfo);
+            var matchService = CreateMatchService(gameInfo);
             return new GameDateTimeService(_uowFactory, gameInfo, matchService, _gameDateTimeReadManager, _gameDateTimeMutationManager);
         }
 
-        public TeamService CreateTeamService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
+        public TeamService CreateTeamService(GameInfo gameInfo)
         {
             Assert(gameInfo);
             return new TeamService(_uowFactory, gameInfo);
         }
 
-        public PlayerService CreatePlayerService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
+        public PlayerService CreatePlayerService(GameInfo gameInfo)
         {
             Assert(gameInfo);
-            var teamService = CreateTeamService(uowFactory, gameInfo);
+            var teamService = CreateTeamService(gameInfo);
             return new PlayerService(_uowFactory, gameInfo, teamService, _playerGenerator, _teamManager);
         }
 
@@ -90,32 +90,32 @@ namespace TwoNil.Services
             return new UserService(_uowFactory);
         }
 
-        public MatchService CreateMatchService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
+        public MatchService CreateMatchService(GameInfo gameInfo)
         {
             Assert(gameInfo);
-            var seasonService = CreateSeasonService(uowFactory, gameInfo);
+            var seasonService = CreateSeasonService(gameInfo);
             return new MatchService(_uowFactory, gameInfo, seasonService, _postMatchOrchestrator);
         }
 
-        public SeasonService CreateSeasonService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
+        public SeasonService CreateSeasonService(GameInfo gameInfo)
         {
             Assert(gameInfo);
             return new SeasonService(_uowFactory, gameInfo, _seasonManager);
         }
 
-        public RoundService CreateRoundService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
+        public RoundService CreateRoundService(GameInfo gameInfo)
         {
             Assert(gameInfo);
             return new RoundService(_uowFactory, gameInfo);
         }
 
-        public LeagueTableService CreateLeagueTableService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
+        public LeagueTableService CreateLeagueTableService(GameInfo gameInfo)
         {
             Assert(gameInfo);
             return new LeagueTableService(_uowFactory, gameInfo);
         }
 
-        public StatisticsService CreateStatisticsService(IUnitOfWorkFactory uowFactory, GameInfo gameInfo)
+        public StatisticsService CreateStatisticsService(GameInfo gameInfo)
         {
             return new StatisticsService(_uowFactory, gameInfo);
         }

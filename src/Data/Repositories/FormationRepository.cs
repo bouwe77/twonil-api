@@ -3,7 +3,7 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Data.Repositories
 {
-    public interface IFormationRepository
+    public interface IFormationRepository : IGenericRepository<Formation>
     {
         Formation Get343();
         Formation Get433();

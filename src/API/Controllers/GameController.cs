@@ -8,7 +8,8 @@ using Shally.Hal;
 using Shally.Forms;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
-using TwoNil.Logic;
+using TwoNil.Services;
+using System.Threading.Tasks;
 
 namespace TwoNil.API.Controllers
 {
@@ -16,7 +17,8 @@ namespace TwoNil.API.Controllers
     {
         private readonly GameInfoMapper _gameInfoMapper;
 
-        public GameController()
+        public GameController(ServiceFactory serviceFactory, UriHelper uriHelper)
+            : base(serviceFactory, uriHelper)
         {
             _gameInfoMapper = new GameInfoMapper(UriHelper);
         }
@@ -191,12 +193,12 @@ namespace TwoNil.API.Controllers
             return new Response(HttpStatusCode.NoContent);
         }
 
-        public Response Post()
+        public async Task<Response> Post()
         {
             try
             {
-                var gameCreationManager = new GameCreationManager();
-                var game = gameCreationManager.CreateGame();
+                var gameService = ServiceFactory.CreateGameService();
+                var game = await gameService.CreateGame();
 
                 string locationUri = UriHelper.GetGameUri(game.Id);
                 var response = new CreatedResponse(locationUri);

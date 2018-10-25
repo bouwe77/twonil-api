@@ -3,7 +3,7 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Data.Repositories
 {
-    public interface ILineRepository
+    public interface ILineRepository : IGenericRepository<Line>
     {
         Line GetAttack();
         Line GetDefence();

@@ -3,7 +3,7 @@ using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.Data.Repositories
 {
-    public interface IPlayerProfileRepository
+    public interface IPlayerProfileRepository : IGenericRepository<PlayerProfile>
     {
         PlayerProfile GetCentralMidfieldProfile();
         PlayerProfile GetCentreBackProfile();

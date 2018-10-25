@@ -9,199 +9,205 @@ using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
 using TwoNil.API.Resources.TwoNil.API.Resources;
 using TwoNil.Logic.Exceptions;
+using TwoNil.Services;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Controllers
 {
-   public class MatchController : ControllerBase
-   {
-      /// <summary>
-      /// Plays all matches on the given match day.
-      /// </summary>
-      public Response PostPlayDayMatches(string gameId, string dayId)
-      {
-         var game = GetGameInfo(gameId);
+    public class MatchController : ControllerBase
+    {
+        public MatchController(ServiceFactory serviceFactory, UriHelper uriHelper)
+            : base(serviceFactory, uriHelper)
+        {
+        }
 
-         DateTime matchDay = ValidateAndParseMatchDay(dayId);
+        /// <summary>
+        /// Plays all matches on the given match day.
+        /// </summary>
+        public Response PostPlayDayMatches(string gameId, string dayId)
+        {
+            var game = GetGameInfo(gameId);
 
-         var matchService = ServiceFactory.CreateMatchService(game);
+            DateTime matchDay = ValidateAndParseMatchDay(dayId);
 
-         try
-         {
-            matchService.PlayMatchDay(matchDay);
-         }
-         catch (BusinessLogicException businessLogicException)
-         {
-            throw Handle(businessLogicException);
-         }
+            var matchService = ServiceFactory.CreateMatchService(game);
 
-         // If the manager's team played a match the Location header URI is that match, otherwise it's the matches on that day.
-         var locationUri = UriHelper.GetMatchDayUri(gameId, dayId);
-         var matchForCurrentTeam = matchService.GetByMatchDayAndTeam(matchDay, game.CurrentTeamId);
-         if (matchForCurrentTeam != null)
-         {
-            locationUri = UriHelper.GetMatchUri(gameId, matchForCurrentTeam.Id);
-         }
+            try
+            {
+                matchService.PlayMatchDay(matchDay);
+            }
+            catch (BusinessLogicException businessLogicException)
+            {
+                throw Handle(businessLogicException);
+            }
 
-         var response = new CreatedResponse(locationUri);
-         AddAccessControlAllowOriginHeader(response);
+            // If the manager's team played a match the Location header URI is that match, otherwise it's the matches on that day.
+            var locationUri = UriHelper.GetMatchDayUri(gameId, dayId);
+            var matchForCurrentTeam = matchService.GetByMatchDayAndTeam(matchDay, game.CurrentTeamId);
+            if (matchForCurrentTeam != null)
+            {
+                locationUri = UriHelper.GetMatchUri(gameId, matchForCurrentTeam.Id);
+            }
 
-         return response;
-      }
+            var response = new CreatedResponse(locationUri);
+            AddAccessControlAllowOriginHeader(response);
 
-      public Response GetDayMatches(string gameId, string dayId)
-      {
-         var game = GetGameInfo(gameId);
+            return response;
+        }
 
-         DateTime matchDay = ValidateAndParseMatchDay(dayId);
+        public Response GetDayMatches(string gameId, string dayId)
+        {
+            var game = GetGameInfo(gameId);
 
-         var halDocument = CreateHalDocument(UriHelper.GetMatchDayUri(gameId, dayId), game);
-         var matchResources = GetDayMatchesResources(game, matchDay, out int _).ToList();
+            DateTime matchDay = ValidateAndParseMatchDay(dayId);
 
-         if (!matchResources.Any())
-         {
-            throw ResponseHelper.Get404NotFound($"No matches found for match day '{dayId}'");
-         }
+            var halDocument = CreateHalDocument(UriHelper.GetMatchDayUri(gameId, dayId), game);
+            var matchResources = GetDayMatchesResources(game, matchDay, out int _).ToList();
 
-         halDocument.AddResource("rel:matches-per-competition", matchResources);
+            if (!matchResources.Any())
+            {
+                throw ResponseHelper.Get404NotFound($"No matches found for match day '{dayId}'");
+            }
 
-         AddPlayNextMatchDayForm(game, halDocument, matchDay);
+            halDocument.AddResource("rel:matches-per-competition", matchResources);
 
-         return GetResponse(halDocument);
-      }
+            AddPlayNextMatchDayForm(game, halDocument, matchDay);
 
-      public Response GetItem(string gameId, string matchId)
-      {
-         var gameInfo = GetGameInfo(gameId);
+            return GetResponse(halDocument);
+        }
 
-         RequestHelper.ValidateId(matchId);
+        public Response GetItem(string gameId, string matchId)
+        {
+            var gameInfo = GetGameInfo(gameId);
 
-         var matchService = ServiceFactory.CreateMatchService(gameInfo);
-         var match = matchService.GetMatch(matchId);
-         if (match == null)
-         {
-            throw ResponseHelper.Get404NotFound($"Match ID '{matchId}' not found");
-         }
+            RequestHelper.ValidateId(matchId);
 
-         var halDocument = CreateHalDocument(UriHelper.GetMatchUri(gameId, matchId), gameInfo);
+            var matchService = ServiceFactory.CreateMatchService(gameInfo);
+            var match = matchService.GetMatch(matchId);
+            if (match == null)
+            {
+                throw ResponseHelper.Get404NotFound($"Match ID '{matchId}' not found");
+            }
 
-         var matchMapper = new MatchMapper(UriHelper);
+            var halDocument = CreateHalDocument(UriHelper.GetMatchUri(gameId, matchId), gameInfo);
 
-         var matchResource = matchMapper.Map(
-            match,
-            MatchMapper.HomeScore,
-            MatchMapper.AwayScore,
-            MatchMapper.PenaltiesTaken,
-            MatchMapper.HomePenaltyScore,
-            MatchMapper.AwayPenaltyScore,
-            MatchMapper.Date,
-            MatchMapper.Played,
-            MatchMapper.Round);
+            var matchMapper = new MatchMapper(UriHelper);
 
-         var teamMapper = new TeamMapper(UriHelper);
-         var homeTeamResource = teamMapper.Map(match.HomeTeam, TeamMapper.TeamName);
-         var awayTeamResource = teamMapper.Map(match.AwayTeam, TeamMapper.TeamName);
-         matchResource.AddResource("home-team", homeTeamResource);
-         matchResource.AddResource("away-team", awayTeamResource);
+            var matchResource = matchMapper.Map(
+               match,
+               MatchMapper.HomeScore,
+               MatchMapper.AwayScore,
+               MatchMapper.PenaltiesTaken,
+               MatchMapper.HomePenaltyScore,
+               MatchMapper.AwayPenaltyScore,
+               MatchMapper.Date,
+               MatchMapper.Played,
+               MatchMapper.Round);
 
-         halDocument.AddResource("rel:match", matchResource);
+            var teamMapper = new TeamMapper(UriHelper);
+            var homeTeamResource = teamMapper.Map(match.HomeTeam, TeamMapper.TeamName);
+            var awayTeamResource = teamMapper.Map(match.AwayTeam, TeamMapper.TeamName);
+            matchResource.AddResource("home-team", homeTeamResource);
+            matchResource.AddResource("away-team", awayTeamResource);
 
-         AddPlayNextMatchDayForm(gameInfo, halDocument, match.Date);
+            halDocument.AddResource("rel:match", matchResource);
 
-         // Add the other matches that are played on this match day. Unless there is only one match, then there's no need to add these matches.
-         //var matchesPerCompetition = GetDayMatchesResources(gameInfo, match.Date, out int numberOfMatches);
-         //if (numberOfMatches > 1)
-         //{
-         //   halDocument.AddResource("rel:matches-per-competition", matchesPerCompetition);
-         //}
+            AddPlayNextMatchDayForm(gameInfo, halDocument, match.Date);
 
-         var response = GetResponse(halDocument);
-         return response;
-      }
+            // Add the other matches that are played on this match day. Unless there is only one match, then there's no need to add these matches.
+            //var matchesPerCompetition = GetDayMatchesResources(gameInfo, match.Date, out int numberOfMatches);
+            //if (numberOfMatches > 1)
+            //{
+            //   halDocument.AddResource("rel:matches-per-competition", matchesPerCompetition);
+            //}
 
-      private void AddPlayNextMatchDayForm(GameInfo gameInfo, Resource halDocument, DateTime matchDate)
-      {
-         var seasonService = ServiceFactory.CreateSeasonService(gameInfo);
-         var matchService = ServiceFactory.CreateMatchService(gameInfo);
+            var response = GetResponse(halDocument);
+            return response;
+        }
 
-         var currentSeason = seasonService.GetCurrentSeason();
-         var nextMatchDate = matchService.GetNextMatchDate(currentSeason.Id);
-         if (nextMatchDate.HasValue && matchDate == nextMatchDate)
-         {
-            // Add a form to play the match day.
-            var matchDayResourceFactory = new MatchDayResourceFactory(UriHelper, gameInfo.Id, nextMatchDate.Value);
-            var form = matchDayResourceFactory.GetForm();
-            halDocument.AddForm(form);
+        private void AddPlayNextMatchDayForm(GameInfo gameInfo, Resource halDocument, DateTime matchDate)
+        {
+            var seasonService = ServiceFactory.CreateSeasonService(gameInfo);
+            var matchService = ServiceFactory.CreateMatchService(gameInfo);
 
-            // Also add a link to the match day.
-            var link = matchDayResourceFactory.GetLink();
-            halDocument.AddLink("rel:next-match-day", link);
-         }
-      }
+            var currentSeason = seasonService.GetCurrentSeason();
+            var nextMatchDate = matchService.GetNextMatchDate(currentSeason.Id);
+            if (nextMatchDate.HasValue && matchDate == nextMatchDate)
+            {
+                // Add a form to play the match day.
+                var matchDayResourceFactory = new MatchDayResourceFactory(UriHelper, gameInfo.Id, nextMatchDate.Value);
+                var form = matchDayResourceFactory.GetForm();
+                halDocument.AddForm(form);
 
-      public Response GetTeamMatches(string gameId, string seasonId, string teamId)
-      {
-         var game = GetGameInfo(gameId);
+                // Also add a link to the match day.
+                var link = matchDayResourceFactory.GetLink();
+                halDocument.AddLink("rel:next-match-day", link);
+            }
+        }
 
-         RequestHelper.ValidateId(seasonId);
-         RequestHelper.ValidateId(teamId);
+        public Response GetTeamMatches(string gameId, string seasonId, string teamId)
+        {
+            var game = GetGameInfo(gameId);
 
-         // Check team exists.
-         var teamService = ServiceFactory.CreateTeamService(game);
-         var team = teamService.GetTeam(teamId);
-         if (team == null)
-         {
-            throw ResponseHelper.Get404NotFound($"Team with ID '{teamId}' not found");
-         }
+            RequestHelper.ValidateId(seasonId);
+            RequestHelper.ValidateId(teamId);
 
-         var matchService = ServiceFactory.CreateMatchService(game);
+            // Check team exists.
+            var teamService = ServiceFactory.CreateTeamService(game);
+            var team = teamService.GetTeam(teamId);
+            if (team == null)
+            {
+                throw ResponseHelper.Get404NotFound($"Team with ID '{teamId}' not found");
+            }
 
-         var matches = matchService.GetTeamRoundMatches(teamId, seasonId, team.CurrentLeagueCompetitionId).ToList();
-         if (!matches.Any())
-         {
-            throw ResponseHelper.Get404NotFound($"No matches found for seasonId '{seasonId}' and teamId '{teamId}'");
-         }
+            var matchService = ServiceFactory.CreateMatchService(game);
 
-         var halDocument = CreateHalDocument(UriHelper.GetSeasonTeamMatchesUri(gameId, seasonId, teamId), game);
+            var matches = matchService.GetTeamRoundMatches(teamId, seasonId, team.CurrentLeagueCompetitionId).ToList();
+            if (!matches.Any())
+            {
+                throw ResponseHelper.Get404NotFound($"No matches found for seasonId '{seasonId}' and teamId '{teamId}'");
+            }
 
-         halDocument.AddLink("rel:matches-of-team", new Link(UriHelper.GetTeamUri(gameId, teamId)));
+            var halDocument = CreateHalDocument(UriHelper.GetSeasonTeamMatchesUri(gameId, seasonId, teamId), game);
 
-         var resourceFactory = new TeamMatchResourceFactory(UriHelper);
-         var resources = resourceFactory.Create(matches, gameId, seasonId, teamId);
-         halDocument.AddResource("rel:matches", resources);
+            halDocument.AddLink("rel:matches-of-team", new Link(UriHelper.GetTeamUri(gameId, teamId)));
 
-         var teamListResourceFactory = new TeamListResourceFactory(game, UriHelper, UriHelper.GetSeasonTeamMatchesUri(gameId, seasonId, "###teamid###"));
-         halDocument.AddResource("rel:teams", teamListResourceFactory.Create());
+            var resourceFactory = new TeamMatchResourceFactory(UriHelper);
+            var resources = resourceFactory.Create(matches, gameId, seasonId, teamId);
+            halDocument.AddResource("rel:matches", resources);
 
-         var seasonListResourceFactory = new SeasonListResourceFactory(game, UriHelper, UriHelper.GetSeasonTeamMatchesUri(gameId, "###seasonid###", teamId));
-         halDocument.AddResource("rel:seasons", seasonListResourceFactory.Create());
+            var teamListResourceFactory = new TeamListResourceFactory(game, UriHelper, UriHelper.GetSeasonTeamMatchesUri(gameId, seasonId, "###teamid###"));
+            halDocument.AddResource("rel:teams", teamListResourceFactory.Create());
 
-         return GetResponse(halDocument);
-      }
+            var seasonListResourceFactory = new SeasonListResourceFactory(game, UriHelper, UriHelper.GetSeasonTeamMatchesUri(gameId, "###seasonid###", teamId));
+            halDocument.AddResource("rel:seasons", seasonListResourceFactory.Create());
 
-      private static DateTime ValidateAndParseMatchDay(string dayId)
-      {
-         bool parseSuccessful = DateTime.TryParseExact(dayId, "yyyyMMddHH", new CultureInfo("en-US"), DateTimeStyles.None, out var matchDay);
-         if (!parseSuccessful)
-         {
-            throw ResponseHelper.Get400BadRequest($"Invalid 'days' querystring argument: {dayId}");
-         }
+            return GetResponse(halDocument);
+        }
 
-         return matchDay;
-      }
+        private static DateTime ValidateAndParseMatchDay(string dayId)
+        {
+            bool parseSuccessful = DateTime.TryParseExact(dayId, "yyyyMMddHH", new CultureInfo("en-US"), DateTimeStyles.None, out var matchDay);
+            if (!parseSuccessful)
+            {
+                throw ResponseHelper.Get400BadRequest($"Invalid 'days' querystring argument: {dayId}");
+            }
 
-      private IEnumerable<Resource> GetDayMatchesResources(GameInfo game, DateTime matchDay, out int numberOfMatches1)
-      {
-         var matchService = ServiceFactory.CreateMatchService(game);
+            return matchDay;
+        }
 
-         var matches = matchService.GetByMatchDay(matchDay).ToList();
+        private IEnumerable<Resource> GetDayMatchesResources(GameInfo game, DateTime matchDay, out int numberOfMatches1)
+        {
+            var matchService = ServiceFactory.CreateMatchService(game);
 
-         var resourceFactory = new MatchesGroupedByCompetitionResourceFactory(UriHelper);
+            var matches = matchService.GetByMatchDay(matchDay).ToList();
 
-         var stuff = resourceFactory.Create(matches, game.Id, game.CurrentTeamId, out int numberOfMatches2);
-         numberOfMatches1 = numberOfMatches2;
+            var resourceFactory = new MatchesGroupedByCompetitionResourceFactory(UriHelper);
 
-         return stuff;
-      }
-   }
+            var stuff = resourceFactory.Create(matches, game.Id, game.CurrentTeamId, out int numberOfMatches2);
+            numberOfMatches1 = numberOfMatches2;
+
+            return stuff;
+        }
+    }
 }

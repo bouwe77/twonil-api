@@ -5,12 +5,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TwoNil.API.Helpers;
+using TwoNil.API.Resources;
 using TwoNil.Logic.Exceptions;
+using TwoNil.Services;
 
 namespace TwoNil.API.Controllers
 {
     public class GameDateTimeController : ControllerBase
     {
+        public GameDateTimeController(ServiceFactory serviceFactory, UriHelper uriHelper)
+            : base(serviceFactory, uriHelper)
+        {
+
+        }
         public Response PostEnd(string gameId)
         {
             RequestHelper.ValidateId(gameId);

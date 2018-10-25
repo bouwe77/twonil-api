@@ -5,46 +5,52 @@ using Dolores.Responses;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
 using TwoNil.Logic.Exceptions;
+using TwoNil.Services;
 using TwoNil.Shared.DomainObjects;
 
 namespace TwoNil.API.Controllers
 {
-   //[BasicAuthenticationFilter(false)]
-   public class LoginController : ControllerBase
-   {
-      public Response Post()
-      {
-         const string invalidRequestBodyError = "Invalid request body";
+    //[BasicAuthenticationFilter(false)]
+    public class LoginController : ControllerBase
+    {
+        public LoginController(ServiceFactory serviceFactory, UriHelper uriHelper)
+            : base(serviceFactory, uriHelper)
+        {
+        }
 
-         LoginResource loginResource;
-         try
-         {
-            loginResource = Request.MessageBody.DeserializeJson<LoginResource>();
-         }
-         catch (Exception)
-         {
-            throw ResponseHelper.Get400BadRequest(invalidRequestBodyError);
-         }
+        public Response Post()
+        {
+            const string invalidRequestBodyError = "Invalid request body";
 
-         var userService = ServiceFactory.CreateUserService();
+            LoginResource loginResource;
+            try
+            {
+                loginResource = Request.MessageBody.DeserializeJson<LoginResource>();
+            }
+            catch (Exception)
+            {
+                throw ResponseHelper.Get400BadRequest(invalidRequestBodyError);
+            }
 
-         User user;
-         try
-         {
-            user = userService.GetUser(loginResource.Username, loginResource.Password);
-         }
-         catch (ValidationException validationException)
-         {
-            throw ResponseHelper.Get400BadRequest(validationException.Message);
-         }
+            var userService = ServiceFactory.CreateUserService();
 
-         if (user == null)
-         {
-            throw ResponseHelper.Get404NotFound("Username/password combination not found");
-         }
+            User user;
+            try
+            {
+                user = userService.GetUser(loginResource.Username, loginResource.Password);
+            }
+            catch (ValidationException validationException)
+            {
+                throw ResponseHelper.Get400BadRequest(validationException.Message);
+            }
 
-         var response = new Response(HttpStatusCode.Ok);
-         return response;
-      }
-   }
+            if (user == null)
+            {
+                throw ResponseHelper.Get404NotFound("Username/password combination not found");
+            }
+
+            var response = new Response(HttpStatusCode.Ok);
+            return response;
+        }
+    }
 }

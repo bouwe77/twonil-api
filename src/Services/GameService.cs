@@ -1,7 +1,9 @@
 ﻿using System; //======= KLAAR =======
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TwoNil.Data;
+using TwoNil.Logic;
 using TwoNil.Logic.Exceptions;
 using TwoNil.Shared.DomainObjects;
 
@@ -9,9 +11,18 @@ namespace TwoNil.Services
 {
     public class GameService : ServiceBase
     {
-        public GameService(IUnitOfWorkFactory uowFactory)
+        private readonly GameCreationManager _gameCreationManager;
+
+        public GameService(IUnitOfWorkFactory uowFactory, GameCreationManager gameCreationManager)
             : base(uowFactory)
         {
+            _gameCreationManager = gameCreationManager;
+        }
+
+        public async Task<Game> CreateGame()
+        {
+            var game = await _gameCreationManager.CreateGame();
+            return game;
         }
 
         public IEnumerable<GameInfo> GetGames(string userId)

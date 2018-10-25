@@ -5,11 +5,17 @@ using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
 using TwoNil.API.Resources.TwoNil.API.Resources;
 using TwoNil.Logic.Exceptions;
+using TwoNil.Services;
 
 namespace TwoNil.API.Controllers
 {
     public class SeasonController : ControllerBase
     {
+        public SeasonController(ServiceFactory serviceFactory, UriHelper uriHelper)
+            : base(serviceFactory, uriHelper)
+        {
+        }
+
         public Response PostEndSeasonItem(string gameId, string seasonId)
         {
             var game = GetGameInfo(gameId);

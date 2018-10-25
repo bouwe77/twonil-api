@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using Dolores.Responses;
 using TwoNil.API.Helpers;
 using TwoNil.API.Resources;
+using TwoNil.Services;
 
 namespace TwoNil.API.Controllers
 {
     public class TeamController : ControllerBase
     {
+        public TeamController(ServiceFactory serviceFactory, UriHelper uriHelper)
+            : base(serviceFactory, uriHelper)
+        {
+        }
+
         public Response GetTeamItem(string gameId, string teamId)
         {
             var gameInfo = GetGameInfo(gameId);
@@ -46,7 +52,7 @@ namespace TwoNil.API.Controllers
             var response = GetResponse(halDocument);
             return response;
         }
-        
+
         //[HttpPost]
         // Example request:
         // HTTP POST to
@@ -97,8 +103,7 @@ namespace TwoNil.API.Controllers
         //      RequestHelper.ValidateId(chosenTeamId);
 
         //      // Get the team from the database.
-        //      var serviceFactory = new ServiceFactory();
-        //      var teamService = serviceFactory.CreateTeamService(game);
+        //      var teamService = ServiceFactory.CreateTeamService(game);
         //      var chosenTeam = teamService.GetTeam(chosenTeamId);
 
         //      // Determine team is found and belongs to current game.
@@ -108,7 +113,7 @@ namespace TwoNil.API.Controllers
         //      }
 
         //      // Everything is OK, save the team as the current team for the game.
-        //      var gameService = serviceFactory.CreateGameService();
+        //      var gameService = ServiceFactory.CreateGameService();
         //      gameService.AddChosenTeam(gameId, chosenTeam);
 
         //      // Return a response containing a location with a link to the game.
@@ -186,7 +191,7 @@ namespace TwoNil.API.Controllers
         //      }
 
         //      // Check if the players exist and belong to the user.
-        //      var playerService = new ServiceFactory().CreatePlayerService(game);
+        //      var playerService = ServiceFactory.CreatePlayerService(game);
         //      var player1 = playerService.GetPlayer(player1Id, teamId);
         //      if (player1 == null || player1.GameId != gameId)
         //      {

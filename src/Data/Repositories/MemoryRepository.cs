@@ -17,30 +17,22 @@ namespace TwoNil.Data.Repositories
             InMemoryData = new InMemoryData();
         }
 
-        public void Add(TEntity entity)
-        {
-            throw new NotSupportedException("Adding is not supported for in-memory repositories");
-        }
-
-        public void Update(TEntity entity)
-        {
-            throw new NotSupportedException("Updating is not supported for in-memory repositories");
-        }
-
-        public void Remove(TEntity entity)
-        {
-            throw new NotSupportedException("Removing is not supported for in-memory repositories");
-        }
-
-        public Task<TEntity> Find(params object[] keyParams)
-        {
-            //TODO Deze nog implemeteren?
-            throw new NotImplementedException();
-        }
-
         public IQueryable<TEntity> GetAll(params Expression<Func<TEntity, object>>[] includes)
         {
             return Entities.AsQueryable();
+        }
+
+        public Task<TEntity> Find(params object[] keyParams) => throw NotSupported();
+        public void Add(TEntity entity) => throw NotSupported();
+        public void Update(TEntity entity) => throw NotSupported();
+        public void Remove(TEntity entity) => throw NotSupported();
+        public void Add(IEnumerable<TEntity> entities) => throw NotSupported();
+        public void Update(IEnumerable<TEntity> entities) => throw NotSupported();
+        public void Remove(IEnumerable<TEntity> entities) => throw NotSupported();
+
+        private NotSupportedException NotSupported()
+        {
+            return new NotSupportedException("In-memory repositories do not support this operation");
         }
     }
 }
